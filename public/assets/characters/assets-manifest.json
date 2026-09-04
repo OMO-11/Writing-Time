@@ -1,0 +1,67 @@
+{
+  "version": 1,
+  "updatedAt": "2026-07-29",
+  "styleGuide": "/docs/character-bible.md",
+  "promptLibrary": "/assets/characters/prompts.json",
+  "fallbacks": {
+    "noval": "/assets/decor/noval-fallback.svg",
+    "eden": "/assets/decor/eden-fallback.svg",
+    "duo": "/assets/decor/duo-fallback.svg"
+  },
+  "characters": {
+    "noval": [
+      { "file": "character-sheet.webp", "status": "generated", "use": "identity-reference" },
+      { "file": "expression-sheet.webp", "status": "generated", "use": "expression-reference" },
+      { "file": "full-body.webp", "status": "prepared-from-project-reference", "use": "full-body" },
+      { "file": "half-welcome.webp", "displayFile": "half-welcome-safe.webp", "status": "generated", "use": "home-hero" },
+      { "file": "half-writing.webp", "status": "generated", "use": "article-writing" },
+      { "file": "half-empty-editor.webp", "displayFile": "half-empty-editor-v2.webp", "status": "generated-v2", "use": "empty-editor" },
+      { "file": "half-discovery.webp", "status": "generated", "use": "ideas-and-create" },
+      { "file": "bust-neutral.webp", "status": "pending", "use": "avatar-neutral" },
+      { "file": "bust-curious.webp", "status": "pending", "use": "avatar-curious" },
+      { "file": "bust-pleading.webp", "status": "pending", "use": "gentle-request" },
+      { "file": "chibi-note.webp", "status": "pending", "use": "note-feedback" },
+      { "file": "chibi-save.webp", "status": "pending", "use": "rare-save-feedback" },
+      { "file": "chibi-import.webp", "status": "pending", "use": "markdown-import-success" },
+      { "file": "chibi-empty.webp", "status": "pending", "use": "compact-empty" }
+    ],
+    "eden": [
+      { "file": "character-sheet.webp", "status": "generated", "use": "identity-reference" },
+      { "file": "expression-sheet.webp", "status": "generated", "use": "expression-reference" },
+      { "file": "full-body.webp", "status": "prepared-from-project-reference", "use": "full-body" },
+      { "file": "half-gallery.webp", "displayFile": "half-gallery-v2.webp", "status": "generated-v2", "use": "gallery-empty" },
+      { "file": "half-search.webp", "displayFile": "half-search-safe.webp", "status": "generated", "use": "search-empty" },
+      { "file": "half-archive.webp", "displayFile": "half-archive-v2.webp", "status": "generated-v2", "use": "archive" },
+      { "file": "half-housework.webp", "displayFile": "half-housework-v2.webp", "status": "generated-v2", "use": "settings-and-cleanup" },
+      { "file": "bust-neutral.webp", "status": "pending", "use": "avatar-neutral" },
+      { "file": "bust-smile.webp", "status": "pending", "use": "avatar-success" },
+      { "file": "bust-troubled.webp", "status": "pending", "use": "avatar-troubled" },
+      { "file": "chibi-frame.webp", "status": "pending", "use": "image-upload-success" },
+      { "file": "chibi-search.webp", "status": "pending", "use": "compact-search" },
+      { "file": "chibi-organize.webp", "status": "pending", "use": "organize-feedback" },
+      { "file": "chibi-empty.webp", "status": "pending", "use": "compact-empty" }
+    ],
+    "duo": [
+      { "file": "relationship-sheet.webp", "status": "generated", "use": "relationship-reference" },
+      { "file": "project-hero.webp", "displayFile": "project-hero-safe.webp", "status": "generated", "use": "project-hero" },
+      { "file": "welcome-small.webp", "status": "pending", "use": "secondary-welcome" },
+      { "file": "noval-hugging-eden.webp", "status": "pending", "use": "relationship-moment" },
+      { "file": "reading-together.webp", "status": "pending", "use": "reading" },
+      { "file": "travel-preparation.webp", "status": "pending", "use": "preparation" },
+      { "file": "backup-success.webp", "status": "pending", "use": "backup-success" },
+      { "file": "project-complete.webp", "status": "pending", "use": "project-complete" },
+      { "file": "footer.webp", "status": "pending", "use": "exhibition-footer" }
+    ]
+  },
+  "decor": [
+    "crystal-icons.svg", "flower-icons.svg", "star-icons.svg", "rune-icons.svg",
+    "noval-divider.svg", "eden-divider.svg", "balanced-divider.svg", "noval-corner.svg",
+    "eden-corner.svg", "cape-curve.svg", "witch-hat-curve.svg"
+  ],
+  "textures": [
+    { "file": "paper-noval.webp", "status": "pending-with-css-fallback" },
+    { "file": "archive-eden.webp", "status": "pending-with-css-fallback" },
+    { "file": "mist-wash.webp", "status": "pending-with-css-fallback" },
+    { "file": "watercolor-noise.webp", "status": "pending-with-css-fallback" }
+  ]
+}

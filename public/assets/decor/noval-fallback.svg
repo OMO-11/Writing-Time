@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 760" role="img" aria-labelledby="title">
+  <title id="title">诺瓦尔晨雾主题装饰占位图</title>
+  <defs>
+    <linearGradient id="wash" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#f8f3e8"/><stop offset="1" stop-color="#dce6ed"/></linearGradient>
+    <filter id="soft"><feGaussianBlur stdDeviation="9"/></filter>
+  </defs>
+  <path fill="url(#wash)" d="M98 699c-39-92-35-212 10-307 54-113 153-232 288-239 81-4 151 45 170 116 22 83-28 175-64 246-38 75-50 131-40 184H98Z" opacity=".9"/>
+  <circle cx="351" cy="250" r="102" fill="#f9f5ec" stroke="#8ea5ba" stroke-width="4"/>
+  <path fill="#eef1f2" stroke="#71819a" stroke-width="5" stroke-linecap="round" d="M261 244c5-104 164-140 207-33-37-25-63-20-93-10-42 14-72 1-114 43Z"/>
+  <path fill="#aebdd0" stroke="#71819a" stroke-width="5" d="M214 610c17-143 49-226 137-226 97 0 137 85 161 226l-58 76H270l-56-76Z"/>
+  <path fill="#fcf9f3" stroke="#71819a" stroke-width="5" d="M292 395c25 27 88 32 123 0l23 226H270l22-226Z"/>
+  <path fill="none" stroke="#94bfd5" stroke-width="10" stroke-linecap="round" d="m316 455 36 28 36-28"/>
+  <path fill="#94bfd5" stroke="#71819a" stroke-width="4" d="m351 472 18 31-18 31-18-31 18-31Z"/>
+  <g fill="#f8f3e8" stroke="#8da6bc" stroke-width="3" transform="translate(242 174)"><circle r="15"/><ellipse rx="9" ry="24" transform="rotate(0) translate(0 -27)"/><ellipse rx="9" ry="24" transform="rotate(72) translate(0 -27)"/><ellipse rx="9" ry="24" transform="rotate(144) translate(0 -27)"/><ellipse rx="9" ry="24" transform="rotate(216) translate(0 -27)"/><ellipse rx="9" ry="24" transform="rotate(288) translate(0 -27)"/></g>
+  <circle cx="187" cy="617" r="42" fill="#94bfd5" opacity=".18" filter="url(#soft)"/><path fill="none" stroke="#c4af7f" stroke-width="3" d="M119 692c95-20 279-18 405 0" opacity=".65"/>
+</svg>

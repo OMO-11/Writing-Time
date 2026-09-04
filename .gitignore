@@ -1,0 +1,12 @@
+node_modules/
+node_modules.*/
+.next/
+out/
+.node-portable/
+.node-portable.zip
+.npm-cache/
+package-lock.concurrent.json
+.DS_Store
+*.log
+.env*
+!.env.example
