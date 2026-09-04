@@ -1,0 +1,33 @@
+{
+  "png_count": 50,
+  "size": [
+    1086,
+    1448
+  ],
+  "mode": "RGBA",
+  "bbox_left_range": [
+    244,
+    244
+  ],
+  "bbox_top_range": [
+    98,
+    98
+  ],
+  "bbox_right_range": [
+    865,
+    868
+  ],
+  "bbox_bottom_range": [
+    1327,
+    1327
+  ],
+  "max_channel_difference_outside_allowed_zones": 0,
+  "seam_rms_frame50_to_01": 1.6538,
+  "motion_rms_frame49_to_50": 1.4211,
+  "gif_frames": 50,
+  "gif_loop": 0,
+  "gif_duration_values": [
+    40
+  ],
+  "gif_all_corners_transparent": true
+}

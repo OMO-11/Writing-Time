@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 760" role="img" aria-labelledby="title">
+  <title id="title">伊登星夜主题装饰占位图</title>
+  <defs><linearGradient id="wash" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#eee9e2"/><stop offset="1" stop-color="#ccd0dc"/></linearGradient></defs>
+  <path fill="url(#wash)" d="M92 698c-22-142 23-250 105-354 74-93 212-181 314-102 105 82 48 213 0 300-32 57-42 110-27 156H92Z" opacity=".92"/>
+  <path fill="#59647f" stroke="#514d4b" stroke-width="6" stroke-linejoin="round" d="m154 241 118-105 51-95 45 96c94 10 154 50 178 103-123 49-283 50-392 1Z"/>
+  <path fill="none" stroke="#c4af7f" stroke-width="7" stroke-linecap="round" d="M347 91c-17 27-5 55 20 68-40 3-63-31-49-62 6-13 16-20 29-6Z"/>
+  <circle cx="334" cy="291" r="92" fill="#f5f1e9" stroke="#77708d" stroke-width="5"/>
+  <path fill="#b9bec8" stroke="#77708d" stroke-width="5" d="M251 293c0-81 57-117 105-109 54 10 83 66 68 125-25-45-43-55-75-65-33 23-61 35-98 49Z"/>
+  <path fill="#59647f" stroke="#514d4b" stroke-width="6" d="M183 643c34-168 72-251 153-251 90 0 133 86 166 251l-67 66H250l-67-66Z"/>
+  <path fill="#f5f1e9" stroke="#77708d" stroke-width="5" d="M284 404c25 19 76 20 103 0l35 210H247l37-210Z"/>
+  <path fill="#aaa0bd" stroke="#77708d" stroke-width="4" d="m334 437 34 24-34 26-34-26 34-24Z"/>
+  <g fill="#c4af7f"><path d="m478 390 6 15 15 6-15 6-6 15-6-15-15-6 15-6Z"/><path d="m139 515 4 10 10 4-10 4-4 10-4-10-10-4 10-4Z"/></g>
+  <path fill="none" stroke="#77708d" stroke-width="3" d="M122 697c109-23 305-18 409 0" opacity=".6"/>
+</svg>
