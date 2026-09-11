@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ArrowLeft, ChevronLeft, ChevronRight, ImagePlus, Trash2, X } from "lucide-react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 import { db, importImageFile } from "@/lib/db";
 import type { ImageRecord } from "@/types/workshop";
 
@@ -39,7 +39,7 @@ export function ArchiveGallery() {
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
   useEffect(() => {
-    if (initialized || !allImages) return;
+    if (initialized) return;
     void db.settings.get(GALLERY_SETTING_KEY).then(async (record) => {
       if (Array.isArray(record?.value)) {
         const existing = new Set(allImages.map((image) => image.id));
@@ -110,6 +110,9 @@ export function ArchiveGallery() {
       await persistIds(nextIds);
       setSelectedIndex(Math.max(0, nextIds.length - imported.length));
       announce(`已加入 ${imported.length} 份图片档案。`);
+    } catch (error) {
+      console.error(error);
+      announce("导入失败，请检查图片后重试。");
     } finally {
       setImporting(false);
     }
@@ -151,31 +154,41 @@ export function ArchiveGallery() {
         <div className="archive-array-panel">
           <div className="archive-array-heading">
             <div><span>循环档案阵列</span><strong>{galleryImages.length.toString().padStart(2, "0")} ARCHIVES</strong></div>
-            <p>滚轮式循环索引 · 点击任意档案切换预览</p>
+            <p>循环索引 · 点击任意档案切换预览 · 方向键连续浏览</p>
           </div>
 
           {galleryImages.length ? (
             <div className="archive-array-stage">
               <button className="archive-cycle-button archive-cycle-prev" type="button" onClick={() => move(-1)} aria-label="上一份档案"><ChevronLeft /></button>
               <div className="archive-card-track" role="listbox" aria-label="图片档案">
-                {visibleCells.map(({ image, index, offset }) => (
-                  <button
-                    key={`${image.id}-${offset}`}
-                    className="archive-card"
-                    type="button"
-                    data-active={offset === 0}
-                    style={{ "--archive-offset": offset } as React.CSSProperties}
-                    onClick={() => setSelectedIndex(index)}
-                    role="option"
-                    aria-selected={offset === 0}
-                  >
-                    <div className="archive-card-frame"><GalleryImage image={image} /></div>
-                    <div className="archive-card-meta">
-                      <span>{String(index + 1).padStart(3, "0")}</span>
-                      <strong>{image.title}</strong>
-                    </div>
-                  </button>
-                ))}
+                {visibleCells.map(({ image, index, offset }) => {
+                  const distance = Math.abs(offset);
+                  const style = {
+                    "--archive-offset": offset,
+                    "--archive-distance": distance,
+                    "--archive-scale": Math.max(.72, 1 - distance * .06),
+                    "--archive-opacity": Math.max(.38, 1 - distance * .13),
+                    "--archive-z": 30 - distance,
+                  } as CSSProperties;
+                  return (
+                    <button
+                      key={`${image.id}-${offset}`}
+                      className="archive-card"
+                      type="button"
+                      data-active={offset === 0}
+                      style={style}
+                      onClick={() => setSelectedIndex(index)}
+                      role="option"
+                      aria-selected={offset === 0}
+                    >
+                      <div className="archive-card-frame"><GalleryImage image={image} /></div>
+                      <div className="archive-card-meta">
+                        <span>{String(index + 1).padStart(3, "0")}</span>
+                        <strong>{image.title}</strong>
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
               <button className="archive-cycle-button archive-cycle-next" type="button" onClick={() => move(1)} aria-label="下一份档案"><ChevronRight /></button>
             </div>
