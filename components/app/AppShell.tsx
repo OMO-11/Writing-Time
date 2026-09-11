@@ -27,7 +27,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       }
       if (commandKey && event.shiftKey && event.key.toLowerCase() === "h") {
         event.preventDefault();
-        void flushSave().then(() => router.push("/"));
+        void flushSave().then(() => router.push("/workshop"));
       }
     };
     window.addEventListener("keydown", shortcuts);
