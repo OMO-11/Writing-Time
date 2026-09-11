@@ -5,8 +5,9 @@ import { AppShell } from "@/components/app/AppShell";
 
 export function RootShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const isPortalSurface = pathname === "/" || pathname.startsWith("/archive-gallery");
 
-  if (pathname === "/") {
+  if (isPortalSurface) {
     return <>{children}</>;
   }
 
