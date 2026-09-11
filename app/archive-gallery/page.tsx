@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { ArchiveGallery } from "@/components/archive-gallery/ArchiveGallery";
+import "./archive-gallery.css";
 
 export const metadata: Metadata = {
   title: "Archive Gallery",
