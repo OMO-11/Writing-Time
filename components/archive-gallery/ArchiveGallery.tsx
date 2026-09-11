@@ -70,15 +70,17 @@ export function ArchiveGallery() {
 
   useEffect(() => {
     if (!initialized) return;
-    const records = toRhineRecords(galleryImages);
-    localStorage.setItem(RHINE_RECORDS_KEY, JSON.stringify(records));
+    localStorage.setItem(RHINE_RECORDS_KEY, JSON.stringify(toRhineRecords(galleryImages)));
     const currentPrefs = (() => {
       try { return JSON.parse(localStorage.getItem("rhine-settings") ?? "{}"); } catch { return {}; }
     })();
     localStorage.setItem("rhine-settings", JSON.stringify({ ...currentPrefs, sound: false, music: false, reduced: true }));
-    if (!galleryImages.some((image) => image.id === selectedId)) setSelectedId(galleryImages[0]?.id ?? null);
     setRuntimeRevision((value) => value + 1);
-  }, [galleryImages, initialized, selectedId]);
+  }, [galleryImages, initialized]);
+
+  useEffect(() => {
+    if (!galleryImages.some((image) => image.id === selectedId)) setSelectedId(galleryImages[0]?.id ?? null);
+  }, [galleryImages, selectedId]);
 
   useEffect(() => {
     const receive = (event: MessageEvent) => {
@@ -140,12 +142,7 @@ export function ArchiveGallery() {
       {initialized && galleryImages.length ? (
         <section className="rhine-gallery-layout">
           <div className="rhine-runtime-frame">
-            <iframe
-              key={runtimeRevision}
-              src="/rhinelab/index.html?embed=1"
-              title="RhineLabUI 无限档案阵列"
-              allow="fullscreen"
-            />
+            <iframe key={runtimeRevision} src="/rhinelab/index.html?embed=1" title="RhineLabUI 无限档案阵列" allow="fullscreen" />
             <div className="rhine-runtime-credit">Archive engine: RhineLabUI · LBEILC · MIT License</div>
           </div>
 
