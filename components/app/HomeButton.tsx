@@ -13,11 +13,11 @@ export function HomeButton() {
   const goHome = async (event: MouseEvent<HTMLAnchorElement>) => {
     event.preventDefault();
     await flushSave();
-    router.push("/");
+    router.push("/workshop");
   };
 
   return (
-    <Link className="global-home-button" href="/" onClick={(event) => void goHome(event)} aria-label="保存并返回 Fantasy Workshop 首页">
+    <Link className="global-home-button" href="/workshop" onClick={(event) => void goHome(event)} aria-label="保存并返回 Fantasy Workshop 首页">
       <span className="workshop-sigil"><Castle aria-hidden="true" size={19} strokeWidth={1.55} /></span>
       <span><strong>Fantasy Workshop</strong><small>幻想作品工坊</small></span>
     </Link>
