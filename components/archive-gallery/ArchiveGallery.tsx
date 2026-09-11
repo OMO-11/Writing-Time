@@ -84,8 +84,14 @@ export function ArchiveGallery() {
 
   useEffect(() => {
     const receive = (event: MessageEvent) => {
-      if (event.origin !== location.origin || event.data?.type !== "writing-time-rhine-selection") return;
-      if (typeof event.data.imageId === "string" && imageMap.has(event.data.imageId)) setSelectedId(event.data.imageId);
+      if (event.origin !== location.origin) return;
+      const imageId = typeof event.data?.imageId === "string" ? event.data.imageId : null;
+      if (!imageId || !imageMap.has(imageId)) return;
+      if (event.data?.type === "writing-time-rhine-selection") setSelectedId(imageId);
+      if (event.data?.type === "writing-time-rhine-open") {
+        setSelectedId(imageId);
+        setLightboxOpen(true);
+      }
     };
     window.addEventListener("message", receive);
     return () => window.removeEventListener("message", receive);
