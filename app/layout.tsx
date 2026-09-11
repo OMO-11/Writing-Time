@@ -1,11 +1,12 @@
 import type { Metadata, Viewport } from "next";
-import { AppShell } from "@/components/app/AppShell";
+import { RootShell } from "@/components/app/RootShell";
 import "./globals.css";
 import "./workflow.css";
+import "./portal.css";
 
 export const metadata: Metadata = {
-  title: { default: "Fantasy Workshop", template: "%s · Fantasy Workshop" },
-  description: "一个 local-first 的 Markdown 与插画个人作品工坊。",
+  title: { default: "Writing Time", template: "%s · Writing Time" },
+  description: "个人创作与内容管理工作空间。",
 };
 
 export const viewport: Viewport = {
@@ -17,7 +18,7 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="zh-CN">
-      <body><AppShell>{children}</AppShell></body>
+      <body><RootShell>{children}</RootShell></body>
     </html>
   );
 }
