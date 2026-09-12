@@ -9,6 +9,7 @@ const NPM_CACHE_ROOT = join(ROOT, ".npm-cache-rhinelab");
 const INSTALL_MARKER = join(VENDOR_ROOT, "node_modules", ".writing-time-install-ok");
 const UPSTREAM = "https://github.com/LBEILC/RhineLabUI.git";
 const UPSTREAM_COMMIT = "8799b03179a9a0ebd2611843e644a5a0530b24bf";
+const INSTALL_REVISION = `${UPSTREAM_COMMIT}:npm-policy-v2`;
 
 function childNpmEnv() {
   const env = { ...process.env };
@@ -55,6 +56,16 @@ function replaceOrThrow(source, needle, replacement, label) {
   return source.replace(needle, replacement);
 }
 
+function insertAfterRegexOrThrow(source, pattern, insertion, label) {
+  let matched = false;
+  const next = source.replace(pattern, (match) => {
+    matched = true;
+    return `${match}${insertion}`;
+  });
+  if (!matched) throw new Error(`RhineLabUI upstream changed: patch point not found (${label}).`);
+  return next;
+}
+
 function ensureCheckout() {
   mkdirSync(dirname(VENDOR_ROOT), { recursive: true });
   if (!existsSync(join(VENDOR_ROOT, ".git"))) {
@@ -66,10 +77,20 @@ function ensureCheckout() {
   run("git", ["clean", "-fd"], VENDOR_ROOT);
 }
 
+function configureVendorNpmPolicy() {
+  const target = join(VENDOR_ROOT, "package.json");
+  const pkg = JSON.parse(readFileSync(target, "utf8"));
+  pkg.allowScripts = {
+    ...(pkg.allowScripts && typeof pkg.allowScripts === "object" ? pkg.allowScripts : {}),
+    esbuild: true,
+  };
+  writeFileSync(target, `${JSON.stringify(pkg, null, 2)}\n`);
+}
+
 function dependenciesAreComplete() {
   if (!existsSync(INSTALL_MARKER)) return false;
   try {
-    return readFileSync(INSTALL_MARKER, "utf8").trim() === UPSTREAM_COMMIT;
+    return readFileSync(INSTALL_MARKER, "utf8").trim() === INSTALL_REVISION;
   } catch {
     return false;
   }
@@ -80,13 +101,13 @@ function ensureDependencies() {
 
   const nodeModules = join(VENDOR_ROOT, "node_modules");
   if (existsSync(nodeModules)) {
-    console.log("Incomplete RhineLabUI dependency install detected; cleaning node_modules before retry...");
+    console.log("Incomplete or outdated RhineLabUI dependency install detected; cleaning node_modules before retry...");
     removeTree(nodeModules);
   }
 
   console.log(`Installing RhineLabUI dependencies with project-local npm cache: ${NPM_CACHE_ROOT}`);
   run("npm", ["ci", "--no-audit", "--no-fund"], VENDOR_ROOT, { npm: true });
-  writeFileSync(INSTALL_MARKER, `${UPSTREAM_COMMIT}\n`);
+  writeFileSync(INSTALL_MARKER, `${INSTALL_REVISION}\n`);
 }
 
 function patchDataAdapter() {
@@ -97,22 +118,24 @@ function patchDataAdapter() {
 function patchBridge() {
   const target = join(VENDOR_ROOT, "src", "main.ts");
   let source = readFileSync(target, "utf8");
-  source = replaceOrThrow(
+  const eol = source.includes("\r\n") ? "\r\n" : "\n";
+
+  source = insertAfterRegexOrThrow(
     source,
-    'const reviewParams = new URLSearchParams(location.search);',
-    'const reviewParams = new URLSearchParams(location.search);\ndocument.documentElement.dataset.writingTimeEmbed = String(reviewParams.get("embed") === "1");',
+    /const reviewParams = new URLSearchParams\(location\.search\);/,
+    `${eol}document.documentElement.dataset.writingTimeEmbed = String(reviewParams.get("embed") === "1");`,
     "embed marker",
   );
-  source = replaceOrThrow(
+  source = insertAfterRegexOrThrow(
     source,
-    'function updateSelection(navigation?: ArchiveNavigation) {\n  const r = records[selected];',
-    'function updateSelection(navigation?: ArchiveNavigation) {\n  const r = records[selected];\n  if (reviewParams.get("embed") === "1") {\n    window.parent?.postMessage({ type: "writing-time-rhine-selection", imageId: r.source, index: selected, title: r.title }, location.origin);\n  }',
+    /function updateSelection\(navigation\?: ArchiveNavigation\) \{\r?\n  const r = records\[selected\];/,
+    `${eol}  if (reviewParams.get("embed") === "1") {${eol}    window.parent?.postMessage({ type: "writing-time-rhine-selection", imageId: r.source, index: selected, title: r.title }, location.origin);${eol}  }`,
     "selection bridge",
   );
-  source = replaceOrThrow(
+  source = insertAfterRegexOrThrow(
     source,
-    'function openFile() {\n  if (!ready) return;',
-    'function openFile() {\n  if (!ready) return;\n  if (reviewParams.get("embed") === "1") {\n    const record = records[selected];\n    window.parent?.postMessage({ type: "writing-time-rhine-open", imageId: record.source, index: selected, title: record.title }, location.origin);\n    return;\n  }',
+    /function openFile\(\) \{\r?\n  if \(!ready\) return;/,
+    `${eol}  if (reviewParams.get("embed") === "1") {${eol}    const record = records[selected];${eol}    window.parent?.postMessage({ type: "writing-time-rhine-open", imageId: record.source, index: selected, title: record.title }, location.origin);${eol}    return;${eol}  }`,
     "open bridge",
   );
   writeFileSync(target, source);
@@ -121,15 +144,22 @@ function patchBridge() {
   writeFileSync(cssTarget, readFileSync(cssTarget, "utf8") + `\nhtml[data-writing-time-embed="true"] .system-nav,\nhtml[data-writing-time-embed="true"] .system-footer,\nhtml[data-writing-time-embed="true"] .powered,\nhtml[data-writing-time-embed="true"] #skip,\nhtml[data-writing-time-embed="true"] .mobile-entry { display:none !important; }\nhtml[data-writing-time-embed="true"] #viewport { background:#ebe9e5; }\n`);
 }
 
+function prepareVendorRuntimeAssets() {
+  const fontPrep = join(VENDOR_ROOT, "scripts", "prepare-webfonts.mjs");
+  if (existsSync(fontPrep)) run("node", ["scripts/prepare-webfonts.mjs"], VENDOR_ROOT);
+}
+
 function buildRuntime() {
   removeTree(OUTPUT_ROOT);
   mkdirSync(OUTPUT_ROOT, { recursive: true });
+  prepareVendorRuntimeAssets();
   run("npm", ["exec", "vite", "build", "--", "--base=/rhinelab/", "--outDir", OUTPUT_ROOT], VENDOR_ROOT, { npm: true });
   copyFileSync(join(VENDOR_ROOT, "LICENSE"), join(OUTPUT_ROOT, "RHINELABUI-LICENSE.txt"));
   writeFileSync(join(OUTPUT_ROOT, "UPSTREAM.txt"), `RhineLabUI\n${UPSTREAM}\ncommit ${UPSTREAM_COMMIT}\n`);
 }
 
 ensureCheckout();
+configureVendorNpmPolicy();
 ensureDependencies();
 patchDataAdapter();
 patchBridge();
