@@ -8,8 +8,24 @@ const OUTPUT_ROOT = join(ROOT, "public", "rhinelab");
 const UPSTREAM = "https://github.com/LBEILC/RhineLabUI.git";
 const UPSTREAM_COMMIT = "8799b03179a9a0ebd2611843e644a5a0530b24bf";
 
-function run(command, args, cwd = ROOT) {
-  execFileSync(command, args, { cwd, stdio: "inherit", shell: process.platform === "win32" });
+function cleanNpmEnv() {
+  const env = { ...process.env };
+  for (const key of Object.keys(env)) {
+    const normalized = key.toLowerCase();
+    if (normalized === "npm_config_allow_scripts" || normalized === "npm_config_ignore_scripts") {
+      delete env[key];
+    }
+  }
+  return env;
+}
+
+function run(command, args, cwd = ROOT, options = {}) {
+  execFileSync(command, args, {
+    cwd,
+    stdio: "inherit",
+    shell: process.platform === "win32",
+    env: options.cleanNpmEnv ? cleanNpmEnv() : process.env,
+  });
 }
 
 function replaceOrThrow(source, needle, replacement, label) {
@@ -29,7 +45,9 @@ function ensureCheckout() {
 }
 
 function ensureDependencies() {
-  if (!existsSync(join(VENDOR_ROOT, "node_modules"))) run("npm", ["ci", "--no-audit", "--no-fund"], VENDOR_ROOT);
+  if (!existsSync(join(VENDOR_ROOT, "node_modules"))) {
+    run("npm", ["ci", "--no-audit", "--no-fund"], VENDOR_ROOT, { cleanNpmEnv: true });
+  }
 }
 
 function patchDataAdapter() {
@@ -67,7 +85,7 @@ function patchBridge() {
 function buildRuntime() {
   rmSync(OUTPUT_ROOT, { recursive: true, force: true });
   mkdirSync(OUTPUT_ROOT, { recursive: true });
-  run("npm", ["exec", "vite", "build", "--", "--base=/rhinelab/", "--outDir", OUTPUT_ROOT], VENDOR_ROOT);
+  run("npm", ["exec", "vite", "build", "--", "--base=/rhinelab/", "--outDir", OUTPUT_ROOT], VENDOR_ROOT, { cleanNpmEnv: true });
   copyFileSync(join(VENDOR_ROOT, "LICENSE"), join(OUTPUT_ROOT, "RHINELABUI-LICENSE.txt"));
   writeFileSync(join(OUTPUT_ROOT, "UPSTREAM.txt"), `RhineLabUI\n${UPSTREAM}\ncommit ${UPSTREAM_COMMIT}\n`);
 }
