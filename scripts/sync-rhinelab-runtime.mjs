@@ -5,17 +5,29 @@ import { dirname, join, resolve } from "node:path";
 const ROOT = resolve(process.cwd());
 const VENDOR_ROOT = join(ROOT, ".vendor", "rhinelab-ui");
 const OUTPUT_ROOT = join(ROOT, "public", "rhinelab");
+const NPM_CACHE_ROOT = join(ROOT, ".npm-cache-rhinelab");
+const INSTALL_MARKER = join(VENDOR_ROOT, "node_modules", ".writing-time-install-ok");
 const UPSTREAM = "https://github.com/LBEILC/RhineLabUI.git";
 const UPSTREAM_COMMIT = "8799b03179a9a0ebd2611843e644a5a0530b24bf";
 
-function cleanNpmEnv() {
+function childNpmEnv() {
   const env = { ...process.env };
   for (const key of Object.keys(env)) {
     const normalized = key.toLowerCase();
-    if (normalized === "npm_config_allow_scripts" || normalized === "npm_config_ignore_scripts") {
+    if (
+      normalized === "npm_config_allow_scripts" ||
+      normalized === "npm_config_ignore_scripts" ||
+      normalized === "npm_config_cache" ||
+      normalized === "npm_config_logs_dir"
+    ) {
       delete env[key];
     }
   }
+
+  mkdirSync(NPM_CACHE_ROOT, { recursive: true });
+  env.npm_config_cache = NPM_CACHE_ROOT;
+  env.npm_config_logs_dir = join(NPM_CACHE_ROOT, "_logs");
+  env.npm_config_update_notifier = "false";
   return env;
 }
 
@@ -24,7 +36,17 @@ function run(command, args, cwd = ROOT, options = {}) {
     cwd,
     stdio: "inherit",
     shell: process.platform === "win32",
-    env: options.cleanNpmEnv ? cleanNpmEnv() : process.env,
+    env: options.npm ? childNpmEnv() : process.env,
+  });
+}
+
+function removeTree(path) {
+  if (!existsSync(path)) return;
+  rmSync(path, {
+    recursive: true,
+    force: true,
+    maxRetries: process.platform === "win32" ? 8 : 2,
+    retryDelay: 250,
   });
 }
 
@@ -36,7 +58,7 @@ function replaceOrThrow(source, needle, replacement, label) {
 function ensureCheckout() {
   mkdirSync(dirname(VENDOR_ROOT), { recursive: true });
   if (!existsSync(join(VENDOR_ROOT, ".git"))) {
-    rmSync(VENDOR_ROOT, { recursive: true, force: true });
+    removeTree(VENDOR_ROOT);
     run("git", ["clone", "--filter=blob:none", UPSTREAM, VENDOR_ROOT]);
   }
   run("git", ["fetch", "origin", UPSTREAM_COMMIT], VENDOR_ROOT);
@@ -44,10 +66,27 @@ function ensureCheckout() {
   run("git", ["clean", "-fd"], VENDOR_ROOT);
 }
 
-function ensureDependencies() {
-  if (!existsSync(join(VENDOR_ROOT, "node_modules"))) {
-    run("npm", ["ci", "--no-audit", "--no-fund"], VENDOR_ROOT, { cleanNpmEnv: true });
+function dependenciesAreComplete() {
+  if (!existsSync(INSTALL_MARKER)) return false;
+  try {
+    return readFileSync(INSTALL_MARKER, "utf8").trim() === UPSTREAM_COMMIT;
+  } catch {
+    return false;
   }
+}
+
+function ensureDependencies() {
+  if (dependenciesAreComplete()) return;
+
+  const nodeModules = join(VENDOR_ROOT, "node_modules");
+  if (existsSync(nodeModules)) {
+    console.log("Incomplete RhineLabUI dependency install detected; cleaning node_modules before retry...");
+    removeTree(nodeModules);
+  }
+
+  console.log(`Installing RhineLabUI dependencies with project-local npm cache: ${NPM_CACHE_ROOT}`);
+  run("npm", ["ci", "--no-audit", "--no-fund"], VENDOR_ROOT, { npm: true });
+  writeFileSync(INSTALL_MARKER, `${UPSTREAM_COMMIT}\n`);
 }
 
 function patchDataAdapter() {
@@ -83,9 +122,9 @@ function patchBridge() {
 }
 
 function buildRuntime() {
-  rmSync(OUTPUT_ROOT, { recursive: true, force: true });
+  removeTree(OUTPUT_ROOT);
   mkdirSync(OUTPUT_ROOT, { recursive: true });
-  run("npm", ["exec", "vite", "build", "--", "--base=/rhinelab/", "--outDir", OUTPUT_ROOT], VENDOR_ROOT, { cleanNpmEnv: true });
+  run("npm", ["exec", "vite", "build", "--", "--base=/rhinelab/", "--outDir", OUTPUT_ROOT], VENDOR_ROOT, { npm: true });
   copyFileSync(join(VENDOR_ROOT, "LICENSE"), join(OUTPUT_ROOT, "RHINELABUI-LICENSE.txt"));
   writeFileSync(join(OUTPUT_ROOT, "UPSTREAM.txt"), `RhineLabUI\n${UPSTREAM}\ncommit ${UPSTREAM_COMMIT}\n`);
 }
