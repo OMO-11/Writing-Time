@@ -1,0 +1,33 @@
+const {chromium}=require('C:/Users/fufu/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules/playwright');
+const assert=require('node:assert/strict');
+const sharp=require('sharp');
+(async()=>{
+ const browser=await chromium.launch({executablePath:'C:/Program Files/Google/Chrome/Application/chrome.exe',headless:true,args:['--enable-webgl','--enable-unsafe-swiftshader']});
+ const page=await browser.newPage({viewport:{width:1440,height:900},reducedMotion:'reduce'});
+ const errors=[];page.on('pageerror',e=>errors.push(e.message));
+ await page.goto('http://localhost:3100',{waitUntil:'networkidle'});
+ await page.locator('canvas[data-ready="true"]').waitFor();
+ await page.getByRole('button',{name:/光影随时间流转/}).click();
+ const shot=async(hour,exposure=0,softness=.4)=>{
+  await page.locator('#dream-hour').fill(String(hour));
+  await page.locator('#dream-exposure').fill(String(exposure));
+  await page.locator('#dream-softness').fill(String(softness));
+  await page.waitForTimeout(100);
+  const style=await page.addStyleTag({content:'.dream-header,.dream-welcome,.dream-footer,.dream-scrim,.dream-dust{visibility:hidden!important}'});
+  const raw=await sharp(await page.locator('canvas').screenshot()).removeAlpha().raw().toBuffer();
+  await style.evaluate(el=>el.remove());return raw;
+ };
+ const mean=a=>a.reduce((s,n)=>s+n,0)/a.length;
+ const diff=(a,b)=>a.reduce((s,n,i)=>s+Math.abs(n-b[i]),0)/a.length;
+ const day=await shot(12),low=await shot(12,-2),night=await shot(0),early=await shot(21),late=await shot(3),hard=await shot(17,0,0),soft=await shot(17,0,1);
+ assert(mean(low)<mean(day)*.65,'Exposure -2 EV must significantly dim every light contribution');
+ assert(diff(early,late)>1,'Moon illumination direction must change across the night');
+ assert(diff(hard,soft)>1,'Softness must change the actual image');
+ assert(mean(night)<mean(day)*.85,'Night must remain darker than day');
+ console.log(JSON.stringify({dayMean:mean(day),lowExposureMean:mean(low),nightMean:mean(night),moonDirectionDifference:diff(early,late),softnessDifference:diff(hard,soft),errors},null,2));
+ await shot(0);await page.getByRole('button',{name:/正在预览光影/}).click();await page.screenshot({path:'tmp/home-preview/painted-night-final.png'});
+ await page.getByRole('button',{name:/正在预览光影/}).click();await shot(12);await page.getByRole('button',{name:/正在预览光影/}).click();await page.screenshot({path:'tmp/home-preview/painted-day-final.png'});
+ await page.setViewportSize({width:375,height:812});await page.evaluate(()=>scrollTo(0,0));
+ await page.getByRole('button',{name:'开启我的空间'}).click();await page.keyboard.press('Escape');assert(await page.getByRole('button',{name:'开启我的空间'}).evaluate(el=>el===document.activeElement));
+ assert.deepEqual(errors,[]);await browser.close();
+})().catch(e=>{console.error(e);process.exit(1)});
