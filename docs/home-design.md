@@ -96,3 +96,4 @@ Edit target: supplied illustration. Make a precisely registered closed-eye anima
 
 
 背景版本回退：根据用户反馈，静态底图与 WebGL 色图均已切回上一版 enhance-noval-observatory.webp（3344×1882）。final 超分素材保留备份，当前页面不再引用；参数面板、光照与动画保持不变。
+`n面板精简：删除泛光、高亮阈值、扩散半径的自定义状态与控件，渲染保持默认 0.16 / 0.9 / 1。配方仅影响剩余可见参数。面板改为更紧凑的纸张手记，强化标题、分组、数值与分段按钮；光束浮尘独占整行。

@@ -28,9 +28,6 @@ export function DreamHome() {
   const [softness, setSoftness] = useState(.4);
   const [sheen, setSheen] = useState(.5);
   const [exposure, setExposure] = useState(0);
-  const [bloom, setBloom] = useState(.16);
-  const [threshold, setThreshold] = useState(.9);
-  const [radius, setRadius] = useState(1);
   const [styleStrength, setStyleStrength] = useState(.85);
   const [view, setView] = useState(0);
   const [atmosphereStrength, setAtmosphereStrength] = useState(.75);
@@ -76,7 +73,7 @@ export function DreamHome() {
       }}>
       <div className="dream-scene" aria-hidden="true">
         <Image src="/assets/home/enhance-noval-observatory.webp" alt="" fill priority sizes="(max-width: 760px) 180vh, 100vw" className="dream-art" />
-        <RelightScene bloom={bloom} threshold={threshold} radius={radius} styleStrength={styleStrength} hour={hour} softness={softness} sheen={sheen} exposure={exposure} view={view} moving={moving} atmosphere={atmosphereStrength} />
+        <RelightScene bloom={.16} threshold={.9} radius={1} styleStrength={styleStrength} hour={hour} softness={softness} sheen={sheen} exposure={exposure} view={view} moving={moving} atmosphere={atmosphereStrength} />
       </div>
 
       <header className="dream-header">
@@ -109,18 +106,16 @@ export function DreamHome() {
             <p className="light-notebook-intro">借一点光，为此刻添上自己的颜色。</p>
             <LightingSlider id="hour" label="光影时刻" value={hour} min={0} max={23.99} step={.05} display={`${String(Math.floor(hour)).padStart(2,"0")}:${String(Math.floor(hour%1*60)).padStart(2,"0")}`} onChange={setPreview} />
             <div className="light-time-actions"><span>静夜 · 晨曦 · 白昼 · 薄暮</span><button onClick={() => setPreview(null)} disabled={preview === null}>跟随当前时间</button></div>
+            <div className="light-section-caption"><span>光与笔触</span><span>LIGHT & PIGMENT</span></div>
             <div className="light-parameter-grid">
-              <LightingSlider id="exposure" label="曝光" english="Exposure" value={exposure} min={-2} max={1} step={.01} display={`${exposure.toFixed(2)} EV`} onChange={setExposure} />
-              <LightingSlider id="bloom" label="泛光" english="Bloom" value={bloom} min={0} max={.6} step={.01} display={bloom.toFixed(2)} onChange={setBloom} />
-              <LightingSlider id="threshold" label="高亮阈值" value={threshold} min={.3} max={2} step={.01} display={threshold.toFixed(2)} onChange={setThreshold} />
-              <LightingSlider id="radius" label="扩散半径" value={radius} min={.25} max={2} step={.01} display={`${radius.toFixed(2)} ×`} onChange={setRadius} />
+              <LightingSlider id="exposure" label="曝光补偿" value={exposure} min={-2} max={1} step={.01} display={`${exposure.toFixed(2)} EV`} onChange={setExposure} />
               <LightingSlider id="style" label="手绘光影" value={styleStrength} min={0} max={1} step={.01} display={`${Math.round(styleStrength*100)}%`} onChange={setStyleStrength} />
               <LightingSlider id="softness" label="边缘柔和" value={softness} min={0} max={1} step={.01} display={`${Math.round(softness*100)}%`} onChange={setSoftness} />
               <LightingSlider id="sheen" label="发丝柔光" value={sheen} min={0} max={1} step={.01} display={`${Math.round(sheen*100)}%`} onChange={setSheen} />
               <LightingSlider id="atmosphere" label="光束与浮尘" value={atmosphereStrength} min={0} max={1.5} step={.05} display={`${Math.round(atmosphereStrength*100)}%`} onChange={setAtmosphereStrength} />
             </div>
             <p className="light-exposure-note">夜深时自动补光 +1 EV，叠加于曝光设置。</p>
-            <div className="light-presets"><button onClick={() => {setExposure(-.22);setBloom(.05);setThreshold(1.05);setRadius(.71);setStyleStrength(1);setSoftness(1);setSheen(.46);}}>参考图配方</button><button onClick={() => {setExposure(0);setBloom(.16);setThreshold(.9);setRadius(1);setStyleStrength(.85);setSoftness(.4);setSheen(.5);setAtmosphereStrength(.75);}}>恢复默认</button></div>
+            <div className="light-presets"><button onClick={() => {setExposure(-.22);setStyleStrength(1);setSoftness(1);setSheen(.46);}}>柔绘配方</button><button onClick={() => {setExposure(0);setStyleStrength(.85);setSoftness(.4);setSheen(.5);setAtmosphereStrength(.75);}}>恢复默认</button></div>
             <div className="dream-view-modes" role="group" aria-label="光照对比">{["光照效果", "底图", "法线图"].map((label, index) => <button key={label} aria-pressed={view === index} onClick={() => setView(index)}>{label}</button>)}</div>
             <button className="dream-motion-toggle" onClick={() => setMoving(!moving)}>{moving ? <Pause size={14} /> : <Play size={14} />}{moving ? "暂停场景动效" : "开启场景动效"}</button>
           </section>}
