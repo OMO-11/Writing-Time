@@ -1,330 +1,625 @@
-# Fantasy Workshop · 奇幻工坊
+# Writing Time · Personal Creative Universe
 
-一个 **local-first**（本地优先）的 Markdown 写作与插画管理个人创作工坊。所有作品、图片、设定与元数据都保存在浏览器本地的 IndexedDB 中，**不依赖任何服务器，数据永不上传**。界面由两位原创角色——见习修士「诺瓦尔」与森林魔女「伊登」——贯穿的幻想手绘风格呈现。
+**Writing Time** 是一个以本地优先（local-first）为核心的个人创作空间。项目目前由顶层入口 **Writing Time Portal** 统一承载多个创作模块：已经投入使用的 **Fantasy Workshop（幻想工坊）** 负责 Markdown 写作、设定与内容管理，**Archive Gallery（拾光画廊）** 负责沉浸式图片档案浏览，后续模块可以继续挂载到同一入口之下。
 
-核心能力一览：
+用户作品、图片、设定与元数据保存在浏览器本地的 IndexedDB 中；项目没有用于存储个人创作内容的后端服务。开发与构建 Archive Gallery 时会同步并编译固定版本的第三方 RhineLabUI runtime，但这与用户内容存储是两条独立链路。
 
-- ✍️ **创作工坊**：基于 CodeMirror 6 的 Markdown 编辑器，分屏实时预览、文档大纲、斜杠命令、自动保存与崩溃恢复快照
-- 🗂 **九类统一内容模型**：文章、图片、图片集、设定卡、项目、合集、时间线、灵感、展览，支持跨内容引用与关系图谱
-- 🖼 **图片画廊**：批量导入（选择 / 拖放 / 粘贴）、网格与瀑布流视图、灯箱浏览、引用追踪
-- 🔍 **全站搜索**：MiniSearch 本地索引，中文 bigram 分词，支持类型 / 状态 / 标签 / 合集 / 时间筛选
-- 🔗 **Wiki 双链**：`[[标题]]` 与 `[[标题#小节]]` 语法，按标题自动跳转对应内容
-- 💾 **备份与导出**：完整 JSON 备份 / 恢复，单篇 Markdown、内容包 ZIP、静态 HTML 等多种导出格式
-- 🎭 **角色主题系统**：按路由自动切换或手动固定的角色主题，插画 / 纹理 / 动效偏好可调
+当前核心能力：
+
+- **Writing Time Portal**：全屏场景入口、本地实时时钟、昼夜欢迎词、双层空间导航与 WebGL 动态重光照
+- **Fantasy Workshop**：CodeMirror 6 Markdown 编辑器、实时预览、大纲、斜杠命令、自动保存与恢复快照
+- **统一内容模型**：文章、图片、图片集、设定卡、项目、合集、时间线、灵感、展览共 9 类内容
+- **Archive Gallery**：基于 RhineLabUI Three.js runtime 的独立档案画廊，复用 Writing Time 本地图片数据
+- **图片资源管理**：批量导入、网格 / 瀑布流、灯箱、引用追踪和跨内容关联
+- **全文搜索**：MiniSearch 本地索引，支持中文 bigram、类型 / 状态 / 标签 / 合集 / 时间筛选
+- **Wiki 双链**：支持 `[[标题]]` 与 `[[标题#小节]]`
+- **备份与导出**：完整 JSON 备份、Markdown、内容包 ZIP、图片集 ZIP、项目 ZIP、静态 HTML
+- **角色与视觉系统**：诺瓦尔 / 伊登角色主题、场景插画、动态光影、粒子与减少动效适配
 
 ---
 
 ## 目录
 
+- [当前产品结构](#当前产品结构)
 - [环境要求](#环境要求)
 - [快速开始](#快速开始)
 - [页面导览](#页面导览)
-- [功能详解](#功能详解)
-  - [创作工坊（编辑器）](#创作工坊编辑器)
-  - [统一内容模型](#统一内容模型)
-  - [图片画廊](#图片画廊)
-  - [全站搜索](#全站搜索)
-  - [首页仪表盘](#首页仪表盘)
-  - [备份、导入与导出](#备份导入与导出)
-  - [角色主题系统](#角色主题系统)
+- [Writing Time Portal](#writing-time-portal)
+- [Fantasy Workshop](#fantasy-workshop)
+- [Archive Gallery](#archive-gallery)
+- [统一内容模型](#统一内容模型)
+- [搜索与 Wiki](#搜索与-wiki)
+- [备份、导入与导出](#备份导入与导出)
 - [数据架构](#数据架构)
 - [Markdown 约定](#markdown-约定)
 - [项目结构](#项目结构)
 - [常用脚本](#常用脚本)
 - [角色资产管线](#角色资产管线)
 - [快捷键](#快捷键)
+- [开发注意事项](#开发注意事项)
 - [常见问题](#常见问题)
+
+---
+
+## 当前产品结构
+
+项目已经从单一的 Fantasy Workshop 演进为一个可继续扩展的顶层创作入口：
+
+```text
+Writing Time  /
+│
+├── Fantasy Workshop  /workshop
+│   ├── Markdown 创作工坊
+│   ├── 内容库 / 设定 / 项目 / 时间线
+│   ├── 本地图片资源库
+│   ├── 搜索 / Wiki / 引用图谱
+│   └── 备份与导出
+│
+├── Archive Gallery  /archive-gallery
+│   └── RhineLabUI Three.js 档案浏览 runtime
+│
+└── Future Spaces
+    └── 后续顶层模块预留入口
+```
+
+`/` 不再是旧版内容仪表盘，而是 Writing Time 的顶层 Portal；原来的本地创作仪表盘完整保留在 `/workshop`。
 
 ---
 
 ## 环境要求
 
-| 依赖 | 版本 |
+| 依赖 | 要求 |
 | --- | --- |
-| Node.js | **≥ 20.9.0**（`package.json` 的 `engines` 字段约束） |
+| Node.js | **>= 22.12.0** |
 | npm | 随 Node.js 附带即可 |
-| 浏览器 | 任何支持 IndexedDB 的现代浏览器（Chrome / Edge / Firefox / Safari 较新版本） |
+| 浏览器 | 支持 IndexedDB、现代 JavaScript 与 WebGL 的现代浏览器 |
+| Python | 仅角色插画预处理脚本需要 |
 
-> 本项目为纯客户端应用（数据全部落在浏览器 IndexedDB），部署时只需要静态托管，不需要数据库或后端服务。
+Node.js 最低版本与当前 RhineLabUI / Vite runtime 保持一致，具体约束以 `package.json` 的 `engines` 字段为准。
+
+> 用户创作数据保存在浏览器 IndexedDB 中，不需要数据库服务。首次同步或重新构建 Archive Gallery runtime 时，需要能够访问 RhineLabUI 上游仓库和 npm 依赖源。
+
+---
 
 ## 快速开始
 
 ```bash
-# 1. 安装依赖
+# 1. 安装 Writing Time 依赖
 npm install
 
-# 2. 启动开发服务器（默认 http://localhost:3000）
+# 2. 启动开发服务器
+# predev 会自动执行 npm run sync:rhinelab
 npm run dev
 
-# 3. 生产构建与启动
+# 默认访问
+# http://localhost:3000
+
+# 3. 生产构建
+# prebuild 同样会自动同步 / 构建 RhineLabUI runtime
 npm run build
+
+# 4. 启动生产服务器
 npm run start
 
-# 4. 代码检查
+# 5. 代码检查
 npm run lint
 ```
 
-首次启动后应用会自动写入一份示例数据（一篇《沿着道路进入工坊》 starter 文章与三张示例插画），帮助快速上手；之后的一切内容都只存在于你的浏览器中。
+如果只需要重新同步 Archive Gallery runtime：
 
-> 端口被占用时可改用：`npm run dev -- -p 3001`
+```bash
+npm run sync:rhinelab
+```
+
+端口被占用时：
+
+```bash
+npm run dev -- -p 3001
+```
+
+首次进入 Fantasy Workshop 后，应用会自动准备 starter 内容，之后的个人内容保存在当前浏览器 profile 的 IndexedDB 中。
+
+---
 
 ## 页面导览
 
 | 路由 | 页面 | 说明 |
 | --- | --- | --- |
-| `/` | 首页仪表盘 | 作品 / 图片统计、快捷操作、可自定义的内容模块流、拖放导入 |
-| `/workbench?work={id}` | 创作工坊 | CodeMirror Markdown 编辑器 + 实时预览，核心写作环境 |
-| `/library?type={type}` | 作品库 | 按类型浏览统一内容，关键词与状态筛选 |
-| `/content` | 内容工作区 | 与作品库同构的内容总览入口 |
-| `/content/{id}` | 内容详情 | 各类内容的编辑器与关联关系面板 |
-| `/gallery` | 图片画廊 | 图片导入、检索、引用管理与灯箱浏览 |
-| `/search` | 全站搜索 | 多维度筛选的本地全文搜索 |
-| `/wiki/{title}` | Wiki 跳转 | 解析 `[[链接]]`，按标题重定向到对应内容 |
-| `/work/{slug}` | 作品阅读页 | 文章的只读渲染视图，附「继续编辑」入口 |
-| `/settings` | 设置 | 角色外观、备份恢复、换行模式与隐私说明 |
+| `/` | Writing Time Portal | 顶层创作入口，动态时钟、场景光影与模块导航 |
+| `/workshop` | Fantasy Workshop 首页 | 原创作仪表盘：统计、快捷操作、模块化内容流 |
+| `/archive-gallery` | Archive Gallery | RhineLabUI 驱动的沉浸式图片档案浏览模块 |
+| `/workbench?work={id}` | 创作工坊 | CodeMirror Markdown 编辑器 + 实时预览 |
+| `/library?type={type}` | 作品库 | 按内容类型、状态与关键词浏览 |
+| `/content` | 内容工作区 | 统一内容模型总览 |
+| `/content/{id}` | 内容详情 | 各类型编辑器与关联关系面板 |
+| `/gallery` | 图片资源库 | 图片导入、检索、引用管理与灯箱浏览 |
+| `/search` | 全站搜索 | 多维度本地全文搜索 |
+| `/wiki/{title}` | Wiki 跳转 | 解析 `[[链接]]` 并跳转到对应内容 |
+| `/work/{slug}` | 作品阅读页 | 文章只读视图与继续编辑入口 |
+| `/settings` | 设置 | 主题、动画、换行模式、备份恢复与隐私说明 |
 
-## 功能详解
+> `/gallery` 是 Fantasy Workshop 内部的图片资源管理页面；`/archive-gallery` 是顶层沉浸式展示模块，两者复用同一套本地图片数据，而不是维护两份独立资源。
 
-### 创作工坊（编辑器）
+---
 
-位于 `/workbench`，是应用的核心写作环境：
+## Writing Time Portal
 
-- **三种编辑模式**：分屏预览（默认）/ 纯编辑 / 纯预览，模式选择会随编辑会话持久化。
-- **自动保存**：输入停顿 800ms 后自动写入 IndexedDB；失焦、切换标签页、关闭页面前兜底保存；站内跳转前会强制刷新保存（全局 `flushSave` 机制），顶部导航常驻「保存中 / 已保存」状态指示。
-- **崩溃恢复**：每 30 秒自动写入一份恢复快照，快照保留 24 小时，异常关闭后可找回内容。
-- **编辑会话记忆**：恢复上次的光标位置、滚动位置、编辑模式与大纲开合状态。
-- **文档大纲**：按标题层级生成目录，点击跳转、跟随光标高亮。
-- **格式化工具**：工具栏 + 斜杠命令（输入 `/` 唤起）+ 选中文本浮动菜单，覆盖标题、粗斜体、删除线、引用、三种列表、行内代码、代码块、链接、图片、表格、分隔线与场景模板插入；另有 CodeMirror 内查找与撤销 / 重做。
-- **插图**：从图片库选取，以 `fw-asset://<图片ID>` 协议插入正文，渲染时自动解析为图片。
-- **拖放导入**：拖入 `.md` 文件直接导入为作品；拖入图片会导入图片库并插入引用。
-- **状态栏**：字数（中文字符 + 英文单词）、段落数、光标行列、保存状态。
-- **空文档陪伴**：新建空白文档时展示角色插画引导，可一键插入场景模板。
-- **导出**：随时把当前作品下载为 `.md` 文件。
+入口文件为 `app/page.tsx`，核心交互在 `components/home/DreamHome.tsx`。
 
-### 统一内容模型
+当前 Portal 采用“双层主页”设计：第一层是诺瓦尔的观星书房场景、本地时间和欢迎语；第二层从右侧滑入，展示当前可以进入的创作空间。桌面端和移动端均支持按钮或横向手势切换，`Escape` 可关闭抽屉，并处理焦点恢复与隐藏区域键盘隔离。
 
-应用把所有资料抽象为 9 种内容类型（见 `lib/content-registry.ts` 与 `types/content.ts`），共用同一张 `contents` 表与同一套标签 / 合集 / 收藏 / 状态体系：
+### 动态光影
 
-| 类型 | 名称 | 说明 |
+主页并非简单叠加 CSS 滤镜，而是使用 WebGL 对插画进行实时重光照：
+
+- 原始场景图提供颜色
+- 配套 RGB normal map 提供近似表面方向
+- 根据本地时间计算日光 / 月光方向、色温与环境光
+- 窗口方向决定主要入射光和光束
+- 支持发丝柔光、虹膜反射、冷暖环境散射
+- 使用线性 HDR 场景缓冲、曝光和后处理
+- 约 300 个 WebGL 浮尘粒子随昼夜和光束变化
+- WebGL 不可用或纹理加载失败时保留静态背景
+- 后台标签页暂停，支持 `prefers-reduced-motion`
+- 渲染画布限制最大边长，控制移动设备开销
+
+左下角“窗边 · 调色手记”允许预览一天中的任意时刻，并调整：
+
+- 曝光补偿
+- 手绘光影强度
+- 阴影边缘柔和度
+- 发丝柔光
+- 光束与浮尘
+
+还可以切换 `光照效果 / 底图 / 法线图` 进行比较，或暂停场景动效。
+
+更完整的实现说明见 [`docs/home-design.md`](docs/home-design.md)。
+
+---
+
+## Fantasy Workshop
+
+`/workshop` 是原 Fantasy Workshop 仪表盘，也是所有本地创作工具的主要入口。
+
+### 创作工坊
+
+`/workbench` 是核心写作环境：
+
+- **三种编辑模式**：分屏 / 纯编辑 / 纯预览
+- **自动保存**：输入停顿 800ms 后写入 IndexedDB，并在失焦、标签页切换和站内跳转前兜底保存
+- **恢复快照**：每 30 秒创建恢复快照，24 小时后过期
+- **会话记忆**：恢复光标、滚动位置、编辑模式和大纲状态
+- **文档大纲**：按标题层级生成并跟随当前编辑位置
+- **格式工具**：工具栏、斜杠命令与选中文本浮动菜单
+- **图片引用**：使用 `fw-asset://<图片ID>` 引用本地图片库资源
+- **拖放导入**：Markdown 直接导入作品，图片直接进入资源库并插入引用
+- **状态栏**：字数、段落、光标位置与保存状态
+- **导出**：单篇作品可直接下载为 `.md`
+
+### Workshop 首页
+
+`/workshop` 的 `HomeDashboard` 保留原来的创作仪表盘能力：
+
+- 本地作品与图片统计
+- 新建作品 / 灵感 / 图片 / 设定快捷操作
+- 继续编辑
+- 灵感速记
+- 进行中项目
+- 最近作品
+- 最新图片
+- 未归类内容
+- 收藏
+- 今日动态
+
+模块显隐与排序保存在 IndexedDB 的 `home-module-layout` 设置中。
+
+### 图片资源库
+
+`/gallery` 用于资源管理：
+
+- 文件选择、拖放、剪贴板粘贴导入
+- PNG / JPEG / WebP
+- 名称 / Alt / 说明搜索
+- 标签、关联内容、引用状态筛选
+- 网格 / 瀑布流
+- Lightbox 浏览
+- 引用次数与反向关系查看
+
+---
+
+## Archive Gallery
+
+`/archive-gallery` 是顶层独立模块。它不再使用早期手写的模拟档案卡片，而是直接集成固定版本的 **RhineLabUI** 作为 Three.js archive-array runtime。
+
+上游信息：
+
+- Project: `LBEILC/RhineLabUI`
+- License: MIT
+- Pinned commit: `8799b03179a9a0ebd2611843e644a5a0530b24bf`
+
+运行时同步流程：
+
+```text
+npm run sync:rhinelab
+        ↓
+.vendor/rhinelab-ui
+        ↓
+应用 Writing Time 兼容补丁
+        ↓
+Vite 构建 RhineLabUI
+        ↓
+public/rhinelab
+        ↓
+/ archive-gallery iframe / bridge
+```
+
+兼容层只负责 Writing Time 与 RhineLabUI 之间的数据桥接：
+
+- 使用 Writing Time 的本地图片档案生成 Rhine archive 数据
+- 通过 `localStorage` 提供档案元数据
+- 通过 `postMessage` 把选中 / 打开事件传回父页面
+- Embed 模式下打开档案时进入 Writing Time 的本地图片预览，而不是 RhineLabUI 原始研究文档页
+
+Three.js 场景、GLB 档案盒、相机、循环逻辑、拖动导航、材质、灯光、后处理和动画仍来自 RhineLabUI 本身。
+
+生成目录 `.vendor/rhinelab-ui` 与 `public/rhinelab` 均被 Git 忽略，不应提交到仓库。
+
+完整集成说明见 [`docs/RHINELAB_INTEGRATION.md`](docs/RHINELAB_INTEGRATION.md)。
+
+---
+
+## 统一内容模型
+
+Fantasy Workshop 将资料统一抽象为 9 种内容类型，共用 `contents` 表及统一标签 / 合集 / 收藏 / 状态体系：
+
+| 类型 | 名称 | 用途 |
 | --- | --- | --- |
-| `article` | 文章 | Markdown 长文与章节，在创作工坊中编辑，支持 Frontmatter |
-| `image` | 图片 | 可复用插画资源：原始文件 + 自动生成的 WebP 缩略图 + 宽高元数据 |
-| `gallery` | 图片集 | 将一组图片排序编排（网格 / 瀑布流 / 幻灯片三种布局），支持逐图配注 |
-| `record` | 设定卡 | 内置 5 种模板：**角色 / 地点 / 物品 / 服装 / 魔法**，每种有专属字段组 |
-| `project` | 项目 | 描述、进度、成员内容、三列看板（待整理 / 进行中 / 已完成）与里程碑 |
-| `collection` | 合集 | 跨类型整理内容的轻量书架 |
-| `timeline` | 时间线 | 事件、日期与描述的年表，可关联任意内容 |
-| `note` | 灵感 | 快速灵感卡片：纯文本或 Markdown、配图、链接、可挂到项目 |
-| `exhibition` | 展览 | 用可排序区块（文本 / 图片 / 图组 / 引文 / 分隔线 / 封面等）编排展示，4 种主题 |
+| `article` | 文章 | Markdown 长文与章节 |
+| `image` | 图片 | 原始图片、缩略图和元数据 |
+| `gallery` | 图片集 | 图片排序编排与逐图说明 |
+| `record` | 设定卡 | 角色 / 地点 / 物品 / 服装 / 魔法 |
+| `project` | 项目 | 进度、成员、看板与里程碑 |
+| `collection` | 合集 | 跨类型内容整理 |
+| `timeline` | 时间线 | 事件、日期与关联内容 |
+| `note` | 灵感 | 快速记录、配图、链接与项目关联 |
+| `exhibition` | 展览 | 通过可排序区块编排展示内容 |
 
-内容之间通过 **引用图谱**（`contentReferences` 表）连接，边分为 5 类：
+内容之间通过 `contentReferences` 构建引用图谱，目前包含：
 
-- `wiki` —— 正文中的 `[[标题]]` 双链
-- `asset` —— 正文 `fw-asset://` 引用或卡片配图
-- `relation` —— 设定卡 / 时间线事件等显式关联
-- `cover` —— 封面图引用
-- `membership` —— 项目 / 合集的成员关系
+- `wiki`：正文中的 Wiki 双链
+- `asset`：正文或卡片使用的图片资源
+- `relation`：设定、时间线等显式关系
+- `cover`：封面引用
+- `membership`：项目 / 合集成员关系
 
-每次保存内容都会增量重建其引用边，内容详情页右侧的「关联面板」即基于该图谱展示正向 / 反向引用；删除图片前也会检查引用，避免误删仍被使用中的素材。
+保存内容时会增量重建引用边；删除仍被引用的图片前会进行关系检查。
 
-灵感卡片支持一键转换：可转为**文章**、**角色 / 地点设定卡**，或转换为所属**项目的看板任务**。
+灵感卡片可以转换为文章、角色 / 地点设定，或转换成所属项目的看板任务。
 
-### 图片画廊
+---
 
-- **批量导入**：按钮选择、整页拖放、直接 `Ctrl+V` 粘贴剪贴板图片，支持 PNG / JPEG / WebP；URL 带 `?upload=1` 时自动打开文件选择。
-- **检索与筛选**：按名称 / Alt / 说明搜索；筛选抽屉支持按关联内容、标签、引用状态（已引用 / 未引用）过滤。
-- **浏览**：网格 / 瀑布流两种视图，点击打开灯箱（Lightbox）大图浏览。
-- **引用管理**：每张图显示被引用次数，可跳转详情编辑标题、Alt、说明、标签与关联内容。
+## 搜索与 Wiki
 
 ### 全站搜索
 
-- 基于 [MiniSearch](https://lucaong.github.io/minisearch/) 在浏览器内存中构建索引，`liveQuery` 订阅内容表变更自动重建。
-- **中文优化**：分词器对中文文本同时产出单字、相邻双字（bigram）与整词，配合前缀 + 模糊匹配（fuzzy 0.2），无需分词服务即可获得可用的中文召回。
-- **字段权重**：标题 5 > 标签 3 > 合集名 2 > 正文 1。
-- **筛选维度**：内容类型（含标签聚合）、状态、标签、合集、更新时间（近 7 天 / 30 天 / 一年），最多返回 100 条。
-- 顶栏全局搜索框提供实时下拉结果，`Enter` 进入搜索页查看完整结果。
+本地全文搜索基于 MiniSearch：
 
-### 首页仪表盘
+- `liveQuery` 监听内容变化并自动重建索引
+- 中文同时生成单字、相邻 bigram 和整词 token
+- 前缀匹配 + fuzzy 0.2
+- 字段权重：标题 5 > 标签 3 > 合集 2 > 正文 1
+- 支持类型、状态、标签、合集、更新时间筛选
+- 顶栏搜索框提供实时结果，完整结果进入 `/search`
 
-- 欢迎区展示本地作品总数、图片总数与最近一篇作品。
-- 快捷操作：新建作品、新建灵感卡、添加图片、新建设定。
-- **模块化内容流**：继续编辑、灵感速记、进行中项目、最近作品、最新图片、未归类内容、收藏、今日动态共 8 种模块，显隐与顺序可自由调整并持久化到 IndexedDB（`home-module-layout`）。
-- 整页支持拖放导入：Markdown 自动导入为作品并跳转工坊，图片进入图片库。
+### Wiki
 
-### 备份、导入与导出
+支持：
 
-所有导入导出均在浏览器内完成（JSZip 打包），不经过任何网络：
+```markdown
+[[角色设定]]
+[[角色设定#外貌]]
+```
 
-| 操作 | 格式 | 说明 |
+跳转时按标题在内容库中匹配；文章支持标题锚点定位，找不到目标时回退到搜索。
+
+---
+
+## 备份、导入与导出
+
+所有个人创作内容的导入导出都在浏览器侧完成。
+
+| 操作 | 格式 | 内容 |
 | --- | --- | --- |
-| 完整备份 | `fantasy-workshop-backup-*.json` | 包含全部统一内容、图片原文件（Data URL）、编辑会话、恢复快照、活动日志与设置（schema v3） |
-| 恢复备份 | JSON | 默认**合并模式**：同 ID 内容以备份版本覆盖；恢复前有确认提示 |
-| 单篇文章 | `.md` | 原始 Markdown（含 Frontmatter） |
-| 内容包 | `-package.zip` | `content.json` + 正文 `.md` + 全部关联图片 |
-| 图片集 | `.zip` | `gallery.json` + 图片原文件 |
-| 项目 | `.zip` | `project.json` + 成员清单 + 成员文章 / 图片 / 封面 |
-| 静态网页 | `.html` | 带内联样式的独立 HTML 文件，可直接分享浏览 |
-| 导入 Markdown | `.md` | 读取 Frontmatter 的 `title` / `tags` / `status` 字段，正文渲染入库 |
+| 完整备份 | `fantasy-workshop-backup-*.json` | 内容、图片 Data URL、编辑会话、恢复快照、活动与设置 |
+| 恢复备份 | JSON | 默认合并，同 ID 以备份版本覆盖 |
+| 单篇文章 | `.md` | 原始 Markdown + Frontmatter |
+| 内容包 | `.zip` | 内容元数据、Markdown 与关联图片 |
+| 图片集 | `.zip` | 图片集元数据与原始图片 |
+| 项目 | `.zip` | 项目、成员清单和相关资源 |
+| 静态网页 | `.html` | 可独立打开的渲染页面 |
+| Markdown 导入 | `.md` | 读取 title / tags / status Frontmatter |
 
-### 角色主题系统
-
-应用由两位原创角色贯穿，主题按路由自动切换（也可在设置中手动固定）：
-
-| 主题 | 角色 | 自动应用于 |
-| --- | --- | --- |
-| `noval` 诺瓦尔·晨雾 | 银白发见习修士，明亮好奇 | 创作工坊、作品阅读页 |
-| `eden` 伊登·星夜 | 灰色魔女，安静可靠 | 画廊、搜索、Wiki |
-| `balanced` 共同旅途 | 双人组合 | 首页、内容库、设置 |
-
-设置页可调整的显示偏好（持久化到 IndexedDB）：
-
-- **人物插画**：完整 / 精简 / 关闭
-- **装饰纹理**：开 / 关
-- **动画**：完整 / 减少动效 / 关闭（并自动遵循系统「减弱动态效果」设置）
-
-主题与偏好通过 `<html>` 的 `data-*` 属性驱动全局 CSS 生效；插画加载失败时自动回退为 SVG 剪影。专注模式下始终隐藏人物与纹样。
-
-角色的外观设定、UI 职责与双人关系约束固定在 [`docs/character-bible.md`](docs/character-bible.md)，任何新增插画都必须通过其一致性验收。
+---
 
 ## 数据架构
 
-### 存储
+### IndexedDB
 
-数据全部保存在浏览器 **IndexedDB**，数据库名 `FantasyWorkshop`，通过 [Dexie 4](https://dexie.org/) 访问，当前 schema 为 **version 3**：
+数据库名：`FantasyWorkshop`，通过 Dexie 4 访问，当前 schema 为 version 3。
 
 | 表 | 主键 | 用途 |
 | --- | --- | --- |
-| `contents` | `id` | **统一内容表**：9 种类型内容的主存储（含各自的 `payload`） |
-| `works` | `id` | 文章的旧格式镜像（与 `contents` 双写，保持兼容） |
-| `images` | `id` | 图片二进制（原始 Blob + WebP 缩略图）与元数据 |
-| `collections` | `id` | 合集的旧格式镜像（与 `contents` 双写） |
-| `contentReferences` | `id` | 内容引用图谱（wiki / asset / relation / cover / membership） |
-| `editorSessions` | `workId` | 每篇作品的编辑会话（光标 / 滚动 / 模式） |
-| `recoverySnapshots` | `id` | 编辑恢复快照（30s 一份，24h 过期清理） |
-| `activity` | `id` | 活动日志（created / updated / imported / converted） |
-| `settings` | `key` | 应用设置与迁移标记（换行模式、首页布局、主题偏好等） |
+| `contents` | `id` | 9 类统一内容主表 |
+| `works` | `id` | 文章旧格式镜像，用于兼容 |
+| `images` | `id` | 图片 Blob、WebP 缩略图与元数据 |
+| `collections` | `id` | 合集旧格式镜像 |
+| `contentReferences` | `id` | 内容引用图谱 |
+| `editorSessions` | `workId` | 光标、滚动和编辑模式 |
+| `recoverySnapshots` | `id` | 30 秒恢复快照 |
+| `activity` | `id` | 内容活动日志 |
+| `settings` | `key` | UI、迁移、主题和布局设置 |
 
-### 迁移机制
+### 迁移
 
-- **v1 → v2**：新增编辑会话与恢复快照表；归一化旧状态值（`complete` → `completed`、`polishing` → `draft`），补齐 slug、摘要与标题派生字段。
-- **v2 → v3**：新增统一内容三表；把 `works` / `images` / `collections` 折算生成 `contents` 记录，并补齐图片的 altText / 关联 / 更新时间字段。
-- 启动时 `ensureUnifiedContentModel()` 与 `ensureDerivedWorkData()` 幂等地保证内容镜像、派生字段（渲染 HTML、纯文本、摘要、标题锚点）与引用图谱处于最新状态，对应进度记录在 `settings` 表中。
+- **v1 -> v2**：新增编辑会话与恢复快照，归一化旧状态与文章派生字段
+- **v2 -> v3**：新增统一内容相关表，将旧 `works` / `images` / `collections` 折算为 `contents`
 
-### 全局状态
+启动时通过幂等迁移确保内容镜像、HTML、纯文本、摘要、标题锚点和引用图谱处于可用状态。
 
-Zustand（`stores/ui-store.ts`）负责跨页面的 UI 状态：编辑器模式与专注 / 打字机模式、抽屉与命令面板开关、全局保存状态、Toast 通知，以及 **保存处理器注册机制**——各页面注册 `flushSave` 回调，全局导航跳转前统一强制保存，避免路由切换丢稿。
+### UI 状态
+
+Zustand `stores/ui-store.ts` 管理编辑模式、专注 / 打字机模式、命令面板、抽屉、Toast、保存状态及全局 `flushSave` 注册机制。
+
+---
 
 ## Markdown 约定
 
-- **Frontmatter**（`gray-matter` 解析）：
+### Frontmatter
 
-  ```markdown
-  ---
-  title: 沿着道路进入工坊
-  tags: [旅途, 工坊]
-  status: draft        # draft | completed | archived
-  ---
-  ```
+```markdown
+---
+title: 沿着道路进入工坊
+tags: [旅途, 工坊]
+status: draft
+---
+```
 
-- **Wiki 链接**：`[[标题]]` 或 `[[标题#小节]]`。渲染时展开为 `/wiki/...` 链接；跳转时按标题在内容库中查找（忽略大小写），文章支持 `?heading=` 锚点定位，找不到目标时自动转搜索。
-- **图片协议**：`![说明](fw-asset://<图片ID>)` 引用图片库素材，导出内容包时自动带上原文件。
-- **换行模式**：设置中可在「标准 CommonMark」与「单次换行即换行（`remark-breaks`）」间切换，切换后会对全部作品重新渲染并重建搜索索引。
-- **安全**：所有 Markdown 渲染统一经过 `rehype-sanitize` 白名单清理（额外放行 `fw-asset:` 与 `data:` 图片协议），粘贴恶意 HTML 不会造成脚本注入。
-- 其他：GFM 表格 / 任务列表 / 删除线、标题自动生成锚点 slug、自动提取纯文本与前三段摘要。
+状态值：
+
+```text
+draft | completed | archived
+```
+
+### Wiki 链接
+
+```markdown
+[[标题]]
+[[标题#小节]]
+```
+
+### 本地图片协议
+
+```markdown
+![说明](fw-asset://<图片ID>)
+```
+
+导出内容包时会自动带上关联原图。
+
+### Markdown 渲染
+
+- `gray-matter` 解析 Frontmatter
+- `remark-gfm` 支持 GFM
+- 可在设置中切换标准 CommonMark / `remark-breaks` 单换行模式
+- 标题自动生成锚点 slug
+- 自动提取纯文本和摘要
+- HTML 输出统一经过 `rehype-sanitize` 清理
+
+---
 
 ## 项目结构
 
-```
-New_Blog/
-├── app/                        # Next.js App Router 页面与全局样式
-│   ├── layout.tsx              # 根布局：AppShell + 元数据
-│   ├── page.tsx                # 首页仪表盘
-│   ├── workbench/              # 创作工坊
-│   ├── library/                # 作品库
-│   ├── content/                # 内容工作区与详情编辑页
-│   ├── gallery/                # 图片画廊
-│   ├── search/                 # 全站搜索
-│   ├── wiki/[title]/           # Wiki 链接跳转
-│   ├── work/[slug]/            # 作品阅读页
-│   ├── settings/               # 设置页
-│   └── *.css                   # 全局 / 主题 / 工作流 / 内容样式
+```text
+Writing-Time/
+├── app/
+│   ├── page.tsx                    # Writing Time Portal
+│   ├── dream-home.css              # Portal 场景与交互样式
+│   ├── workshop/                   # Fantasy Workshop 首页
+│   ├── archive-gallery/            # 顶层 Archive Gallery
+│   ├── workbench/                  # Markdown 创作工坊
+│   ├── library/                    # 作品库
+│   ├── content/                    # 统一内容工作区
+│   ├── gallery/                    # 本地图片资源库
+│   ├── search/                     # 本地全文搜索
+│   ├── wiki/                       # Wiki 跳转
+│   ├── work/                       # 作品阅读页
+│   └── settings/                   # 设置
+│
 ├── components/
-│   ├── app/                    # 应用外壳、全局头部、命令面板、快速创建、Toast
-│   ├── workbench/              # CodeMirror 编辑器、工具栏、大纲、斜杠命令、状态栏
-│   ├── content/                # 各内容类型的编辑器与详情面板
-│   ├── gallery/                # 画廊、灯箱
-│   ├── home/                   # 仪表盘各模块
-│   ├── library/                # 作品库视图与详情
-│   ├── search/                 # 搜索弹层与结果项
-│   ├── settings/               # 设置面板
-│   ├── markdown/               # Markdown 渲染与摘要组件
-│   ├── theme/                  # 角色主题提供者、插画、装饰组件
-│   └── ui/                     # 图标、Blob 图片、页面外壳等基础组件
-├── lib/                        # 核心服务层（无 UI 依赖）
-│   ├── db.ts                   # Dexie 数据库、schema 迁移、starter 数据
-│   ├── content-registry.ts     # 9 种内容类型的注册表与工厂
-│   ├── content-service.ts      # 内容 CRUD、引用图谱重建、灵感转换
-│   ├── markdown-service.ts     # Markdown 解析 / 渲染 / 摘要 / 锚点
-│   ├── search-service.ts       # MiniSearch 索引与查询
-│   ├── export-service.ts       # 备份与各类导出
-│   ├── work-import.ts          # Markdown 导入
-│   └── character-assets.ts     # 角色资产注册表与回退链
-├── stores/ui-store.ts          # Zustand 全局 UI 状态
-├── types/                      # TypeScript 类型定义（content / workshop / theme）
-├── docs/character-bible.md     # 角色一致性设定基准
+│   ├── home/
+│   │   ├── DreamHome.tsx           # Portal 主交互
+│   │   ├── RelightScene.tsx        # WebGL 重光照与粒子场景
+│   │   └── LightingSlider.tsx      # 光照参数控件
+│   ├── archive-gallery/            # RhineLabUI 外层桥接与图片预览
+│   ├── workbench/                  # CodeMirror 编辑器与工具
+│   ├── content/                    # 内容类型编辑器
+│   ├── gallery/                    # 图片库与 Lightbox
+│   ├── library/                    # 作品库
+│   ├── search/                     # 搜索 UI
+│   ├── settings/                   # 设置 UI
+│   ├── markdown/                   # Markdown 展示
+│   ├── theme/                      # 角色主题
+│   └── ui/                         # 通用 UI
+│
+├── lib/
+│   ├── home/
+│   │   ├── relight-shaders.ts      # 场景重光照 GLSL
+│   │   ├── atmosphere-shaders.ts   # 光束 / 散射 GLSL
+│   │   └── postprocess.ts          # HDR / Bloom / Tone mapping
+│   ├── db.ts                       # Dexie schema 与 starter 数据
+│   ├── content-registry.ts         # 9 类内容注册表
+│   ├── content-service.ts          # CRUD 与引用图谱
+│   ├── markdown-service.ts         # Markdown 解析 / 渲染
+│   ├── search-service.ts           # MiniSearch
+│   ├── export-service.ts           # 备份和导出
+│   ├── work-import.ts              # Markdown 导入
+│   └── character-assets.ts         # 角色资产注册表
+│
 ├── scripts/
-│   └── prepare-character-assets.py  # 角色插画预处理脚本（需 Python + Pillow）
+│   ├── sync-rhinelab-runtime.mjs   # 同步 / patch / 构建 RhineLabUI
+│   └── prepare-character-assets.py # 角色插画预处理
+│
+├── docs/
+│   ├── home-design.md              # Portal 与重光照设计文档
+│   ├── RHINELAB_INTEGRATION.md     # Archive Gallery 集成说明
+│   └── character-bible.md          # 角色一致性基准
+│
 ├── public/
-│   ├── assets/characters/      # 角色插画（noval / eden / duo，WebP）
-│   ├── assets/decor/           # 装饰性 SVG（边框、分隔线、符文图标等）
-│   └── images/                 # 站点装饰图与角色原始参考图
-└── 图片素材/                    # 原始素材（本地，不参与构建）
+│   ├── assets/home/                # Portal 场景、法线图等
+│   ├── assets/characters/          # 角色插画
+│   ├── assets/decor/               # 装饰 SVG
+│   └── rhin...                     # public/rhinelab 为构建期生成，不入 Git
+│
+├── stores/
+├── types/
+├── package.json
+└── README.md
 ```
+
+以下内容属于本地缓存或生成产物，不应提交：
+
+```text
+node_modules/
+.next/
+.npm-cache/
+.npm-cache-*/
+.vendor/
+public/rhinelab/
+```
+
+---
 
 ## 常用脚本
 
 | 命令 | 说明 |
 | --- | --- |
-| `npm run dev` | 启动开发服务器（Next.js Turbopack，默认 3000 端口） |
-| `npm run build` | 生产构建（含 TypeScript 全量类型检查） |
+| `npm run dev` | 先同步 RhineLabUI，再启动 Next.js 开发服务器 |
+| `npm run sync:rhinelab` | 同步固定 RhineLabUI revision、应用兼容 patch 并构建 runtime |
+| `npm run build` | 先同步 RhineLabUI，再执行生产构建和 TypeScript 检查 |
 | `npm run start` | 启动生产服务器 |
-| `npm run lint` | ESLint 检查（flat config，继承 `eslint-config-next`） |
-| `python scripts/prepare-character-assets.py` | 角色插画预处理：裁切全透明边、恢复安全边距、导出 WebP（需 `pip install pillow`） |
+| `npm run lint` | ESLint 检查 |
+| `python scripts/prepare-character-assets.py` | 预处理角色插画，需要 Pillow |
+
+---
 
 ## 角色资产管线
 
-1. **原始素材**：参考图与 AI 生成素材整理进 `图片素材/` 与 `public/images/`。
-2. **预处理**：`scripts/prepare-character-assets.py` 只裁切完全透明的画布边缘，并按比例恢复透明安全边距，保证角色像素零损失，输出高质量 WebP。
-3. **注册**：产出的资产登记到 `lib/character-assets.ts` 的静态清单（按角色 × 变体，记录路径、宽高、alt 与 `generated` 标记），未生成的变体渲染时自动回退到 SVG 剪影。
-4. **消费**：`components/theme/` 下的组件按页面主题、尺寸与显示偏好选择资产，`CharacterThemeProvider` 把路由 → 主题的分配与用户偏好写入 `<html>` 数据属性。
-5. **验收**：新增插画必须通过 `docs/character-bible.md` 的一致性验收（发型、发色、服装层次、关键饰品、比例、朝向、角色职责等），才可标记为 `generated: true`。
+1. 原始参考图与生成素材进入本地素材目录或 `public/images/`
+2. `scripts/prepare-character-assets.py` 裁切透明边并恢复安全边距，输出 WebP
+3. 在 `lib/character-assets.ts` 注册角色、变体、尺寸与生成状态
+4. `components/theme/` 根据当前路由和主题偏好选择资产
+5. 新增插画通过 [`docs/character-bible.md`](docs/character-bible.md) 验证角色一致性
+
+主题目前围绕：
+
+- `noval`：诺瓦尔·晨雾
+- `eden`：伊登·星夜
+- `balanced`：共同旅途
+
+设置中可以控制人物插画、装饰纹理和动画强度，并遵循系统减少动态效果设置。
+
+---
 
 ## 快捷键
 
 | 快捷键 | 作用 |
 | --- | --- |
-| `Ctrl/Cmd + K` | 打开命令面板（返回主页、打开作品库 / 画廊、聚焦搜索、新建作品、打开设置） |
-| `Ctrl/Cmd + Shift + H` | 保存当前内容并返回主页 |
-| `/`（编辑器内行首） | 唤起斜杠命令菜单 |
-| `Esc` | 关闭命令面板 / 浮动菜单 / 抽屉 |
-| `Ctrl/Cmd + V`（画廊页） | 粘贴剪贴板图片导入 |
+| `Ctrl/Cmd + K` | 打开 Fantasy Workshop 命令面板 |
+| `Ctrl/Cmd + Shift + H` | 保存当前内容并返回 Workshop 首页 |
+| `/`（编辑器行首） | 打开斜杠命令菜单 |
+| `Esc` | 关闭命令面板 / 浮动菜单 / 抽屉；Portal 中关闭空间选择 |
+| `Ctrl/Cmd + V`（图片库） | 从剪贴板导入图片 |
+
+---
+
+## 开发注意事项
+
+### RhineLabUI 固定 revision
+
+不要直接跟踪上游 `main`。升级 Archive Gallery runtime 时：
+
+1. 修改 `scripts/sync-rhinelab-runtime.mjs` 中的 `UPSTREAM_COMMIT`
+2. 执行 `npm run sync:rhinelab`
+3. 确认兼容 patch 点仍然有效
+4. 实测 Archive Gallery 交互和本地图片 bridge
+5. 再提交新的固定 revision
+
+### 不要提交缓存与生成目录
+
+当前 `.gitignore` 已覆盖：
+
+```gitignore
+.npm-cache/
+.npm-cache-*/
+.vendor/
+public/rhinelab/
+```
+
+`.npm-cache-rhinelab` 等目录只用于本地隔离 npm 安装环境，不属于源码。
+
+### 用户数据与构建网络请求不是同一回事
+
+- 用户 Markdown、图片、设定、项目和偏好保存在 IndexedDB
+- RhineLabUI 与 npm 请求只发生在依赖同步 / 构建链路
+- Writing Time 当前没有把个人内容上传到服务端的同步逻辑
+
+---
 
 ## 常见问题
 
-**数据保存在哪里？会不会上传？**
-全部保存在当前浏览器 profile 的 IndexedDB（数据库名 `FantasyWorkshop`）中。应用没有任何后端与网络请求存储逻辑，数据不会离开你的设备。
+### 数据保存在哪里？
 
-**清除浏览器数据 / 换浏览器 / 换电脑会怎样？**
-IndexedDB 属于浏览器本地数据，清除站点数据、使用隐身模式或更换设备都会导致数据不可见。请养成在「设置 → 备份与恢复」导出完整 JSON 备份的习惯，恢复时选择备份文件即可（合并模式，同 ID 内容以备份版本覆盖）。
+保存在当前浏览器 profile 的 IndexedDB，数据库名为 `FantasyWorkshop`。
 
-**忘记保存会丢稿吗？**
-工坊有 800ms 防抖自动保存、失焦兜底保存、路由跳转强制保存三重保障，另有每 30 秒一份、保留 24 小时的恢复快照；正常情况下不会丢失超过半分钟的内容。
+### 会把我的作品上传到服务器吗？
 
-**如何迁移到另一台设备？**
-旧设备导出完整 JSON 备份 → 新设备打开应用 → 设置中「恢复 JSON 备份」选择该文件即可，图片原文件也包含在备份内。
+当前没有用于同步个人创作数据的后端。Workshop 数据与图片都在浏览器本地。Archive Gallery 构建时会下载第三方源码和 npm 依赖，但不会把 IndexedDB 内容上传给 RhineLabUI。
 
-**为什么搜索能搜中文？**
-索引分词器对中文按「单字 + 相邻双字 + 整词」三重切分存储，配合前缀与模糊匹配，无需任何外部分词服务。
+### 清理浏览器数据会发生什么？
 
-**新增一种内容类型要改哪些地方？**
-在 `types/content.ts` 定义 payload、在 `lib/content-registry.ts` 注册类型定义（图标、默认标题、payload 工厂），随后在 `lib/content-service.ts` 补齐引用抽取（`payloadRelations`）、在 `lib/search-service.ts` 补齐搜索文本提取、在 `components/content/` 添加对应编辑器即可，无需改动数据库 schema（`contents` 表是类型无关的）。
+IndexedDB 属于浏览器站点数据。清除站点数据、使用新的浏览器 profile 或更换设备都会导致原内容不可见，因此建议定期在设置页导出完整 JSON 备份。
+
+### 忘记保存会丢稿吗？
+
+WorkBench 使用 800ms 防抖自动保存、失焦兜底、路由跳转前强制保存，并每 30 秒保留恢复快照。
+
+### 如何迁移到另一台设备？
+
+旧设备导出完整 JSON 备份，在新设备的设置页恢复即可；图片原文件也包含在完整备份内。
+
+### 为什么搜索可以搜中文？
+
+本地索引会同时生成中文单字、相邻双字和整词 token，再配合前缀与模糊匹配。
+
+### `/gallery` 和 `/archive-gallery` 有什么区别？
+
+`/gallery` 是资源管理工具，负责导入、标签、引用和元数据；`/archive-gallery` 是沉浸式浏览界面。两者使用同一份 Writing Time 图片数据。
+
+### 为什么第一次 `npm run dev` 比普通 Next.js 项目慢？
+
+`predev` 会先执行 `sync:rhinelab`。如果本地还没有有效的固定 revision runtime，需要拉取 RhineLabUI、安装它的依赖并构建 `public/rhinelab`。之后只要 revision 与安装标记有效，就会复用本地结果。
+
+### 新增一种内容类型要修改哪些地方？
+
+通常需要：
+
+1. 在 `types/content.ts` 增加 payload 类型
+2. 在 `lib/content-registry.ts` 注册内容类型
+3. 在 `lib/content-service.ts` 增加关系提取
+4. 在 `lib/search-service.ts` 增加搜索文本提取
+5. 在 `components/content/` 增加对应编辑器
+
+`contents` 是类型无关的统一表，因此通常不需要修改数据库 schema。
+
+---
+
+Writing Time 目前仍处于持续迭代阶段。顶层 Portal、Fantasy Workshop 与 Archive Gallery 已经形成相互独立但共享本地内容基础设施的三层结构，后续的新创作模块可以继续挂载在 Portal 之下，而不需要破坏现有 Workshop 数据模型。
