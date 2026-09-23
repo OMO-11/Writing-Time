@@ -42,35 +42,40 @@ uniform vec2 uViewport;
 uniform vec2 uImage;
 uniform float uHour;
 uniform float uTime;
+uniform float uWindTravel;
 uniform float uPixelRatio;
 uniform float uAtmosphereStrength;
 varying vec3 vTint;
 varying float vAlpha;
+varying float vNear;
 ${scatteringGLSL}
 void main() {
   // Depth varies size and speed within a shared airflow.
   float depth=aSeed.z;
-  float speed=mix(.006,.022,depth*depth);
+  float mid=step(.65,depth), near=step(.92,depth);
+  vNear=near;
+  float speed=mix(.0022,.0055,mid)+near*.003;
+  float layerAlpha=mix(.32,.78,mid)-near*.18;
   float t=uTime*speed;
   float daylight=smoothstep(-.18,.32,sin((uHour-6.)/12.*3.14159265));
   vec3 lightDirection=normalize(mix(windowMoon(uHour),windowSun(uHour),daylight));
-  float gust=sin(uTime*.42+aSeed.y*6.)*.025;
+  float windTravel=uWindTravel*speed*.7;
   float hourDrift=sin(uHour/24.*6.283185+aSeed.w*3.)*.045;
-  vec2 uv=vec2(fract(aSeed.x+t*(.65-lightDirection.x*.35)+gust+hourDrift+sin(uTime*.7+aSeed.w*30.)*.006),fract(aSeed.y-t*(.65+lightDirection.y*.5)+cos(uTime*.31+aSeed.x*11.)*.009));
+  vec2 uv=vec2(fract(aSeed.x+t*(.65-lightDirection.x*.35)+windTravel+hourDrift+sin(uTime*.7+aSeed.w*30.)*.006),fract(aSeed.y-t*(.65+lightDirection.y*.5)+cos(uTime*.31+aSeed.x*11.)*.009));
   vec2 ratio=uViewport/uImage;
   vec2 visible=uViewport/(uImage*max(ratio.x,ratio.y));
   vec2 screen=(uv-(1.-visible)*vec2(uViewport.x<761.?.65:.67,.5))/visible;
   gl_Position=vec4(screen.x*2.-1.,1.-screen.y*2.,0.,1.);
-  gl_PointSize=(3.5+depth*depth*12.)*uPixelRatio;
+  gl_PointSize=(mix(2.2,5.,mid)+near*5.+aSeed.w*1.2)*uPixelRatio;
   float elevation=sin((uHour-6.)/12.*3.14159265);
   float day=smoothstep(-.18,.32,elevation);
   float golden=sunsetWarmth(elevation);
   vTint=mix(vec3(.47,.67,1.),sunlightTint(golden),day);
   float beam=rayField(uv,uHour);
-  float life=smoothstep(0.,.12,uv.y)*(1.-smoothstep(.88,1.,uv.y));
+  float life=smoothstep(0.,.08,uv.y)*(1.-smoothstep(.92,1.,uv.y))*smoothstep(0.,.035,uv.x)*(1.-smoothstep(.965,1.,uv.x));
   vec2 faceDistance=(uv-vec2(.655,.345))/vec2(.095,.135);
-  float faceClear=1.-exp(-dot(faceDistance,faceDistance)*1.5);
-  vAlpha=(.15+day*.40+beam*mix(.8,2.1,day))*life*(.85+.15*sin(aSeed.w*33.+uTime*.7))*uAtmosphereStrength*faceClear;
+  float faceClear=smoothstep(.4,1.3+near*.4,length(faceDistance));
+  vAlpha=(.15+day*.40+beam*mix(.8,2.1,day))*life*layerAlpha*uAtmosphereStrength*faceClear;
 }
 `;
 
@@ -78,12 +83,13 @@ export const dustFragmentShader = `
 precision mediump float;
 varying vec3 vTint;
 varying float vAlpha;
+varying float vNear;
 uniform float uExposure;
 uniform float uHdr;
 void main() {
   vec2 p=gl_PointCoord*2.-1.;
   float radius=dot(p,p);
-  float profile=(.72*exp(-radius*6.)+.28*exp(-radius*1.8))*(1.-smoothstep(.6,1.,radius));
+  float profile=(mix(.72,.38,vNear)*exp(-radius*6.)+mix(.28,.62,vNear)*exp(-radius*1.8))*(1.-smoothstep(.6,1.,radius));
   vec3 tint=uHdr>.5 ? pow(vTint,vec3(2.2))*1.35 : vTint;
   float exposureAlpha=uHdr>.5 ? 1. : min(1.25,exp2(uExposure*.5));
   gl_FragColor=vec4(tint,min(.9,profile*vAlpha*exposureAlpha));

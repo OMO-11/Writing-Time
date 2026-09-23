@@ -4,18 +4,23 @@ import { useEffect, useRef, useState } from "react";
 import { fragmentShader, vertexShader } from "@/lib/home/relight-shaders";
 import { createHomePostprocess } from "@/lib/home/postprocess";
 import { dustFragmentShader, dustVertexShader } from "@/lib/home/atmosphere-shaders";
+import { ambientHourOffset, createAmbientTimeline } from "@/lib/home/ambient-motion";
 
 export type RelightSettings = {
+  active: boolean;
+  onMotionStatus?: (status: string) => void;
   bloom: number;
   threshold: number;
   radius: number;
   styleStrength: number;
   hour: number;
+  previewing: boolean;
   softness: number;
   sheen: number;
   exposure: number;
   view: number;
   moving: boolean;
+  allowReducedMotion: boolean;
   atmosphere: number;
 };
 
@@ -35,12 +40,20 @@ export function RelightScene(settings: RelightSettings) {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const gl = canvas.getContext("webgl", { alpha: false, antialias: false, depth: false, powerPreference: "low-power" });
-    if (!gl) return;
+    if (!gl) { latest.current.onMotionStatus?.("静态背景 · WebGL 不可用"); return; }
     let disposed = false;
     let frame = 0;
     let currentHour = latest.current.hour;
     let lastTime = 0;
     let motionTime = 0;
+    const motion = createAmbientTimeline();
+    let closedAvailable = false;
+    let shownBlink = 0, blinkCount = 0, wasBlinking = false;
+    let lastStatus = "";
+    const report = (status: string) => {
+      canvas.dataset.motionStatus = status;
+      if (status !== lastStatus) { lastStatus = status; latest.current.onMotionStatus?.(status); }
+    };
     let initialized = false;
     let imageWidth = 3344;
     let imageHeight = 1882;
@@ -92,15 +105,38 @@ export function RelightScene(settings: RelightSettings) {
     };
     const draw = (time: number) => {
       frame = 0;
-      if (!initialized || disposed || document.hidden || gl.isContextLost()) return;
+      if (!initialized || disposed || document.hidden || !latest.current.active || gl.isContextLost()) return;
       const target = latest.current;
-      const animated = target.moving && !reduced.matches && target.view === 0;
+      // Respect the OS by default, but allow an explicit choice in this scene.
+      const reduceMotion = reduced.matches && !target.allowReducedMotion;
+      const animated = target.moving && !reduceMotion && target.view === 0;
       if (animated && time - lastTime < 32) { frame = requestAnimationFrame(draw); return; }
-      const delta = ((target.hour - currentHour + 36) % 24) - 12;
-      const dt = Math.min((time - lastTime) / 1000 || .016, .06);
-      currentHour = reduced.matches || Math.abs(delta) < .002 ? target.hour : (currentHour + delta * (1 - Math.exp(-dt * 7)) + 24) % 24;
+      const drift = target.previewing || reduceMotion ? 0 : ambientHourOffset(motionTime);
+      const sceneHour = (target.hour + drift + 24) % 24;
+      const delta = ((sceneHour - currentHour + 36) % 24) - 12;
+      const dt = Math.min((time - lastTime) / 1000 || .016, .25);
+      currentHour = reduceMotion || Math.abs(delta) < .002 ? sceneHour : (currentHour + delta * (1 - Math.exp(-dt * 7)) + 24) % 24;
+      const previousMotionTime = motionTime;
       if (animated) motionTime += dt;
       lastTime = time;
+      const motionClock = reduceMotion ? 0 : motionTime;
+      // Normal frames sample the continuous eyelid curve, not its interval peak.
+      // Only genuinely slow frames need missed-event detection.
+      let missedBlink = 0;
+      if (animated && dt > .08) {
+        for (let t = previousMotionTime; t < motionClock; t += 1 / 60) missedBlink = Math.max(missedBlink, motion(t).blink);
+      }
+      const ambient = motion(motionClock);
+      if (animated) {
+        const desired = Math.max(missedBlink, ambient.blink);
+        shownBlink += Math.max(-.38, Math.min(.45, desired - shownBlink));
+      }
+      if (reduceMotion) shownBlink = 0;
+      const blinking = shownBlink > .1 && closedAvailable;
+      if (blinking && !wasBlinking) blinkCount++;
+      wasBlinking = blinking;
+      report(reduceMotion ? "系统减少动态效果已开启 · 人物静止" : target.view !== 0 ? "贴图对比中 · 动效暂停" : !target.moving ? "场景动效已暂停" : !closedAvailable ? "发丝与呼吸运行中 · 闭眼图加载失败" : `场景动效运行中 · 已眨眼 ${blinkCount} 次`);
+      canvas.dataset.motionTime = motionClock.toFixed(2);
       // +1 EV only after evening has faded; manual exposure remains additive.
       const nightPhase = Math.max(0, Math.min(1, (currentHour - 18.5) / 1.5));
       const dawnPhase = Math.max(0, Math.min(1, (6 - currentHour) / 1.5));
@@ -131,7 +167,9 @@ export function RelightScene(settings: RelightSettings) {
       gl.uniform1f(uniforms.uStyle, target.styleStrength);
       gl.uniform1f(uniforms.uSheen, target.sheen);
       gl.uniform1f(uniforms.uExposure, effectiveExposure);
-      gl.uniform1f(uniforms.uTime, reduced.matches ? 0 : motionTime);
+      gl.uniform1f(uniforms.uTime, motionClock);
+      gl.uniform1f(uniforms.uBlink, closedAvailable ? shownBlink : 0);
+      gl.uniform1f(uniforms.uWind, ambient.wind);
       gl.uniform1f(uniforms.uHdr, useHdr ? 1 : 0);
       gl.uniform1f(uniforms.uView, target.view);
       gl.uniform1f(uniforms.uAtmosphereStrength, target.atmosphere);
@@ -143,7 +181,8 @@ export function RelightScene(settings: RelightSettings) {
         gl.uniform2f(dustUniforms.uViewport, width, height);
         gl.uniform2f(dustUniforms.uImage, imageWidth, imageHeight);
         gl.uniform1f(dustUniforms.uHour, currentHour);
-        gl.uniform1f(dustUniforms.uTime, motionTime);
+        gl.uniform1f(dustUniforms.uTime, motionClock);
+        gl.uniform1f(dustUniforms.uWindTravel, ambient.windTravel);
         gl.uniform1f(dustUniforms.uPixelRatio, dpr);
         gl.uniform1f(dustUniforms.uExposure, effectiveExposure);
         gl.uniform1f(dustUniforms.uHdr, useHdr ? 1 : 0);
@@ -154,9 +193,14 @@ export function RelightScene(settings: RelightSettings) {
         gl.disableVertexAttribArray(dustPosition);
       }
       if (useHdr) post!.finish(quad, effectiveExposure, currentHour, target.bloom, target.threshold, target.radius);
-      if (animated || Math.abs(delta) > .002 && !reduced.matches) frame = requestAnimationFrame(draw);
+      if (animated || Math.abs(delta) > .002 && !reduceMotion) frame = requestAnimationFrame(draw);
     };
-    const schedule = () => { if (!frame && !disposed && !document.hidden) frame = requestAnimationFrame(draw); };
+    let suspended = false;
+    const schedule = () => {
+      if (!latest.current.active || document.hidden) { cancelAnimationFrame(frame); frame = 0; suspended = true; return; }
+      if (suspended) { lastTime = performance.now(); suspended = false; }
+      if (!frame && !disposed) frame = requestAnimationFrame(draw);
+    };
     const image = (src: string) => new Promise<HTMLImageElement>((resolve, reject) => {
       const img = new window.Image();
       img.onload = () => resolve(img);
@@ -165,8 +209,9 @@ export function RelightScene(settings: RelightSettings) {
     });
     const initialize = async () => {
       try {
-        const [color, normal, closed] = await Promise.all([image(colorSource), image(normalSource), image(closedSource).catch(() => image(colorSource))]);
+        const [color, normal, closed] = await Promise.all([image(colorSource), image(normalSource), image(closedSource).catch(() => null)]);
         if (disposed || gl.isContextLost()) return;
+        closedAvailable = closed !== null;
         imageWidth = color.naturalWidth;
         imageHeight = color.naturalHeight;
         // A true continuous Gaussian low-pass in NORMAL-texture coordinates.
@@ -194,11 +239,11 @@ export function RelightScene(settings: RelightSettings) {
         seeds = buffer(dust);
         scenePosition = gl.getAttribLocation(sceneProgram, "aPosition");
         dustPosition = gl.getAttribLocation(dustProgram, "aSeed");
-        for (const name of ["uColor", "uClosed", "uTime", "uNormal", "uSmoothNormal", "uViewport", "uImage", "uHour", "uSoftness", "uStyle", "uSheen", "uExposure", "uHdr", "uView", "uAtmosphereStrength"]) uniforms[name] = gl.getUniformLocation(sceneProgram, name);
-        for (const name of ["uViewport", "uImage", "uHour", "uTime", "uPixelRatio", "uExposure", "uHdr", "uAtmosphereStrength"]) dustUniforms[name] = gl.getUniformLocation(dustProgram, name);
+        for (const name of ["uColor", "uClosed", "uTime", "uBlink", "uWind", "uNormal", "uSmoothNormal", "uViewport", "uImage", "uHour", "uSoftness", "uStyle", "uSheen", "uExposure", "uHdr", "uView", "uAtmosphereStrength"]) uniforms[name] = gl.getUniformLocation(sceneProgram, name);
+        for (const name of ["uViewport", "uImage", "uHour", "uTime", "uPixelRatio", "uWindTravel", "uExposure", "uHdr", "uAtmosphereStrength"]) dustUniforms[name] = gl.getUniformLocation(dustProgram, name);
         gl.pixelStorei(gl.UNPACK_COLORSPACE_CONVERSION_WEBGL, gl.NONE);
         const maxTextureSize = gl.getParameter(gl.MAX_TEXTURE_SIZE) as number;
-        [color, normal, smooth, closed].forEach((img, index) => {
+        [color, normal, smooth, closed ?? color].forEach((img, index) => {
           const texture = gl.createTexture();
           if (!texture) throw new Error("Unable to allocate texture");
           textures.push(texture);
@@ -232,13 +277,13 @@ export function RelightScene(settings: RelightSettings) {
         lastTime = 0;
         draw(performance.now());
         setReady(true);
-      } catch (error) { console.error("Home relighting unavailable:", error); setReady(false); }
+      } catch (error) { console.error("Home relighting unavailable:", error); setReady(false); report("静态背景 · 动态场景加载失败"); }
     };
     requestDraw.current = schedule;
     const resize = new ResizeObserver(schedule);
     resize.observe(canvas);
     const visibility = () => { if (document.hidden) { cancelAnimationFrame(frame); frame = 0; } else { lastTime = performance.now(); schedule(); } };
-    const lost = (event: Event) => { event.preventDefault(); initialized = false; cancelAnimationFrame(frame); frame = 0; setReady(false); };
+    const lost = (event: Event) => { event.preventDefault(); initialized = false; cancelAnimationFrame(frame); frame = 0; setReady(false); report("动态场景恢复中"); };
     const restored = () => { post = null; textures.length = 0; shaders.length = 0; programs.length = 0; buffers.length = 0; void initialize(); };
     document.addEventListener("visibilitychange", visibility);
     reduced.addEventListener("change", schedule);

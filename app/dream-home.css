@@ -36,39 +36,8 @@
 .dream-light-controls button { border: 0; min-height: 44px; padding: 4px; background: transparent; color: #f6dfb4; font-size: 10px; }
 .dream-light-controls button:disabled { opacity: .5; cursor: default; }
 .dream-light-controls .dream-motion-toggle { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
-.dream-drawer { position: absolute; z-index: 2; top: 0; right: 0; bottom: 0; width: min(51%,760px); padding: 28px clamp(26px,3.5vw,58px); overflow-y: auto; overscroll-behavior: contain; border-left: 1px solid #eee4d15c; background: linear-gradient(130deg,#24333cb8,#1f2d379e); backdrop-filter: blur(12px) saturate(.75); box-shadow: -25px 0 100px #111b2620; transform: translateX(102%); visibility: hidden; transition: transform 750ms cubic-bezier(.22,.8,.22,1),visibility 750ms; }
-.is-open .dream-drawer { transform: translateX(0); visibility: visible; }
-.is-open .dream-scene { transform: scale(1.025) translateX(-18%); }
-.is-open .dream-welcome { transform: translate(-3vw,-50%); }
-.is-open .dream-header-note, .is-open .dream-caption { visibility: hidden; }
-.dream-drawer-top { display: flex; justify-content: space-between; align-items: center; color: #ebddc2; font-size: 9px; letter-spacing: .2em; }
-.dream-drawer-top button { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #e9dfca50; border-radius: 50%; color: #f6efe3; background: transparent; transition: background 200ms; }
-.dream-drawer-top button:hover { background: #ffffff20; }
-.dream-drawer-heading { margin: clamp(25px,5vh,65px) 0 27px; }
-.dream-drawer-heading > span { color: #dfcda9; font-size: 10px; letter-spacing: .16em; }
-.dream-drawer-heading h2 { margin: 9px 0; font-family: var(--font-serif); font-size: clamp(27px,2.7vw,39px); font-weight: 400; letter-spacing: .08em; }
-.dream-drawer-heading p { margin: 0; color: #e1e2e0; font-size: 11px; letter-spacing: .1em; }
-.dream-destinations { display: grid; gap: 16px; }
-.dream-card { position: relative; display: block; padding: 19px 23px 15px; overflow: hidden; border: 1px solid #e4d5b65c; border-radius: 4px; color: #fff9ee; text-decoration: none; background: linear-gradient(115deg,#e3dbc714,#d3b47724); transition: background 220ms,border-color 220ms,transform 220ms; }
-.dream-card-gallery { background: linear-gradient(115deg,#c9d4e916,#88a4c52a); }
-.dream-card:hover { border-color: #e9d2a6; background: #dfceb130; transform: translateX(-4px); }
-.dream-card-top { display: flex; align-items: center; gap: 12px; color: #e3cda7; }
-.dream-card-gallery .dream-card-top { color: #c5d5ec; }
-.dream-card-top > span { font-size: 8px; letter-spacing: .17em; }
-.dream-card-arrow { margin-left: auto; }
-.dream-card-copy { margin-top: 12px; }
-.dream-card-copy > span { font-size: 10px; letter-spacing: .2em; color: #f0e4d2; }
-.dream-card h3 { margin: 1px 0 6px; font-family: Georgia,serif; font-size: clamp(23px,2.2vw,32px); font-weight: 400; line-height: 1.2; letter-spacing: -.03em; }
-.dream-card p { margin: 0; color: #e0e3e1; font-size: 11px; line-height: 1.7; }
-.dream-card-bottom { display: flex; justify-content: space-between; align-items: center; margin-top: 16px; padding-top: 10px; border-top: 1px solid #f1e4ca26; font-size: 10px; letter-spacing: .1em; }
-.dream-coming { display: flex; align-items: center; gap: 16px; margin-top: 17px; padding: 19px 20px; border: 1px dashed #dddfdd55; border-radius: 4px; color: #e0e1dd; }
-.dream-coming h3 { margin: 0; font-family: var(--font-serif); font-size: 13px; font-weight: 400; letter-spacing: .08em; }
-.dream-coming p { margin: 5px 0 0; font-size: 10px; }
-.dream-coming > span { margin-left: auto; font-size: 7px; letter-spacing: .12em; }
-.dream-drawer-footer { display: flex; justify-content: space-between; gap: 12px; margin-top: 27px; padding-bottom: 5px; color: #dedacb; font-size: 9px; letter-spacing: .1em; }
-@media (min-width: 1600px) { .dream-welcome { left: 10%; } .dream-drawer { width: 47%; } }
-@media (max-height: 800px) and (min-width: 761px) { .dream-drawer { padding-top: 20px; padding-bottom: 20px; } .dream-drawer-heading { margin-top: 17px; margin-bottom: 20px; } .dream-card { padding-top: 14px; padding-bottom: 12px; } .dream-card-copy { margin-top: 8px; } .dream-card-bottom { margin-top: 12px; } .dream-coming { padding-block: 13px; } .dream-drawer-footer { margin-top: 18px; } }
-@media (max-width: 1000px) { .dream-welcome { left: 5%; } .dream-date { flex-wrap: wrap; gap: 5px 15px; } .dream-drawer { width: 53%; padding-inline: 25px; } .dream-greeting h1 { font-size: 22px; } .dream-clock { font-size: 112px; } .dream-clock > span { font-size: 13px; margin-left: 8px; } .dream-coming { gap: 10px; padding-inline: 12px; } }
+@media (min-width: 1600px) { .dream-welcome { left: 10%; } }
+@media (max-width: 1000px) { .dream-welcome { left: 5%; } .dream-date { flex-wrap: wrap; gap: 5px 15px; } .dream-greeting h1 { font-size: 22px; } .dream-clock { font-size: 112px; } .dream-clock > span { font-size: 13px; margin-left: 8px; } }
 @media (max-width: 760px) {
  .dream-home { min-height: 680px; }
  .dream-header { inset: 25px 24px auto; } .dream-brand { font-size: 11px; } .dream-brand small { font-size: 6px; } .dream-header-note { display: none; }
@@ -76,12 +45,6 @@
  .dream-clock { font-size: clamp(90px,20vw,135px); line-height: 1.15; } .dream-date { font-size: 10px; } .dream-date > span { font-size: 7px; }
  .dream-greeting { margin-top: 24px; } .dream-greeting h1 { font-size: 23px; } .dream-small-line { margin-bottom: 18px; } .dream-description { font-size: 11px; } .dream-enter { margin-top: 25px; }
  .dream-footer { inset: auto 6% 20px; } .dream-caption { display: none; }
- .dream-drawer { top: 190px; width: calc(100% - 20px); padding: 18px 23px 25px; border-radius: 16px 0 0 0; background: linear-gradient(140deg,#23333ce8,#1b2936cc); backdrop-filter: blur(16px); }
- .dream-drawer-heading { margin: 15px 0 20px; } .dream-drawer-heading h2 { font-size: 28px; }
- .dream-drawer-top { font-size: 8px; } .dream-drawer-top button { width: 44px; height: 44px; }
- .dream-card { padding: 17px 20px 14px; } .dream-card h3 { font-size: 29px; } .dream-coming { padding: 15px; }
- .is-open .dream-welcome { top: 94px; bottom: auto; transform: none; } .is-open .dream-clock { font-size: 61px; margin-top: 0; } .is-open .dream-date { font-size: 9px; } .is-open .dream-greeting, .is-open .dream-enter, .is-open .dream-enter-note { visibility: hidden; }
- .is-open .dream-scene { transform: scale(1.025) translateX(-3%); } .is-open .dream-footer { visibility: hidden; }
  .dream-light-controls { width: min(310px,86vw); }
 }
 @media (prefers-reduced-motion: reduce) { .dream-home *, .dream-home *::before, .dream-home *::after { animation: none !important; transition: none !important; } }

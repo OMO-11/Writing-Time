@@ -12,6 +12,8 @@ varying vec2 vUv;
 uniform sampler2D uColor;
 uniform sampler2D uClosed;
 uniform float uTime;
+uniform float uBlink;
+uniform float uWind;
 uniform sampler2D uNormal;
 uniform sampler2D uSmoothNormal;
 uniform float uAtmosphereStrength;
@@ -26,6 +28,20 @@ uniform float uExposure;
 uniform float uHdr;
 uniform float uView;
 float region(vec2 uv,vec2 center,vec2 radius) { return 1.-smoothstep(.72,1.,length((uv-center)/radius)); }
+// Conservative sky interiors, inset well away from mullions and architecture.
+float skyInterior(vec2 uv) {
+  float pane=smoothstep(.085,.11,uv.x)*(1.-smoothstep(.24,.258,uv.x));
+  float height=smoothstep(.035,.07,uv.y)*(1.-smoothstep(.24,.29,uv.y));
+  return pane*height;
+}
+float hazeNoise(vec2 p) {
+  vec2 cell=floor(p), f=fract(p); f=f*f*(3.-2.*f);
+  float a=fract(sin(dot(cell,vec2(127.1,311.7)))*43758.5453);
+  float b=fract(sin(dot(cell+vec2(1.,0.),vec2(127.1,311.7)))*43758.5453);
+  float c=fract(sin(dot(cell+vec2(0.,1.),vec2(127.1,311.7)))*43758.5453);
+  float d=fract(sin(dot(cell+vec2(1.),vec2(127.1,311.7)))*43758.5453);
+  return mix(mix(a,b,f.x),mix(c,d,f.x),f.y);
+}
 // All material textures and masks use this single inverse deformation field.
 vec2 animatedUv(vec2 uv) {
   vec3 guide=texture2D(uColor,uv).rgb;
@@ -33,23 +49,26 @@ vec2 animatedUv(vec2 uv) {
   float earGuard=region(uv,vec2(.712,.297),vec2(.025,.049));
   float handGuard=max(region(uv,vec2(.626,.439),vec2(.045,.083)),region(uv,vec2(.714,.76),vec2(.09,.052)));
   float protect=max(faceGuard,max(earGuard,handGuard));
-  float hairArea=max(region(uv,vec2(.648,.238),vec2(.113,.165)),region(uv,vec2(.752,.423),vec2(.053,.127)));
   float silver=smoothstep(.28,.56,guide.g)*(1.-smoothstep(.04,.13,guide.r-guide.b));
-  float hair=hairArea*silver*(1.-protect);
-  float tips=smoothstep(.13,.45,uv.y);
-  float sway=sin(uTime*1.05+uv.y*9.)*.65+sin(uTime*1.73+uv.x*13.)*.35;
-  vec2 offset=vec2(sway*.0018, sin(uTime*.95+uv.x*8.)*.0005)*hair*tips;
-  float torso=region(uv,vec2(.713,.589),vec2(.133,.158))*(1.-handGuard)*(1.-faceGuard);
-  float breath=sin(uTime*1.35);
-  offset+=vec2((uv.x-.69)*.006, -.00115)*breath*torso;
+  float bangs=region(uv,vec2(.644,.22),vec2(.071,.103));
+  float side=region(uv,vec2(.586,.29),vec2(.038,.135));
+  float tips=region(uv,vec2(.596,.434),vec2(.038,.079));
+  float pony=region(uv,vec2(.752,.425),vec2(.048,.103))*smoothstep(.34,.47,uv.y);
+  float strand=bangs*.00050*sin(uTime*1.47+uv.y*8.);
+  strand+=side*.00095*sin(uTime*.83+1.1);
+  strand+=tips*.0014*sin(uTime*.83+.4);
+  strand+=pony*.0021*sin(uTime*.72-.7);
+  float gust=max(0.,uWind-.15);
+  strand+=gust*(tips*.0013*sin(uTime*.83+.4)+pony*.0022*sin(uTime*.72-.7));
+  vec2 offset=vec2(strand,strand*.2)*silver*(1.-protect);
+  float cape=region(uv,vec2(.817,.636),vec2(.037,.071))*(1.-protect);
+  offset.x+=cape*gust*.00055*sin(uTime*.72-.9);
+  float torso=region(uv,vec2(.713,.589),vec2(.122,.139))*(1.-protect);
+  float breath=sin(uTime*1.256637); // five-second cycle, anchored below shoulders
+  offset+=vec2((uv.x-.69)*.007,(uv.y-.70)*.014)*breath*torso;
+  // Cloud drift is shared by color and normals; edges remain registered.
+  offset.x+=skyInterior(uv)*.00065*sin(uTime*.02618);
   return uv-offset;
-}
-float blinkAmount(float time) {
-  float cycle=mod(time,13.7);
-  float first=smoothstep(2.9,2.98,cycle)*(1.-smoothstep(3.05,3.19,cycle));
-  float second=smoothstep(7.8,7.88,cycle)*(1.-smoothstep(7.95,8.10,cycle));
-  float third=smoothstep(12.0,12.08,cycle)*(1.-smoothstep(12.14,12.28,cycle));
-  return max(first,max(second,third));
 }
 // The generated normal artwork is not a pixel-perfect geometry scan. Filter
 // its vectors continuously at upload time and retain only broad surface form.
@@ -105,12 +124,22 @@ void main() {
   if (uView>1.5) { gl_FragColor=vec4(texture2D(uNormal,uv).rgb,1.); return; }
   if (uView>.5) { gl_FragColor=vec4(base,1.); return; }
 
-  float blink=blinkAmount(uTime);
+  float blink=uBlink;
   float leftEye=region(uv,vec2(.623,.342),vec2(.0185,.027));
   float rightEye=region(uv,vec2(.676,.298),vec2(.019,.029));
-  vec2 closedUv=uv+mix(vec2(-.004,.004),vec2(.001,.008),step(.65,uv.x));
+  float eyeSide=step(.65,uv.x);
+  vec2 eyeCenter=mix(vec2(.623,.342),vec2(.676,.298),eyeSide);
+  // Move the upper eyelid across the iris instead of dissolving two complete
+  // eye images. Account for the painted head tilt; never squeeze the eyeball.
+  float lidY=(uv.y-eyeCenter.y)+(uv.x-eyeCenter.x)*.48;
+  float frontier=-.020*(1.-blink);
+  vec2 closedUv=uv+mix(vec2(-.004,.004),vec2(.001,.008),eyeSide);
+  closedUv.y-=frontier;
   vec3 closedColor=texture2D(uClosed,closedUv).rgb;
-  base=mix(base,closedColor,blink*max(leftEye,rightEye));
+  float covered=1.-smoothstep(frontier+.001,frontier+.004,lidY);
+  covered=mix(covered,1.,smoothstep(.78,1.,blink));
+  float eyelid=covered*smoothstep(0.,.12,blink)*max(leftEye,rightEye);
+  base=mix(base,closedColor,eyelid);
   float angle=(uHour-6.)/12.*3.14159265;
   float elevation=sin(angle);
   float day=smoothstep(-.18,.32,elevation);
@@ -196,6 +225,9 @@ void main() {
 
   float window=(1.-smoothstep(.42,.49,uv.x))*(1.-smoothstep(.45,.6,uv.y));
   vec3 outside=reflectance*mix(skyColor*.065+moonColor*.035,mix(vec3(.96,.985,1.),vec3(1.,.49,.22),golden*.8),day);
+  float cloudShade=1.+.025*sin(uTime*.0349);
+  float haze=(hazeNoise(originalUv*5.+vec2(uTime*.003,0.))-.5)*.012;
+  outside*=1.+skyInterior(originalUv)*(cloudShade-1.+haze);
   color=mix(color,outside,window*.7);
   // Single-scattering approximation: feathered light shafts through window
   // apertures, attenuated by optical distance and foreground occlusion.
