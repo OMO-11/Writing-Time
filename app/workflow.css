@@ -209,3 +209,15 @@ body:has(.workbench[data-focus="true"]) .workshop-sigil { width: 36px; height: 3
   .global-save-status svg, .editor-status-save svg { animation: none !important; }
   .document-outline { transition: none; }
 }
+.finalize-bar { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:8px 24px; flex-wrap:wrap; background:#f4f0e8; }
+.app-shell .workbench { grid-template-rows: auto 56px auto minmax(0, 1fr) 28px; }
+@media(max-width:760px) { .app-shell .workbench { grid-template-rows:auto auto auto minmax(0,1fr) 28px; } }
+
+/* History and preview-only mode have variable toolbar counts. */
+.app-shell .workbench { display: flex; flex-direction: column; }
+.workbench > .editor-workspace { flex: 1; min-height: 0; }
+.workbench > .editor-header, .workbench > .markdown-toolbar, .workbench > .editor-status-bar, .workbench > .finalize-bar { flex-shrink: 0; }
+.recovery-history { padding: 8px 24px; border-bottom: 1px solid var(--line); background: var(--paper-light); }
+.recovery-history summary { cursor: pointer; }
+.workbench > .recovery-history { flex-shrink: 0; max-height: 45vh; overflow: auto; }
+.recovery-history textarea { font-size: 14px; padding: 8px; border: 1px solid var(--line); }

@@ -18,9 +18,15 @@ export function BlobImage({
   className?: string;
   loading?: "eager" | "lazy";
 }) {
-  const [url] = useState(() => URL.createObjectURL(blob));
-
-  useEffect(() => () => URL.revokeObjectURL(url), [url]);
+  const [url, setUrl] = useState("");
+  useEffect(() => {
+    const next = URL.createObjectURL(blob);
+    // The URL belongs to this effect's Blob lifetime and must be released on replacement.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setUrl(next);
+    return () => URL.revokeObjectURL(next);
+  }, [blob]);
+  if (!url) return null;
 
   return (
     <Image

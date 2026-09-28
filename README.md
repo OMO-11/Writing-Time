@@ -18,6 +18,14 @@
 
 ---
 
+## 2026-09-28 改进状态
+
+已实现保存队列刷新、跨标签页覆盖检测、定稿图片保护、备份 v4 校验与一致快照、资源完整导出、恢复历史和修订副本。书籍编订位于 `/projects`，连续阅读位于 `/books/[id]`；图片资源库按元数据筛选，每页最多读取 48 张图片。恢复历史提供并排预览，恢复时创建新草稿。
+
+TypeScript 与轻量核心测试通过；源码 ESLint 汇总 0 错误、1 条既有警告。本机 Node ARM64 的 Lightning CSS / Tailwind oxide 原生依赖仍无法加载，生产构建、浏览器与手机验收按要求跳过。详细范围、未完成建议及跳过原因见 [实施日志](dosc/项目改进实施日志-2026-09-28.md)。
+
+文档分工：[需求与实施进度](dosc/README.md) · [设计与视觉资料](docs/README.md)。
+
 ## 目录
 
 - [当前产品结构](#当前产品结构)
@@ -285,7 +293,7 @@ Fantasy Workshop 将资料统一抽象为 9 种内容类型，共用 `contents` 
 [[角色设定#外貌]]
 ```
 
-跳转时按标题在内容库中匹配；文章支持标题锚点定位，找不到目标时回退到搜索。
+按标题匹配，同名时选择目标，也可用 `[[内容 ID]]` 建立固定引用。标题使用 `section-` 前缀锚点，重复标题编号；找不到目标时提供搜索入口。代码块和行内代码中的 Wiki 示例不生成引用。
 
 ---
 
@@ -296,12 +304,13 @@ Fantasy Workshop 将资料统一抽象为 9 种内容类型，共用 `contents` 
 | 操作 | 格式 | 内容 |
 | --- | --- | --- |
 | 完整备份 | `fantasy-workshop-backup-*.json` | 内容、图片 Data URL、编辑会话、恢复快照、活动与设置 |
-| 恢复备份 | JSON | 默认合并，同 ID 以备份版本覆盖 |
+| 恢复备份 | JSON v3/v4 | 校验后合并，定稿及其引用图片跳过；返回实际数量 |
 | 单篇文章 | `.md` | 原始 Markdown + Frontmatter |
 | 内容包 | `.zip` | 内容元数据、Markdown 与关联图片 |
 | 图片集 | `.zip` | 图片集元数据与原始图片 |
 | 项目 | `.zip` | 项目、成员清单和相关资源 |
-| 静态网页 | `.html` | 可独立打开的渲染页面 |
+| 静态网页 | `.html` | 图片内嵌，可离线打开；缺失资源中止导出 |
+| 书籍 | `.html` / `.zip` | 整书目录、定稿正文、图片与 Markdown 文件 |
 | Markdown 导入 | `.md` | 读取 title / tags / status Frontmatter |
 
 ---
@@ -310,11 +319,12 @@ Fantasy Workshop 将资料统一抽象为 9 种内容类型，共用 `contents` 
 
 ### IndexedDB
 
-数据库名：`FantasyWorkshop`，通过 Dexie 4 访问，当前 schema 为 version 3。
+数据库名：`FantasyWorkshop`，通过 Dexie 4 访问，当前 schema 为 version 4。备份文件格式独立为 v4，兼容读取 v3。
 
 | 表 | 主键 | 用途 |
 | --- | --- | --- |
 | `contents` | `id` | 9 类统一内容主表 |
+| `books` | `id` | 书籍、章节与定稿作品目录 |
 | `works` | `id` | 文章旧格式镜像，用于兼容 |
 | `images` | `id` | 图片 Blob、WebP 缩略图与元数据 |
 | `collections` | `id` | 合集旧格式镜像 |
@@ -328,6 +338,7 @@ Fantasy Workshop 将资料统一抽象为 9 种内容类型，共用 `contents` 
 
 - **v1 -> v2**：新增编辑会话与恢复快照，归一化旧状态与文章派生字段
 - **v2 -> v3**：新增统一内容相关表，将旧 `works` / `images` / `collections` 折算为 `contents`
+- **v3 -> v4**：新增书籍目录表 `books`
 
 启动时通过幂等迁移确保内容镜像、HTML、纯文本、摘要、标题锚点和引用图谱处于可用状态。
 
@@ -467,6 +478,8 @@ node_modules/
 | `npm run build` | 执行生产构建和 TypeScript 检查 |
 | `npm run start` | 启动生产服务器 |
 | `npm run lint` | ESLint 检查 |
+| `npm test` | 无浏览器的保存队列、Markdown 与备份校验回归 |
+| `npm run test:books` | 可选书籍浏览器回归，需提供 Playwright；支持 BASE_URL / BROWSER_CHANNEL |
 | `python scripts/prepare-character-assets.py` | 预处理角色插画，需要 Pillow |
 
 ---

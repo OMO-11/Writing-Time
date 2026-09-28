@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ArrowLeft, Check, Download, ExternalLink, LoaderCircle, Star } from "lucide-react";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { CollectionEditor } from "@/components/content/CollectionEditor";
 import { CommonContentFields } from "@/components/content/CommonContentFields";
 import { ContentIcon } from "@/components/content/ContentIcon";
@@ -16,7 +16,9 @@ import { ProjectEditor } from "@/components/content/ProjectEditor";
 import { RecordEditor } from "@/components/content/RecordEditor";
 import { TimelineEditor } from "@/components/content/TimelineEditor";
 import { CONTENT_TYPE_REGISTRY, getContentHref } from "@/lib/content-registry";
-import { saveContent } from "@/lib/content-service";
+import { saveContent, toggleFavorite } from "@/lib/content-service";
+import { SaveQueue } from "@/lib/save-queue";
+import { useUIStore } from "@/stores/ui-store";
 import { db } from "@/lib/db";
 import { exportArticleMarkdown, exportContentPackage, exportGalleryZip, exportProjectZip, exportStaticHtml } from "@/lib/export-service";
 import type { ContentItem } from "@/types/content";
@@ -34,20 +36,40 @@ function TypedEditor({ content, onChange }: { content: ContentItem; onChange: (n
 }
 
 export function ContentDetail({ id }: { id: string }) {
-  const stored = useLiveQuery(() => db.contents.get(id), [id]);
+  const stored = useLiveQuery(async () => (await db.contents.get(id)) ?? null, [id]);
   const [draft, setDraft] = useState<ContentItem>();
   const [saveState, setSaveState] = useState<"saved" | "saving" | "error">("saved");
   const hydratedId = useRef<string | undefined>(undefined);
-  const lastSaved = useRef("");
-  useEffect(() => { if (stored && hydratedId.current !== stored.id) { hydratedId.current = stored.id; lastSaved.current = JSON.stringify(stored); setDraft(stored); } }, [stored]);
+  const latest = useRef<ContentItem | undefined>(undefined);
+  const base = useRef(0);
+  const queue = useRef<SaveQueue<ContentItem> | null>(null);
   useEffect(() => {
-    if (!draft || JSON.stringify(draft) === lastSaved.current) return;
-    setSaveState("saving");
-    const timer = window.setTimeout(() => { void saveContent(draft).then((next) => { lastSaved.current = JSON.stringify(next); setDraft(next); setSaveState("saved"); }).catch(() => setSaveState("error")); }, 700);
+    queue.current ??= new SaveQueue(async (value) => {
+      const next = await saveContent({ ...value, updatedAt: base.current });
+      base.current = next.updatedAt;
+      if (latest.current === value) { latest.current = next; setDraft(next); }
+    });
+  }, []);
+  const flush = useCallback(async () => {
+    try { await queue.current!.flush(); setSaveState("saved"); }
+    catch (error) { setSaveState("error"); useUIStore.getState().showToast(error instanceof Error ? error.message : "保存失败，草稿仍保留，请重试。", "error"); throw error; }
+  }, []);
+  const edit = (next: ContentItem) => { latest.current = next; setDraft(next); queue.current!.enqueue(next); setSaveState("saving"); };
+  useEffect(() => { if (stored && hydratedId.current !== stored.id) { hydratedId.current = stored.id; base.current = stored.updatedAt; latest.current = stored; setDraft(stored); } }, [stored]);
+  useEffect(() => {
+    if (saveState !== "saving") return;
+    const timer = window.setTimeout(() => { void flush().catch(() => {}); }, 700);
     return () => window.clearTimeout(timer);
-  }, [draft]);
+  }, [draft, saveState, flush]);
+  useEffect(() => {
+    useUIStore.getState().registerSaveHandler(flush);
+    const save = () => { void flush().catch(() => {}); };
+    window.addEventListener("blur", save);
+    window.addEventListener("pagehide", save);
+    return () => { window.removeEventListener("blur", save); window.removeEventListener("pagehide", save); save(); useUIStore.getState().registerSaveHandler(null); };
+  }, [flush]);
   if (stored === undefined && !draft) return <main className="content-detail-loading"><LoaderCircle aria-hidden="true" size={22} />正在打开内容…</main>;
   if (!draft) return <main className="content-detail-loading">没有找到这项内容。</main>;
   const definition = CONTENT_TYPE_REGISTRY[draft.type];
-  return <main className="content-detail-page"><header className="content-detail-header"><Link href="/library" aria-label="返回内容工作区"><ArrowLeft aria-hidden="true" size={18} /></Link><span data-accent={definition.accent}><ContentIcon type={draft.type} />{definition.label}</span><div><h1>{draft.title}</h1><p>{definition.description}</p></div><details className="content-export-menu"><summary><Download aria-hidden="true" size={17} />导出</summary><div><button type="button" onClick={() => void exportStaticHtml(draft)}>静态 HTML</button><button type="button" onClick={() => void exportContentPackage(draft)}>内容与图片 ZIP</button>{draft.type === "article" ? <button type="button" onClick={() => void exportArticleMarkdown(draft)}>单篇 Markdown</button> : null}{draft.type === "gallery" ? <button type="button" onClick={() => void exportGalleryZip(draft)}>图片集 ZIP</button> : null}{draft.type === "project" ? <button type="button" onClick={() => void exportProjectZip(draft)}>项目 ZIP</button> : null}</div></details><button type="button" aria-pressed={draft.favorite} onClick={() => setDraft({ ...draft, favorite: !draft.favorite } as ContentItem)}><Star aria-hidden="true" size={17} fill={draft.favorite ? "currentColor" : "none"} />{draft.favorite ? "已收藏" : "收藏"}</button><span className="content-save-indicator" data-state={saveState}>{saveState === "saving" ? <LoaderCircle aria-hidden="true" size={15} /> : <Check aria-hidden="true" size={15} />}{saveState === "saving" ? "保存中" : saveState === "error" ? "保存失败" : "已保存"}</span></header><div className="content-detail-layout"><div className="content-detail-main"><CommonContentFields content={draft} onChange={setDraft} /><TypedEditor content={draft} onChange={setDraft} /></div><ContentLinksPanel contentId={draft.id} /></div></main>;
+  return <main className="content-detail-page"><header className="content-detail-header"><Link href="/library" aria-label="返回内容工作区"><ArrowLeft aria-hidden="true" size={18} /></Link><span data-accent={definition.accent}><ContentIcon type={draft.type} />{definition.label}</span><div><h1>{draft.title}</h1><p>{definition.description}</p></div><details className="content-export-menu"><summary><Download aria-hidden="true" size={17} />导出</summary><div><button type="button" onClick={() => void exportStaticHtml(draft)}>静态 HTML</button><button type="button" onClick={() => void exportContentPackage(draft)}>内容与图片 ZIP</button>{draft.type === "article" ? <button type="button" onClick={() => void exportArticleMarkdown(draft)}>单篇 Markdown</button> : null}{draft.type === "gallery" ? <button type="button" onClick={() => void exportGalleryZip(draft)}>图片集 ZIP</button> : null}{draft.type === "project" ? <button type="button" onClick={() => void exportProjectZip(draft)}>项目 ZIP</button> : null}</div></details><button type="button" aria-pressed={draft.favorite} onClick={() => void flush().then(() => toggleFavorite(draft.id)).then(() => { const next = { ...latest.current!, favorite: !draft.favorite }; latest.current = next; setDraft(next); }).catch(() => setSaveState("error"))}><Star aria-hidden="true" size={17} fill={draft.favorite ? "currentColor" : "none"} />{draft.favorite ? "已收藏" : "收藏"}</button><button type="button" hidden={saveState !== "error"} onClick={() => void flush().catch(() => {})}>重试保存</button><span className="content-save-indicator" data-state={saveState}>{saveState === "saving" ? <LoaderCircle aria-hidden="true" size={15} /> : <Check aria-hidden="true" size={15} />}{saveState === "saving" ? "保存中" : saveState === "error" ? "保存失败" : "已保存"}</span></header><div className="content-detail-layout"><div className="content-detail-main">{draft.type === "article" && draft.payload.finalizedAt ? <p>已完全保存，作品不可修改。</p> : <CommonContentFields content={draft} onChange={edit} />}<TypedEditor content={draft} onChange={edit} /></div><ContentLinksPanel contentId={draft.id} /></div></main>;
 }

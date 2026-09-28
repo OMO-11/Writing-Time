@@ -7,13 +7,14 @@ import remarkRehype from "remark-rehype";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import rehypeStringify from "rehype-stringify";
 import { visit } from "unist-util-visit";
-import type { Content, Heading, Image, Paragraph, Root } from "mdast";
+import type { Content, Heading, Image, Paragraph, Root, Text, PhrasingContent } from "mdast";
 import type { ExtractedImage, HeadingItem, LineBreakMode, WorkDocument } from "@/types/workshop";
 
 export interface ParsedMarkdown {
   content: string;
   frontmatter: Record<string, unknown>;
   tree: Root;
+  offset: number;
 }
 
 export interface ProcessedMarkdown extends ParsedMarkdown {
@@ -33,22 +34,48 @@ export interface SearchDocumentInput {
 
 const sanitizeSchema = {
   ...defaultSchema,
+  clobberPrefix: "",
   protocols: {
     ...defaultSchema.protocols,
     src: [...(defaultSchema.protocols?.src ?? []), "fw-asset", "data"],
   },
 };
 
-function expandWikiLinks(markdown: string) {
-  return markdown.split(/(```[\s\S]*?```|~~~[\s\S]*?~~~)/g).map((part, index) => {
-    if (index % 2) return part;
-    return part.replace(/\[\[([^\]#]+?)(?:#([^\]]+))?\]\]/g, (_match, rawTitle: string, rawHeading?: string) => {
-      const title = rawTitle.trim();
-      const heading = rawHeading?.trim();
-      const href = `/wiki/${encodeURIComponent(title)}${heading ? `?heading=${encodeURIComponent(heading)}` : ""}`;
-      return `[${title}${heading ? `#${heading}` : ""}](${href})`;
+function headingIds() {
+  return (tree: Root) => {
+    const counts = new Map<string, number>();
+    visit(tree, "heading", (node: Heading) => {
+      node.data = { ...node.data, hProperties: { id: `section-${slugHeading(nodeText(node).trim(), counts)}` } };
     });
-  }).join("");
+  };
+}
+
+export function wikiTargets(source: string) {
+  const tree = unified().use(remarkParse).use(remarkGfm).parse(matter(source).content);
+  const targets: { title: string; heading?: string }[] = [];
+  visit(tree, "text", (node: Text, _index, parent) => {
+    if (parent?.type === "link" || parent?.type === "linkReference") return;
+    for (const match of node.value.matchAll(/\[\[([^\]#]+?)(?:#([^\]]+))?\]\]/g)) targets.push({ title: match[1].trim(), heading: match[2]?.trim() });
+  });
+  return targets;
+}
+function wikiLinks() {
+  return (tree: Root) => {
+    visit(tree, "text", (node: Text, index, parent) => {
+      if (!parent || index === undefined || parent.type === "link" || parent.type === "linkReference") return;
+      const children: PhrasingContent[] = []; let offset = 0;
+      for (const match of node.value.matchAll(/\[\[([^\]#]+?)(?:#([^\]]+))?\]\]/g)) {
+        children.push({ type: "text", value: node.value.slice(offset, match.index) });
+        const title = match[1].trim(), heading = match[2]?.trim();
+        children.push({ type: "link", url: `/wiki/${encodeURIComponent(title)}${heading ? `?heading=${encodeURIComponent(heading)}` : ""}`, children: [{ type: "text", value: title + (heading ? `#${heading}` : "") }] });
+        offset = match.index! + match[0].length;
+      }
+      if (!offset) return;
+      children.push({ type: "text", value: node.value.slice(offset) });
+      (parent.children as PhrasingContent[]).splice(index, 1, ...children);
+      return index + children.length;
+    });
+  };
 }
 
 function nodeText(node: Content | Root): string {
@@ -70,6 +97,7 @@ function slugHeading(value: string, counts: Map<string, number>) {
 
 async function renderTree(tree: Root) {
   const processor = unified()
+    .use(wikiLinks)
     .use(remarkRehype)
     .use(rehypeSanitize, sanitizeSchema)
     .use(rehypeStringify);
@@ -80,8 +108,8 @@ async function renderTree(tree: Root) {
 export const MarkdownService = {
   parseMarkdown(markdown: string): ParsedMarkdown {
     const parsed = matter(markdown);
-    const tree = unified().use(remarkParse).use(remarkGfm).parse(expandWikiLinks(parsed.content)) as Root;
-    return { content: parsed.content, frontmatter: parsed.data, tree };
+    const tree = unified().use(remarkParse).use(remarkGfm).parse(parsed.content) as Root;
+    return { content: parsed.content, frontmatter: parsed.data, tree, offset: markdown.length - parsed.content.length };
   },
 
   async renderHtml(markdown: string, lineBreakMode: LineBreakMode = "standard") {
@@ -89,10 +117,12 @@ export const MarkdownService = {
     const processor = unified().use(remarkParse).use(remarkGfm);
     if (lineBreakMode === "single") processor.use(remarkBreaks);
     const file = await processor
+      .use(wikiLinks)
+      .use(headingIds)
       .use(remarkRehype)
       .use(rehypeSanitize, sanitizeSchema)
       .use(rehypeStringify)
-      .process(expandWikiLinks(parsed.content));
+      .process(parsed.content);
     return String(file);
   },
 
@@ -115,13 +145,15 @@ export const MarkdownService = {
     const parsed = typeof input === "string" ? this.parseMarkdown(input) : input;
     const counts = new Map<string, number>();
     const headings: HeadingItem[] = [];
-    visit(parsed.tree, "heading", (node: Heading) => {
+    const headingTree = structuredClone(parsed.tree);
+    wikiLinks()(headingTree);
+    visit(headingTree, "heading", (node: Heading) => {
       const text = nodeText(node).trim();
       headings.push({
-        id: slugHeading(text, counts),
+        id: `section-${slugHeading(text, counts)}`,
         text,
         level: node.depth,
-        from: node.position?.start.offset ?? 0,
+        from: (node.position?.start.offset ?? 0) + parsed.offset,
       });
     });
     return headings;

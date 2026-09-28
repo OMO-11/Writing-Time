@@ -12,11 +12,12 @@ import { MarkdownEditor, type EditorPosition, type MarkdownEditorHandle } from "
 import { MarkdownPreview } from "@/components/workbench/MarkdownPreview";
 import { MarkdownToolbar } from "@/components/workbench/MarkdownToolbar";
 import { WorkDrawer } from "@/components/workbench/WorkDrawer";
+import { RecoveryHistory } from "@/components/workbench/RecoveryHistory";
 import { ImagePicker } from "@/components/content/ImagePicker";
 import { CharacterIllustration } from "@/components/theme/CharacterIllustration";
 import { articleContentFromWork, createBlankWork, createRecoverySnapshot, db, ensureStarterData, getLineBreakMode, hydrateWorkDocument, importImageFile, recordActivity } from "@/lib/db";
 import { frontmatterTags, MarkdownService } from "@/lib/markdown-service";
-import { SearchService } from "@/lib/search-service";
+import { rebuildAllReferences, rebuildReferencesFor } from "@/lib/content-service";
 import { importMarkdownWork } from "@/lib/work-import";
 import { useUIStore } from "@/stores/ui-store";
 import type { EditorSession, HeadingItem, SaveState, WorkDocument, WorkStatus } from "@/types/workshop";
@@ -41,6 +42,9 @@ export function Workbench() {
   const positionRef = useRef<EditorPosition>(EMPTY_POSITION);
   const outlineOpenRef = useRef(true);
   const lineBreakModeRef = useRef<"standard" | "single">("standard");
+  const [finalizing, setFinalizing] = useState(false);
+  const finalizingRef = useRef(false);
+  const switchingRef = useRef(false);
   const [activeWork, setActiveWork] = useState<WorkDocument>();
   const [markdown, setMarkdown] = useState("");
   const [renderedHtml, setRenderedHtml] = useState("");
@@ -86,14 +90,16 @@ export function Workbench() {
   }, []);
 
   const saveNow = useCallback(async () => {
-    if (savingRef.current) return savingRef.current;
+    while (savingRef.current) await savingRef.current;
     const work = workRef.current;
-    if (!work) return;
+    if (!work || work.finalizedAt) return;
     if (!dirtyRef.current) { persistSession(editorRef.current?.getPosition() ?? positionRef.current); return; }
     const task = (async () => {
       updateSaveState("saving");
       try {
+        while (dirtyRef.current) {
         const source = markdownRef.current;
+        const baseWork = workRef.current!;
         const revision = revisionRef.current;
         const processed = await MarkdownService.process(source, await getLineBreakMode());
         const latestWork = workRef.current ?? work;
@@ -110,11 +116,16 @@ export function Workbench() {
           status,
           updatedAt: Date.now(),
         };
-        await db.transaction("rw", db.works, db.contents, db.activity, async () => {
+        await db.transaction("rw", db.works, db.contents, db.activity, db.contentReferences, async () => {
+          const current = await db.works.get(next.id);
+          if (current && current.updatedAt !== baseWork.updatedAt) throw new Error("其他标签页已修改此作品，当前正文保留在编辑器和恢复快照中。请重新打开后比较。 ");
+          next.updatedAt = Math.max(Date.now(), baseWork.updatedAt + 1);
           await db.works.put(next);
           const previousContent = await db.contents.get(next.id);
           await db.contents.put({ ...articleContentFromWork(next), favorite: previousContent?.favorite ?? false });
           await recordActivity(next.id, "updated", `保存文章「${next.title}」`);
+          if (current?.title !== next.title) await rebuildAllReferences();
+          else await rebuildReferencesFor(articleContentFromWork(next));
         });
         if (revisionRef.current === revision) {
           dirtyRef.current = false;
@@ -123,16 +134,19 @@ export function Workbench() {
           setRenderedHtml(next.renderedHtml);
           setHeadings(next.headings);
         } else {
+          workRef.current = { ...workRef.current!, updatedAt: next.updatedAt };
           dirtyRef.current = true;
           setDirtyVersion((value) => value + 1);
         }
         persistSession(editorRef.current?.getPosition() ?? positionRef.current);
-        await SearchService.rebuild();
+
         updateSaveState(revisionRef.current === revision ? "saved" : "saving");
+        }
       } catch (error) {
         console.error(error);
+        await createRecoverySnapshot(work.id, markdownRef.current).catch(console.error);
         updateSaveState("error");
-        showToast("保存失败，内容仍保留在编辑器中，请稍后重试。", "error");
+        showToast(error instanceof Error ? error.message : "保存失败，内容仍保留在编辑器中，请稍后重试。", "error");
         throw error;
       } finally {
         savingRef.current = null;
@@ -149,10 +163,14 @@ export function Workbench() {
 
   useEffect(() => {
     let cancelled = false;
+    switchingRef.current = true;
     void (async () => {
+      await saveNow();
       await ensureStarterData();
       lineBreakModeRef.current = await getLineBreakMode();
       const found = requestedId ? await db.works.get(requestedId) : await db.works.orderBy("updatedAt").last();
+      if (requestedId && !found) { showToast("没有找到这篇作品。", "error"); router.replace("/library"); return; }
+      if (found?.finalizedAt) { router.replace(`/work/${found.slug}`); return; }
       const selected = await hydrateWorkDocument(found ?? await createBlankWork());
       const session = await db.editorSessions.get(selected.id) ?? {
         workId: selected.id, cursorFrom: 0, cursorTo: 0, scrollTop: 0, editorMode: "split" as const, outlineOpen: true, updatedAt: Date.now(),
@@ -173,13 +191,14 @@ export function Workbench() {
       setActiveWorkTitle(selected.title);
       dirtyRef.current = false;
       updateSaveState("saved");
-    })();
+      switchingRef.current = false;
+    })().catch((error) => { if (!cancelled) { switchingRef.current = false; showToast(String(error), "error"); } });
     return () => { cancelled = true; };
-  }, [requestedId, setActiveWorkTitle, setEditorMode, updateSaveState]);
+  }, [router, requestedId, setActiveWorkTitle, setEditorMode, updateSaveState, saveNow, showToast]);
 
   useEffect(() => {
     if (!activeWork || !dirtyRef.current) return;
-    const timer = window.setTimeout(() => { void saveNow(); }, 800);
+    const timer = window.setTimeout(() => { void saveNow().catch(() => {}); }, 800);
     return () => window.clearTimeout(timer);
   }, [activeWork, dirtyVersion, saveNow]);
 
@@ -223,14 +242,37 @@ export function Workbench() {
   useEffect(() => () => { setActiveWorkTitle(""); void saveNow(); }, [saveNow, setActiveWorkTitle]);
 
   const markDirty = () => { dirtyRef.current = true; revisionRef.current += 1; updateSaveState("saving"); setDirtyVersion((value) => value + 1); };
-  const changeMarkdown = (value: string) => { markdownRef.current = value; setMarkdown(value); markDirty(); };
+  const changeMarkdown = (value: string) => { if (finalizingRef.current || switchingRef.current) return; markdownRef.current = value; setMarkdown(value); markDirty(); };
   const patchWork = (patch: Partial<WorkDocument>) => {
     const current = workRef.current;
-    if (!current) return;
+    if (!current || finalizingRef.current || switchingRef.current) return;
     const next = { ...current, ...patch };
     workRef.current = next;
     setActiveWork(next);
     markDirty();
+  };
+
+  const finalize = async () => {
+    if (finalizingRef.current || switchingRef.current || !workRef.current || !window.confirm("完全保存后，正文、标题和属性均不可再修改。确认定稿？")) return;
+    finalizingRef.current = true; setFinalizing(true);
+    try {
+      await saveNow();
+      if (dirtyRef.current) await saveNow();
+      const id = workRef.current.id;
+      await db.transaction("rw", db.works, db.contents, async () => {
+        const work = await db.works.get(id);
+        if (!work) throw new Error("作品不存在");
+        if (work.updatedAt !== workRef.current?.updatedAt) throw new Error("其他标签页已修改作品，请重新打开后再定稿。");
+        const next = { ...work, status: "completed" as const, finalizedAt: Date.now(), updatedAt: Math.max(Date.now(), work.updatedAt + 1) };
+        await db.works.put(next);
+        const content = await db.contents.get(id);
+        await db.contents.put({ ...articleContentFromWork(next), favorite: content?.favorite ?? false });
+      });
+      dirtyRef.current = false;
+      workRef.current = await db.works.get(id);
+      router.push("/library?type=finished");
+    } catch { showToast("完全保存失败，请重试。", "error"); }
+    finally { finalizingRef.current = false; setFinalizing(false); }
   };
 
   const selectWork = async (work: WorkDocument) => { await saveNow(); router.replace(`/workbench?work=${work.id}`); };
@@ -268,6 +310,8 @@ export function Workbench() {
 
   return (
     <main className="workbench" data-character-theme="noval" data-focus={focusMode} data-typewriter={typewriterMode} onDragEnter={(event) => { event.preventDefault(); setDragging(true); }} onDragOver={(event) => event.preventDefault()} onDragLeave={(event) => { if (event.currentTarget === event.target) setDragging(false); }} onDrop={(event) => { event.preventDefault(); setDragging(false); void handleFiles(event.dataTransfer.files); }}>
+      <div className="finalize-bar"><span>普通保存保留编辑能力；完全保存后可编入书籍。</span><button type="button" className="primary-paper-button" disabled={!activeWork || finalizing} onClick={() => void finalize()}>{finalizing ? "正在定稿…" : "完全保存"}</button></div>
+      {activeWork && <RecoveryHistory workId={activeWork.id} markdown={markdown} />}
       <EditorHeader work={activeWork} outlineOpen={outlineOpen} onTitleChange={(title) => patchWork({ title })} onToggleOutline={() => setOutlineOpen((value) => !value)} onExport={() => void exportMarkdown()} />
       {editorMode !== "preview" ? <MarkdownToolbar onCommand={(command) => editorRef.current?.applyCommand(command)} onUndo={() => editorRef.current?.undo()} onRedo={() => editorRef.current?.redo()} onFind={() => editorRef.current?.openSearch()} onPickImage={() => setImagePickerOpen(true)} /> : null}
 

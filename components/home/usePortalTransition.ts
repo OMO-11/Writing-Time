@@ -98,6 +98,7 @@ export function usePortalTransition() {
     let saved: string | null = null;
     try { saved = sessionStorage.getItem('writing-time-map-scene-v1'); } catch { /* storage may be disabled */ }
     const bootId = id.current;
+    const invalidateTransition = () => { id.current += 1; };
     if (saved === 'map') {
       progress.current = 1;
       if (fog.current) fog.current.style.opacity = '1';
@@ -118,7 +119,7 @@ export function usePortalTransition() {
         if (mounted.current && id.current === bootId) changePhase('idle');
       }).catch(cause => { if (mounted.current) { setBooting(false); setError(cause instanceof Error ? cause.message : '地图暂时无法展开。'); changePhase('error'); } });
     } else queueMicrotask(() => { if (mounted.current && id.current === bootId) setBooting(false); });
-    return () => { mounted.current = false; id.current++; preference.removeEventListener('change', update); };
+    return () => { mounted.current = false; invalidateTransition(); preference.removeEventListener('change', update); };
   }, [animate, changePhase]);
 
   const returnHome = useCallback(() => {

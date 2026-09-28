@@ -36,7 +36,7 @@ export function GlobalSearch() {
     const timer = window.setTimeout(() => {
       void SearchService.search(query, {}, 16).then((next) => {
         if (!cancelled) {
-          const order = { article: 0, note: 1, record: 2, project: 3, image: 4, gallery: 5, collection: 6, timeline: 7, exhibition: 8, tag: 9 } as const;
+          const order = { article: 0, note: 1, record: 2, project: 3, image: 4, gallery: 5, collection: 6, timeline: 7, exhibition: 8, tag: 9, book: 10 } as const;
           setResults([...next].sort((a, b) => order[a.type] - order[b.type] || b.score - a.score));
           setActiveIndex(0);
           setLoading(false);

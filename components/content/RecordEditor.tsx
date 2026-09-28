@@ -8,7 +8,10 @@ import type { ContentItem, RecordTemplate } from "@/types/content";
 
 export function RecordEditor({ content, onChange }: { content: ContentItem<"record">; onChange: (next: ContentItem<"record">) => void }) {
   const candidates = useLiveQuery(() => db.contents.where("type").anyOf(["article", "image", "project", "record"]).toArray(), [], []);
-  const changeTemplate = (template: RecordTemplate) => onChange({ ...content, payload: { ...content.payload, template, fields: createRecordFields(template) } });
+  const changeTemplate = (template: RecordTemplate) => {
+    if (!window.confirm("切换模板会保留所有已填写字段，切回原模板可继续编辑。是否切换？")) return;
+    onChange({ ...content, payload: { ...content.payload, template, fields: { ...createRecordFields(template), ...content.payload.fields } } });
+  };
   const fields = RECORD_TEMPLATE_FIELDS[content.payload.template];
   const recordTheme = content.payload.template === "character" || content.payload.template === "costume" ? "noval" : "eden";
   return (

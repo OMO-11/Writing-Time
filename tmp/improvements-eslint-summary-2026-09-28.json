@@ -1,0 +1,1562 @@
+[
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\app\\archive-gallery\\page.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\app\\books\\[id]\\page.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\app\\content\\[id]\\page.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\app\\content\\page.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\app\\gallery\\page.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\app\\layout.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\app\\library\\page.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\app\\page.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\app\\projects\\page.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\app\\search\\page.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\app\\settings\\page.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\app\\wiki\\[title]\\page.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\app\\work\\[slug]\\page.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\app\\workbench\\page.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\app\\workshop\\page.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\app\\AppShell.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\app\\CommandPalette.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\app\\GlobalHeader.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\app\\GlobalSearch.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\app\\HomeButton.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\app\\QuickCreate.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\app\\ReturnToMap.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\app\\RootShell.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\app\\ToastAndSaveStatus.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\archive-gallery\\ArchiveGallery.tsx",
+    "messages": [
+      {
+        "ruleId": "@next/next/no-img-element",
+        "severity": 1,
+        "message": "Using `<img>` could result in slower LCP and higher bandwidth. Consider using `<Image />` from `next/image` or a custom image loader to automatically optimize images. This may incur additional usage or cost from your provider. See: https://nextjs.org/docs/messages/no-img-element",
+        "line": 19,
+        "column": 10,
+        "nodeType": "JSXOpeningElement",
+        "endLine": 19,
+        "endColumn": 85
+      }
+    ],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 1,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "source": "\"use client\";\r\n\r\nimport Link from \"next/link\";\r\nimport { useLiveQuery } from \"dexie-react-hooks\";\r\nimport { ArrowLeft, ImagePlus, Maximize2, Trash2, X } from \"lucide-react\";\r\nimport { useCallback, useEffect, useMemo, useRef, useState } from \"react\";\r\nimport { db, importImageFile } from \"@/lib/db\";\r\nimport type { ImageRecord } from \"@/types/workshop\";\r\n\r\nconst GALLERY_SETTING_KEY = \"archive-gallery-image-ids\";\r\n\r\nfunction GalleryImage({ image }: { image: ImageRecord }) {\n  const imageRef = useRef<HTMLImageElement>(null);\n  useEffect(() => {\n    const url = URL.createObjectURL(image.blob);\n    if (imageRef.current) imageRef.current.src = url;\n    return () => URL.revokeObjectURL(url);\n  }, [image.blob]);\n  return <img ref={imageRef} alt={image.altText || image.title} draggable={false} />;\n}\r\n\r\nexport function ArchiveGallery() {\n  const inputRef = useRef<HTMLInputElement>(null);\r\n  const allImages = useLiveQuery(() => db.images.orderBy(\"createdAt\").toArray(), [], []);\r\n  const [galleryIds, setGalleryIds] = useState<string[]>([]);\r\n  const [initialized, setInitialized] = useState(false);\r\n  const [selectedId, setSelectedId] = useState<string | null>(null);\r\n  const [importing, setImporting] = useState(false);\r\n  const [notice, setNotice] = useState(\"\");\r\n  const [lightboxOpen, setLightboxOpen] = useState(false);\r\n\r\n  useEffect(() => {\r\n    if (initialized) return;\r\n    void db.settings.get(GALLERY_SETTING_KEY).then(async (record) => {\r\n      const existingIds = new Set(allImages.map((image) => image.id));\r\n      const ids = Array.isArray(record?.value)\r\n        ? (record.value as string[]).filter((id) => existingIds.has(id))\r\n        : allImages.map((image) => image.id);\r\n      setGalleryIds(ids);\r\n      if (!Array.isArray(record?.value)) await db.settings.put({ key: GALLERY_SETTING_KEY, value: ids });\r\n      setInitialized(true);\r\n    });\r\n  }, [allImages, initialized]);\r\n\r\n  const imageMap = useMemo(() => new Map(allImages.map((image) => [image.id, image])), [allImages]);\r\n  const galleryImages = useMemo(\r\n    () => galleryIds.map((id) => imageMap.get(id)).filter((image): image is ImageRecord => Boolean(image)),\r\n    [galleryIds, imageMap],\r\n  );\r\n  const selected = galleryImages.find((image) => image.id === selectedId) ?? galleryImages[0];\n\r\n  const announce = useCallback((message: string) => {\r\n    setNotice(message);\r\n    window.setTimeout(() => setNotice(\"\"), 2800);\r\n  }, []);\r\n\r\n  const persistIds = useCallback(async (ids: string[]) => {\r\n    setGalleryIds(ids);\r\n    await db.settings.put({ key: GALLERY_SETTING_KEY, value: ids });\r\n  }, []);\r\n\r\n  const importFiles = useCallback(async (files: FileList | File[]) => {\r\n    const candidates = Array.from(files).filter((file) => file.type.startsWith(\"image/\"));\r\n    if (!candidates.length) return announce(\"没有找到可导入的图片文件。\");\r\n    setImporting(true);\r\n    try {\r\n      const imported: ImageRecord[] = [];\r\n      for (const file of candidates) imported.push(await importImageFile(file));\r\n      await persistIds([...galleryIds, ...imported.map((image) => image.id)]);\r\n      setSelectedId(imported[0]?.id ?? selectedId);\r\n      announce(`已加入 ${imported.length} 张图片。`);\n    } catch (error) {\r\n      console.error(error);\r\n      announce(\"导入失败，请检查图片后重试。\");\r\n    } finally {\r\n      setImporting(false);\r\n    }\r\n  }, [announce, galleryIds, persistIds, selectedId]);\r\n\r\n  const removeSelected = useCallback(async () => {\r\n    if (!selected) return;\r\n    const next = galleryIds.filter((id) => id !== selected.id);\r\n    await persistIds(next);\r\n    setSelectedId(next[0] ?? null);\r\n    setLightboxOpen(false);\r\n    announce(`已将「${selected.title}」移出画廊，原图片仍保留在素材库。`);\n  }, [announce, galleryIds, persistIds, selected]);\r\n\r\n  return (\r\n    <main className=\"archive-gallery-shell\">\n      <header className=\"archive-gallery-toolbar\">\n        <Link href=\"/\" className=\"archive-gallery-back\"><ArrowLeft size={17} /> 返回总主页</Link>\n        <div className=\"archive-gallery-title\"><span>WRITING TIME / GALLERY</span><strong>拾光画廊</strong></div>\n        <div className=\"archive-gallery-actions\">\n          <span>{galleryImages.length.toString().padStart(2, \"0\")} IMAGES</span>\n          <button type=\"button\" onClick={() => inputRef.current?.click()} disabled={importing}><ImagePlus size={17} />{importing ? \"导入中\" : \"新增档案\"}</button>\r\n        </div>\r\n      </header>\r\n\r\n      {initialized && galleryImages.length ? (\r\n        <section className=\"archive-gallery-layout\">\n          <div className=\"archive-gallery-grid\" aria-label=\"画廊图片\">\n            {galleryImages.map((image) => (\n              <button\n                key={image.id}\n                className=\"archive-gallery-item\"\n                data-selected={selected?.id === image.id}\n                type=\"button\"\n                onClick={() => setSelectedId(image.id)}\n                onDoubleClick={() => { setSelectedId(image.id); setLightboxOpen(true); }}\n                aria-label={`选择图片：${image.title}`}\n                aria-pressed={selected?.id === image.id}\n              >\n                <GalleryImage image={image} />\n                <span>{image.title}</span>\n              </button>\n            ))}\n          </div>\n\n          <aside className=\"archive-image-inspector\">\n            {selected ? <>\n              <div className=\"archive-image-heading\"><span>SELECTED IMAGE</span><b>{selected.title}</b></div>\n              <button className=\"archive-image-preview\" type=\"button\" onClick={() => setLightboxOpen(true)}><GalleryImage image={selected} /></button>\n              <div className=\"archive-image-meta\">\n                <span>{selected.name}</span>\r\n                <span>{selected.width ?? \"?\"} × {selected.height ?? \"?\"} · {selected.mimeType || \"IMAGE\"}</span>\r\n                <span>{selected.tags.length ? selected.tags.join(\" · \") : \"无标签\"}</span>\r\n              </div>\r\n              <div className=\"archive-image-controls\">\n                <button type=\"button\" onClick={() => setLightboxOpen(true)}><Maximize2 size={16} /> 浏览大图</button>\n                <button className=\"danger\" type=\"button\" onClick={() => void removeSelected()}><Trash2 size={16} /> 移出画廊</button>\n              </div>\r\n            </> : null}\r\n          </aside>\r\n        </section>\r\n      ) : initialized ? (\r\n        <section className=\"archive-gallery-empty\">\n          <ImagePlus size={38} strokeWidth={1.3} />\n          <h2>画廊中还没有图片</h2>\n          <p>添加图片后，就可以在这里挑选和浏览。</p>\n          <button type=\"button\" onClick={() => inputRef.current?.click()}>选择图片</button>\r\n        </section>\r\n      ) : <div className=\"archive-gallery-loading\">正在读取本地图片……</div>}\n\r\n      <input ref={inputRef} hidden type=\"file\" multiple accept=\"image/*\" onChange={(event) => {\r\n        if (event.currentTarget.files) void importFiles(event.currentTarget.files);\r\n        event.currentTarget.value = \"\";\r\n      }} />\r\n      <p className=\"archive-gallery-toast\" data-visible={Boolean(notice)}>{notice}</p>\n\n      {lightboxOpen && selected ? <div className=\"archive-gallery-lightbox\" role=\"dialog\" aria-modal=\"true\">\n        <button type=\"button\" className=\"archive-lightbox-close\" onClick={() => setLightboxOpen(false)} aria-label=\"关闭\"><X /></button>\n        <GalleryImage image={selected} />\r\n        <div><strong>{selected.title}</strong><span>{selected.width ?? \"?\"} × {selected.height ?? \"?\"}</span></div>\r\n      </div> : null}\r\n    </main>\r\n  );\r\n}\r\n",
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\content\\BookProjects.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\content\\BookReader.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\content\\CollectionEditor.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\content\\CommonContentFields.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\content\\ContentDetail.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\content\\ContentIcon.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\content\\ContentLinksPanel.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\content\\ContentWorkspace.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\content\\ExhibitionEditor.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\content\\GalleryEditor.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\content\\ImageContentEditor.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\content\\ImagePicker.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\content\\NoteEditor.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\content\\ProjectEditor.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\content\\RecordEditor.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\content\\TimelineEditor.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\content\\WikiRedirect.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\gallery\\Gallery.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\gallery\\GalleryImage.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\gallery\\Lightbox.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\home\\ContinueEditing.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\home\\DreamHome.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\home\\EmptyState.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\home\\GalleryPreview.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\home\\HomeContentModules.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\home\\HomeDashboard.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\home\\ImportDropOverlay.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\home\\LightingSlider.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\home\\QuickActions.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\home\\RecentWorks.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\home\\RelightScene.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\home\\WelcomeHero.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\home\\WorkCard.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\home\\WorldMapScene.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\home\\demo-data.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\home\\useMapJourney.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\home\\usePortalTransition.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\library\\Library.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\library\\WorkDetail.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\markdown\\MarkdownExcerpt.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\markdown\\MarkdownRenderer.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\search\\SearchPopover.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\search\\SearchResultItem.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\search\\SearchResults.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\settings\\SettingsPanel.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\settings\\StorageHealth.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\theme\\CharacterBadge.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\theme\\CharacterDisplaySettings.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\theme\\CharacterEmptyState.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\theme\\CharacterHero.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\theme\\CharacterIllustration.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\theme\\CharacterThemeProvider.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\theme\\CrystalStatusIcon.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\theme\\DecorativePanelBackground.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\theme\\FlowerDivider.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\theme\\RuneBorder.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\theme\\StarBadge.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\theme\\ThemeSectionHeader.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\ui\\AppIcon.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\ui\\BlobImage.tsx",
+    "messages": [],
+    "suppressedMessages": [
+      {
+        "ruleId": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders\n\nEffects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:\n* Update external systems with the latest state from React.\n* Subscribe for updates from some external system, calling setState in a callback function when external state changes.\n\nCalling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).\n\nD:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\ui\\BlobImage.tsx:26:5\n  24 |     // The URL belongs to this effect's Blob lifetime and must be released on replacement.\n  25 |     // eslint-disable-next-line react-hooks/set-state-in-effect\n> 26 |     setUrl(next);\n     |     ^^^^^^ Avoid calling setState() directly within an effect\n  27 |     return () => URL.revokeObjectURL(next);\n  28 |   }, [blob]);\n  29 |   if (!url) return null;",
+        "line": 26,
+        "column": 5,
+        "nodeType": null,
+        "endLine": 26,
+        "endColumn": 11,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": ""
+          }
+        ]
+      }
+    ],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\ui\\PageShell.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\workbench\\DocumentOutline.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\workbench\\EditorHeader.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\workbench\\EditorStatusBar.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\workbench\\InspectorDrawer.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\workbench\\MarkdownEditor.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\workbench\\MarkdownPreview.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\workbench\\MarkdownToolbar.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\workbench\\RecoveryHistory.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\workbench\\SelectionMenu.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\workbench\\SlashCommandMenu.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\workbench\\WorkDrawer.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\workbench\\Workbench.tsx",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\components\\workbench\\markdown-commands.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\lib\\backup-validation.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\lib\\character-assets.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\lib\\content-registry.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\lib\\content-service.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\lib\\db.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\lib\\export-service.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\lib\\home\\ambient-motion.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\lib\\home\\atmosphere-shaders.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\lib\\home\\postprocess.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\lib\\home\\relight-shaders.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\lib\\home\\world-map.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\lib\\html-safety.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\lib\\markdown-service.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\lib\\revision-service.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\lib\\save-queue.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\lib\\search-service.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\lib\\work-import.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\stores\\ui-store.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\tests\\book-projects.cjs",
+    "messages": [],
+    "suppressedMessages": [
+      {
+        "ruleId": "@typescript-eslint/no-require-imports",
+        "severity": 2,
+        "message": "A `require()` style import is forbidden.",
+        "line": 2,
+        "column": 18,
+        "nodeType": "CallExpression",
+        "messageId": "noRequireImports",
+        "endLine": 2,
+        "endColumn": 39,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": "Optional Playwright browser regression."
+          }
+        ]
+      },
+      {
+        "ruleId": "@typescript-eslint/no-require-imports",
+        "severity": 2,
+        "message": "A `require()` style import is forbidden.",
+        "line": 3,
+        "column": 14,
+        "nodeType": "CallExpression",
+        "messageId": "noRequireImports",
+        "endLine": 3,
+        "endColumn": 43,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": "Optional Playwright browser regression."
+          }
+        ]
+      }
+    ],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\tests\\core.cjs",
+    "messages": [],
+    "suppressedMessages": [
+      {
+        "ruleId": "@typescript-eslint/no-require-imports",
+        "severity": 2,
+        "message": "A `require()` style import is forbidden.",
+        "line": 2,
+        "column": 16,
+        "nodeType": "CallExpression",
+        "messageId": "noRequireImports",
+        "endLine": 2,
+        "endColumn": 45,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": "Node-only regression runner."
+          }
+        ]
+      },
+      {
+        "ruleId": "@typescript-eslint/no-require-imports",
+        "severity": 2,
+        "message": "A `require()` style import is forbidden.",
+        "line": 3,
+        "column": 12,
+        "nodeType": "CallExpression",
+        "messageId": "noRequireImports",
+        "endLine": 3,
+        "endColumn": 30,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": "Node-only regression runner."
+          }
+        ]
+      },
+      {
+        "ruleId": "@typescript-eslint/no-require-imports",
+        "severity": 2,
+        "message": "A `require()` style import is forbidden.",
+        "line": 4,
+        "column": 14,
+        "nodeType": "CallExpression",
+        "messageId": "noRequireImports",
+        "endLine": 4,
+        "endColumn": 34,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": "Node-only regression runner."
+          }
+        ]
+      },
+      {
+        "ruleId": "@typescript-eslint/no-require-imports",
+        "severity": 2,
+        "message": "A `require()` style import is forbidden.",
+        "line": 5,
+        "column": 16,
+        "nodeType": "CallExpression",
+        "messageId": "noRequireImports",
+        "endLine": 5,
+        "endColumn": 38,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": "Node-only regression runner."
+          }
+        ]
+      },
+      {
+        "ruleId": "@typescript-eslint/no-require-imports",
+        "severity": 2,
+        "message": "A `require()` style import is forbidden.",
+        "line": 6,
+        "column": 12,
+        "nodeType": "CallExpression",
+        "messageId": "noRequireImports",
+        "endLine": 6,
+        "endColumn": 33,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": "Node-only regression runner."
+          }
+        ]
+      },
+      {
+        "ruleId": "@typescript-eslint/no-require-imports",
+        "severity": 2,
+        "message": "A `require()` style import is forbidden.",
+        "line": 13,
+        "column": 23,
+        "nodeType": "CallExpression",
+        "messageId": "noRequireImports",
+        "endLine": 13,
+        "endColumn": 54,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": "Node-only regression runner."
+          }
+        ]
+      },
+      {
+        "ruleId": "@typescript-eslint/no-require-imports",
+        "severity": 2,
+        "message": "A `require()` style import is forbidden.",
+        "line": 14,
+        "column": 42,
+        "nodeType": "CallExpression",
+        "messageId": "noRequireImports",
+        "endLine": 14,
+        "endColumn": 79,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": "Node-only regression runner."
+          }
+        ]
+      },
+      {
+        "ruleId": "@typescript-eslint/no-require-imports",
+        "severity": 2,
+        "message": "A `require()` style import is forbidden.",
+        "line": 15,
+        "column": 28,
+        "nodeType": "CallExpression",
+        "messageId": "noRequireImports",
+        "endLine": 15,
+        "endColumn": 66,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": "Node-only regression runner."
+          }
+        ]
+      },
+      {
+        "ruleId": "@typescript-eslint/no-require-imports",
+        "severity": 2,
+        "message": "A `require()` style import is forbidden.",
+        "line": 16,
+        "column": 31,
+        "nodeType": "CallExpression",
+        "messageId": "noRequireImports",
+        "endLine": 16,
+        "endColumn": 68,
+        "suppressions": [
+          {
+            "kind": "directive",
+            "justification": "Node-only regression runner."
+          }
+        ]
+      }
+    ],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\types\\content.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\types\\theme.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  },
+  {
+    "filePath": "D:\\Machine\\VS Code\\Writing-Time\\Writing-Time\\types\\workshop.ts",
+    "messages": [],
+    "suppressedMessages": [],
+    "errorCount": 0,
+    "fatalErrorCount": 0,
+    "warningCount": 0,
+    "fixableErrorCount": 0,
+    "fixableWarningCount": 0,
+    "usedDeprecatedRules": []
+  }
+]

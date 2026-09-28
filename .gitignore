@@ -12,3 +12,5 @@ package-lock.concurrent.json
 .env*
 !.env.example
 .vendor/
+tsconfig.tsbuildinfo
+*.tsbuildinfo
