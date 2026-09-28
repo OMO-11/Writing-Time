@@ -155,6 +155,7 @@ export function articleContentFromWork(work: WorkDocument): ContentItem<"article
     createdAt: work.createdAt,
     updatedAt: work.updatedAt,
     payload: {
+      sourceWorkId: work.sourceWorkId,
       finalizedAt: work.finalizedAt,
       slug: work.slug,
       markdown: work.markdown,
@@ -236,7 +237,6 @@ export async function createBlankWork(): Promise<WorkDocument> {
 }
 
 export async function hydrateWorkDocument(work: WorkDocument): Promise<WorkDocument> {
-  if (work.finalizedAt) return work;
   const processed = await MarkdownService.process(work.markdown, await getLineBreakMode());
   const next = {
     ...work,
@@ -245,11 +245,6 @@ export async function hydrateWorkDocument(work: WorkDocument): Promise<WorkDocum
     excerptHtml: processed.excerptHtml,
     headings: processed.headings,
   };
-  await db.transaction("rw", db.works, db.contents, async () => {
-    await db.works.put(next);
-    const previous = await db.contents.get(next.id);
-    await db.contents.put({ ...articleContentFromWork(next), favorite: previous?.favorite ?? false });
-  });
   return next;
 }
 
@@ -339,7 +334,10 @@ function readImageSize(blob: Blob): Promise<{ width: number; height: number }> {
 
 export async function createRecoverySnapshot(workId: string, markdown: string) {
   const now = Date.now();
+  const snapshots = await db.recoverySnapshots.where("workId").equals(workId).sortBy("createdAt");
+  if (snapshots.at(-1)?.markdown === markdown) return;
   await db.recoverySnapshots.add({ id: crypto.randomUUID(), workId, markdown, createdAt: now });
+  if (snapshots.length >= 30) await db.recoverySnapshots.bulkDelete(snapshots.slice(0, snapshots.length - 29).map((item) => item.id));
   const expired = await db.recoverySnapshots.where("createdAt").below(now - 24 * 60 * 60 * 1000).primaryKeys();
   if (expired.length) await db.recoverySnapshots.bulkDelete(expired);
 }

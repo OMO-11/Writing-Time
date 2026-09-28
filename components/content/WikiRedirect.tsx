@@ -1,22 +1,16 @@
 "use client";
-
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useCallback } from "react";
+import { useLiveQuery } from "dexie-react-hooks";
 import { getContentHref } from "@/lib/content-registry";
 import { db } from "@/lib/db";
-
-function headingSlug(value: string) { return value.toLowerCase().trim().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "") || "section"; }
-
+import type { ContentItem } from "@/types/content";
 export function WikiRedirect({ title }: { title: string }) {
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  useEffect(() => {
-    void db.contents.filter((content) => content.title.toLocaleLowerCase("zh-CN") === title.toLocaleLowerCase("zh-CN")).first().then((content) => {
-      if (!content) { router.replace(`/search?q=${encodeURIComponent(title)}`); return; }
-      const heading = searchParams.get("heading");
-      if (content.type === "article" && heading) router.replace(`/work/${content.payload.slug}#${headingSlug(heading)}`);
-      else router.replace(getContentHref(content));
-    });
-  }, [router, searchParams, title]);
-  return <main className="content-detail-loading" aria-live="polite">正在沿着 Wiki Link 寻找「{title}」…</main>;
+  const router = useRouter(), params = useSearchParams();
+  const contents = useLiveQuery(() => db.contents.filter((content) => content.id === title || content.title.toLocaleLowerCase("zh-CN") === title.toLocaleLowerCase("zh-CN")).toArray(), [title]);
+  const heading = params.get("heading");
+  const href = useCallback((content: ContentItem) => content.type === "article" && heading ? "/work/" + content.payload.slug + "#section-" + (heading.toLowerCase().trim().replace(/[^\p{L}\p{N}]+/gu, "-").replace(/^-|-$/g, "") || "section") : getContentHref(content), [heading]);
+  useEffect(() => { if (contents?.length === 1) router.replace(href(contents[0])); }, [contents, router, href]);
+  return <main className="content-detail-loading">{!contents ? "正在查找…" : !contents.length ? <p>没有找到「{title}」。<Link href={"/search?q=" + encodeURIComponent(title)}>搜索内容</Link></p> : contents.length > 1 ? <div><p>存在同名内容，请选择；可使用 [[内容 ID]] 建立固定引用。</p>{contents.map((content) => <p key={content.id}><Link href={href(content)}>{content.title} · {content.type} · {content.id}</Link></p>)}</div> : "正在打开…"}</main>;
 }

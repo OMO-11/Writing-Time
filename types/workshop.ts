@@ -21,6 +21,7 @@ export interface BookRecord {
 }
 
 export interface WorkDocument {
+  sourceWorkId?: string;
   finalizedAt?: number;
   id: string;
   slug: string;

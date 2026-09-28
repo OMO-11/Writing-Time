@@ -18,7 +18,7 @@ export function SearchResultItem({ result, active, onFocus }: { result: GlobalSe
   const excerpt = result.plainText.split("\n\n").find(Boolean) ?? result.tags;
   return (
     <Link className="search-result-item" data-active={active} href={result.href} onMouseEnter={onFocus}>
-      <span className="search-result-icon">{result.type === "tag" ? <Hash aria-hidden="true" size={17} /> : <ContentIcon type={result.type} size={17} />}</span>
+      <span className="search-result-icon">{result.type === "tag" ? <Hash aria-hidden="true" size={17} /> : <ContentIcon type={result.type === "book" ? "collection" : result.type} size={17} />}</span>
       <span className="search-result-copy">
         <strong><Highlight text={result.title} terms={result.terms} /></strong>
         {excerpt && <small><Highlight text={excerpt.slice(0, 100)} terms={result.terms} /></small>}

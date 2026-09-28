@@ -6,7 +6,7 @@ import {
   imageContentFromRecord,
   recordActivity,
 } from "@/lib/db";
-import { MarkdownService } from "@/lib/markdown-service";
+import { MarkdownService, wikiTargets } from "@/lib/markdown-service";
 import type { ContentItem, ContentReference, ContentType, WikiLinkTarget } from "@/types/content";
 import type { CollectionRecord, ImageRecord, WorkDocument } from "@/types/workshop";
 
@@ -21,10 +21,7 @@ function wikiSource(content: ContentItem) {
 }
 
 export function extractWikiLinks(source: string): WikiLinkTarget[] {
-  return [...source.matchAll(/\[\[([^\]#]+?)(?:#([^\]]+))?\]\]/g)].map((match) => ({
-    title: match[1].trim(),
-    heading: match[2]?.trim(),
-  })).filter((link) => link.title);
+  return wikiTargets(source);
 }
 
 function payloadRelations(content: ContentItem) {
@@ -39,13 +36,24 @@ function payloadRelations(content: ContentItem) {
   return [];
 }
 
-async function rebuildReferencesFor(content: ContentItem) {
+function referenceIndex(contents: ContentItem[]) {
+  const byTitle = new Map<string, ContentItem>();
+  const ambiguous = new Set<string>();
+  for (const item of contents) {
+    const title = item.title.toLocaleLowerCase("zh-CN");
+    if (byTitle.has(title)) ambiguous.add(title);
+    byTitle.set(title, item);
+  }
+  for (const title of ambiguous) byTitle.delete(title);
+  return { byTitle, byId: new Map(contents.map((item) => [item.id, item])) };
+}
+
+export async function rebuildReferencesFor(content: ContentItem, index?: ReturnType<typeof referenceIndex>) {
   const now = Date.now();
   const references: ContentReference[] = [];
-  const contents = await db.contents.toArray();
-  const byTitle = new Map(contents.map((item) => [item.title.toLocaleLowerCase("zh-CN"), item]));
+  const { byTitle, byId } = index ?? referenceIndex(await db.contents.toArray());
   for (const link of extractWikiLinks(wikiSource(content))) {
-    const target = byTitle.get(link.title.toLocaleLowerCase("zh-CN"));
+    const target = byId.get(link.title) ?? byTitle.get(link.title.toLocaleLowerCase("zh-CN"));
     if (!target) continue;
     references.push({ id: `${content.id}:wiki:${target.id}:${link.heading ?? ""}`, sourceId: content.id, targetId: target.id, targetHeading: link.heading, kind: "wiki", updatedAt: now });
   }
@@ -66,13 +74,16 @@ async function rebuildReferencesFor(content: ContentItem) {
   });
 }
 
-async function rebuildAllReferences() {
-  for (const content of await db.contents.toArray()) await rebuildReferencesFor(content);
+export async function rebuildAllReferences() {
+  const contents = await db.contents.toArray();
+  const index = referenceIndex(contents);
+  for (const content of contents) await rebuildReferencesFor(content, index);
 }
 
 function contentToWork(content: ContentItem<"article">): WorkDocument {
   return {
     id: content.id,
+    sourceWorkId: content.payload.sourceWorkId,
     finalizedAt: content.payload.finalizedAt,
     slug: content.payload.slug || `work-${content.id.slice(0, 8)}`,
     title: content.title,
@@ -90,7 +101,12 @@ function contentToWork(content: ContentItem<"article">): WorkDocument {
   };
 }
 
-export async function ensureUnifiedContentModel() {
+let migration: Promise<void> | undefined;
+export function ensureUnifiedContentModel() {
+  return migration ??= migrateUnifiedContentModel().catch((error) => { migration = undefined; throw error; });
+}
+async function migrateUnifiedContentModel() {
+  if (await db.settings.get("unified-content-v3")) return;
   const [works, images, collections] = await Promise.all([db.works.toArray(), db.images.toArray(), db.collections.toArray()]);
   const existing = new Map((await db.contents.toArray()).map((item) => [item.id, item]));
   const migrated: ContentItem[] = [
@@ -99,16 +115,26 @@ export async function ensureUnifiedContentModel() {
     ...collections.map((collection) => ({ ...collectionContentFromRecord(collection), favorite: existing.get(collection.id)?.favorite ?? false })),
   ];
   if (migrated.length) await db.contents.bulkPut(migrated);
-  for (const content of [...migrated, ...[...existing.values()].filter((item) => !migrated.some((next) => next.id === item.id))]) {
-    await rebuildReferencesFor(content);
-  }
+  await rebuildAllReferences();
   await db.settings.put({ key: "unified-content-v3", value: { syncedAt: Date.now() } });
 }
 
 export async function saveContent(content: ContentItem, activity = true) {
   const previousContent = await db.contents.get(content.id);
-  const next = { ...content, updatedAt: Date.now() } as ContentItem;
-  await db.transaction("rw", db.contents, db.works, db.images, db.collections, db.activity, async () => {
+  const next = { ...content, updatedAt: Math.max(Date.now(), content.updatedAt + 1) } as ContentItem;
+  let conflict = false;
+  await db.transaction("rw", [db.contents, db.works, db.images, db.collections, db.activity, db.contentReferences], async () => {
+    const current = await db.contents.get(content.id);
+    if (current) next.favorite = current.favorite;
+    if (current && current.updatedAt !== content.updatedAt) {
+      const copy = { ...next, id: crypto.randomUUID(), title: `${next.title}（冲突副本）`, createdAt: Date.now() } as ContentItem;
+      if (copy.type === "article") copy.payload = { ...copy.payload, finalizedAt: undefined, slug: `conflict-${copy.id}` };
+      await db.contents.add(copy);
+      if (copy.type === "article") await db.works.add(contentToWork(copy));
+      await rebuildReferencesFor(copy);
+      conflict = true;
+      return;
+    }
     await db.contents.put(next);
     if (next.type === "article") await db.works.put(contentToWork(next));
     if (next.type === "image") {
@@ -129,9 +155,10 @@ export async function saveContent(content: ContentItem, activity = true) {
       await db.collections.put(record);
     }
     if (activity) await recordActivity(next.id, "updated", `更新「${next.title}」`);
+    if (!previousContent || previousContent.title !== next.title) await rebuildAllReferences();
+    else await rebuildReferencesFor(next);
   });
-  if (!previousContent || previousContent.title !== next.title) await rebuildAllReferences();
-  else await rebuildReferencesFor(next);
+  if (conflict) throw new Error("其他标签页已修改此内容。你的草稿已另存为工作区中的冲突副本，请重新打开后比较。");
   return next;
 }
 
@@ -165,15 +192,19 @@ export async function getImageReferences(imageId: string) {
 }
 
 export async function deleteImageAsset(imageId: string, force = false) {
-  const references = await getImageReferences(imageId);
-  if (references.length && !force) return { deleted: false, references };
-  await db.transaction("rw", db.images, db.contents, db.contentReferences, async () => {
+  return db.transaction("rw", [db.images, db.contents, db.contentReferences, db.works], async () => {
+    await rebuildAllReferences();
+    const references = await getImageReferences(imageId);
+    const locked = await db.works.filter((work) => !!work.finalizedAt && (work.coverImageId === imageId || work.markdown.includes("fw-asset://" + imageId))).count();
+    const lockedContent = await db.contents.filter((item) => item.type === "article" && !!item.payload.finalizedAt && (item.coverImageId === imageId || item.payload.markdown.includes("fw-asset://" + imageId))).count();
+    if (locked || lockedContent) throw new Error("此图片被已定稿作品使用，不能删除。");
+    if (references.length && !force) return { deleted: false, references };
     await db.images.delete(imageId);
     await db.contents.delete(imageId);
     await db.contentReferences.where("targetId").equals(imageId).delete();
     await db.contentReferences.where("sourceId").equals(imageId).delete();
+    return { deleted: true, references };
   });
-  return { deleted: true, references };
 }
 
 export async function convertNote(note: ContentItem<"note">, target: "article" | "character" | "location" | "project-task") {

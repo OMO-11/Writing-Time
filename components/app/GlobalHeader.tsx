@@ -12,12 +12,12 @@ import { useUIStore } from "@/stores/ui-store";
 
 const routeNames: Record<string, string> = {
   "/workshop": "主页",
-  "/library": "作品库",
+  "/library": "工作区",
   "/gallery": "图片展览",
   "/settings": "设置",
   "/search": "搜索",
   "/workbench": "创作工坊",
-  "/content": "内容工作区",
+  "/content": "工作区",
 };
 
 export function GlobalHeader() {
@@ -27,8 +27,8 @@ export function GlobalHeader() {
   const flushSave = useUIStore((state) => state.flushSave);
   const showBreadcrumbs = pathname === "/workbench" || pathname.startsWith("/work/") || pathname.startsWith("/content/");
   const crumbs: Array<{ label: string; href?: string }> = pathname === "/workshop" ? [] : pathname === "/workbench" || pathname.startsWith("/work/")
-    ? [{ label: "作品库", href: "/library" }, ...(activeWorkTitle ? [{ label: activeWorkTitle }] : [])]
-    : pathname.startsWith("/content/") ? [{ label: "内容工作区", href: "/library" }, { label: "内容编辑" }] : [{ label: routeNames[pathname] ?? "页面" }];
+    ? [{ label: "工作区", href: "/library" }, ...(activeWorkTitle ? [{ label: activeWorkTitle }] : [])]
+    : pathname.startsWith("/content/") ? [{ label: "工作区", href: "/library" }, { label: "内容编辑" }] : [{ label: routeNames[pathname] ?? "页面" }];
 
   const navigate = async (event: MouseEvent<HTMLAnchorElement>, href: string) => {
     event.preventDefault();

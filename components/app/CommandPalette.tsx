@@ -8,7 +8,7 @@ import { useUIStore } from "@/stores/ui-store";
 
 const baseCommands = [
   { id: "home", label: "返回主页", hint: "Ctrl ⇧ H", icon: Castle, href: "/" },
-  { id: "library", label: "打开作品库", hint: "Library", icon: BookOpenText, href: "/library" },
+  { id: "library", label: "打开工作区", hint: "Library", icon: BookOpenText, href: "/library" },
   { id: "gallery", label: "打开图片展览", hint: "Gallery", icon: Images, href: "/gallery" },
   { id: "search", label: "聚焦全局搜索", hint: "Search", icon: Search, action: "search" },
   { id: "new", label: "新建 Markdown 作品", hint: "Create", icon: FilePlus2, action: "new" },

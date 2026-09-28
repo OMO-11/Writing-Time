@@ -4,7 +4,7 @@ import { getContentHref } from "@/lib/content-registry";
 import { db } from "@/lib/db";
 import type { ContentItem, ContentStatus, ContentType } from "@/types/content";
 
-export type SearchEntityType = ContentType | "tag";
+export type SearchEntityType = ContentType | "tag" | "book";
 
 export interface SearchDocument {
   id: string;
@@ -65,6 +65,8 @@ class LocalSearchService {
   private index = createIndex();
   private subscription?: Subscription;
   private ready?: Promise<void>;
+  private generation = 0;
+  private documents = new Map<string, string>();
 
   private async buildDocuments() {
     const contents = await db.contents.toArray();
@@ -93,20 +95,28 @@ class LocalSearchService {
       href: `/search?q=${encodeURIComponent(tag)}&tag=${encodeURIComponent(tag)}`,
       title: `#${tag}`, plainText: tag, tags: tag, collectionNames: "", imageCaptions: "", frontmatter: "", status: "", updatedAt: 0, collectionIds: [],
     })));
+    const books = await db.books.toArray();
+    documents.push(...books.map((book) => ({ id: "book:" + book.id, entityId: book.id, type: "book" as const, href: "/books/" + book.id, title: book.title, plainText: book.chapters.map((chapter) => chapter.title).join(" "), tags: "", collectionNames: "", imageCaptions: "", frontmatter: "", status: "active", updatedAt: book.updatedAt, collectionIds: [] })));
     return documents;
   }
 
   async rebuild() {
+    const generation = ++this.generation;
     const documents = await this.buildDocuments();
-    this.index = createIndex();
-    if (documents.length) this.index.addAll(documents);
+    if (generation !== this.generation) return;
+    const next = new Map(documents.map((document) => [document.id, JSON.stringify(document)]));
+    for (const id of this.documents.keys()) if (!next.has(id)) this.index.discard(id);
+    for (const document of documents) if (this.documents.get(document.id) !== next.get(document.id)) {
+      if (this.index.has(document.id)) this.index.replace(document); else this.index.add(document);
+    }
+    this.documents = next;
   }
 
   async initialize() {
     if (this.ready) return this.ready;
     this.ready = this.rebuild();
     if (typeof window !== "undefined" && !this.subscription) {
-      this.subscription = liveQuery(() => db.contents.toArray()).subscribe({ next: () => { void this.rebuild(); } });
+      this.subscription = liveQuery(() => Promise.all([db.contents.toArray(), db.books.toArray()])).subscribe({ next: () => { void this.rebuild(); } });
     }
     return this.ready;
   }

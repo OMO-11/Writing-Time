@@ -16,6 +16,7 @@ const groupLabels: Record<SearchEntityType, string> = {
   note: "灵感",
   exhibition: "展览",
   tag: "标签",
+  book: "书籍",
 };
 
 export function SearchPopover({ query, results, activeIndex, loading, onActiveChange }: {
@@ -25,7 +26,7 @@ export function SearchPopover({ query, results, activeIndex, loading, onActiveCh
   loading: boolean;
   onActiveChange: (index: number) => void;
 }) {
-  const groups = (["article", "note", "record", "project", "image", "gallery", "collection", "timeline", "exhibition", "tag"] as SearchEntityType[])
+  const groups = (["article", "note", "record", "project", "image", "gallery", "collection", "timeline", "exhibition", "tag", "book"] as SearchEntityType[])
     .map((type) => ({ type, items: results.map((result, index) => ({ result, index })).filter((item) => item.result.type === type) }))
     .filter((group) => group.items.length);
 

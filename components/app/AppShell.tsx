@@ -19,6 +19,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
+    const navigate = (event: MouseEvent) => {
+      if (event.button !== 0 || event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+      const anchor = (event.target as Element).closest?.("a");
+      if (!anchor || anchor.target === "_blank" || anchor.hasAttribute("download") || !useUIStore.getState().saveHandler) return;
+      const target = new URL(anchor.href, location.href);
+      if (target.origin !== location.origin || target.pathname === location.pathname && target.search === location.search) return;
+      event.preventDefault(); event.stopPropagation();
+      void flushSave().then(() => router.push(target.pathname + target.search + target.hash)).catch(() => {});
+    };
+    document.addEventListener("click", navigate, true);
+    return () => document.removeEventListener("click", navigate, true);
+  }, [flushSave, router]);
+
+  useEffect(() => {
     const shortcuts = (event: KeyboardEvent) => {
       const commandKey = event.ctrlKey || event.metaKey;
       if (commandKey && event.key.toLowerCase() === "k") {
