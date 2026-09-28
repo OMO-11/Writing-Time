@@ -2,14 +2,14 @@
 
 **Writing Time** 是一个以本地优先（local-first）为核心的个人创作空间。项目目前由顶层入口 **Writing Time Portal** 统一承载多个创作模块：已经投入使用的 **Fantasy Workshop（幻想工坊）** 负责 Markdown 写作、设定与内容管理，**Archive Gallery（拾光画廊）** 负责沉浸式图片档案浏览，后续模块可以继续挂载到同一入口之下。
 
-用户作品、图片、设定与元数据保存在浏览器本地的 IndexedDB 中；项目没有用于存储个人创作内容的后端服务。开发与构建 Archive Gallery 时会同步并编译固定版本的第三方 RhineLabUI runtime，但这与用户内容存储是两条独立链路。
+用户作品、图片、设定与元数据保存在浏览器本地的 IndexedDB 中；项目没有用于存储个人创作内容的后端服务。
 
 当前核心能力：
 
 - **Writing Time Portal**：全屏场景入口、本地实时时钟、昼夜欢迎词、双层空间导航与 WebGL 动态重光照
 - **Fantasy Workshop**：CodeMirror 6 Markdown 编辑器、实时预览、大纲、斜杠命令、自动保存与恢复快照
 - **统一内容模型**：文章、图片、图片集、设定卡、项目、合集、时间线、灵感、展览共 9 类内容
-- **Archive Gallery**：基于 RhineLabUI Three.js runtime 的独立档案画廊，复用 Writing Time 本地图片数据
+- **Archive Gallery**：独立图片画廊，复用 Writing Time 本地图片数据，支持挑选、预览和移出
 - **图片资源管理**：批量导入、网格 / 瀑布流、灯箱、引用追踪和跨内容关联
 - **全文搜索**：MiniSearch 本地索引，支持中文 bigram、类型 / 状态 / 标签 / 合集 / 时间筛选
 - **Wiki 双链**：支持 `[[标题]]` 与 `[[标题#小节]]`
@@ -56,7 +56,7 @@ Writing Time  /
 │   └── 备份与导出
 │
 ├── Archive Gallery  /archive-gallery
-│   └── RhineLabUI Three.js 档案浏览 runtime
+│   └── 本地图片挑选与预览
 │
 └── Future Spaces
     └── 后续顶层模块预留入口
@@ -75,9 +75,9 @@ Writing Time  /
 | 浏览器 | 支持 IndexedDB、现代 JavaScript 与 WebGL 的现代浏览器 |
 | Python | 仅角色插画预处理脚本需要 |
 
-Node.js 最低版本与当前 RhineLabUI / Vite runtime 保持一致，具体约束以 `package.json` 的 `engines` 字段为准。
+Node.js 最低版本以 `package.json` 的 `engines` 字段为准。
 
-> 用户创作数据保存在浏览器 IndexedDB 中，不需要数据库服务。首次同步或重新构建 Archive Gallery runtime 时，需要能够访问 RhineLabUI 上游仓库和 npm 依赖源。
+> 用户创作数据保存在浏览器 IndexedDB 中，不需要数据库服务。
 
 ---
 
@@ -88,14 +88,12 @@ Node.js 最低版本与当前 RhineLabUI / Vite runtime 保持一致，具体约
 npm install
 
 # 2. 启动开发服务器
-# predev 会自动执行 npm run sync:rhinelab
 npm run dev
 
 # 默认访问
 # http://localhost:3000
 
 # 3. 生产构建
-# prebuild 同样会自动同步 / 构建 RhineLabUI runtime
 npm run build
 
 # 4. 启动生产服务器
@@ -105,11 +103,13 @@ npm run start
 npm run lint
 ```
 
-如果只需要重新同步 Archive Gallery runtime：
+### 云服务器通过公网 IP 访问
 
-```bash
-npm run sync:rhinelab
-```
+在云服务器上执行 `npm ci`、`npm run build`、`npm run start`。生产服务默认监听所有 IPv4 网卡的 **3000** 端口；确认服务器公网 IP 后，访问 `http://<公网IP>:3000/`。如果设置了 `PORT` 环境变量，访问时需使用对应端口。
+
+还需在云平台安全组和服务器防火墙中放行入站 TCP 3000。可先在服务器上运行 `curl -I http://127.0.0.1:3000/` 检查应用是否启动，再从另一台设备访问公网地址；本机可以访问而公网不能访问时，检查安全组、防火墙与公网 IP 配置。
+
+作品和图片保存在访问者浏览器的 IndexedDB 中。同一用户改用公网 IP、域名或另一台设备访问时，浏览器会将其视为不同站点，原有本地数据不会自动出现；请使用应用内的导出和恢复功能迁移数据。
 
 端口被占用时：
 
@@ -127,7 +127,7 @@ npm run dev -- -p 3001
 | --- | --- | --- |
 | `/` | Writing Time Portal | 顶层创作入口，动态时钟、场景光影与模块导航 |
 | `/workshop` | Fantasy Workshop 首页 | 原创作仪表盘：统计、快捷操作、模块化内容流 |
-| `/archive-gallery` | Archive Gallery | RhineLabUI 驱动的沉浸式图片档案浏览模块 |
+| `/archive-gallery` | Archive Gallery | 本地图片挑选与预览模块 |
 | `/workbench?work={id}` | 创作工坊 | CodeMirror Markdown 编辑器 + 实时预览 |
 | `/library?type={type}` | 作品库 | 按内容类型、状态与关键词浏览 |
 | `/content` | 内容工作区 | 统一内容模型总览 |
@@ -229,42 +229,7 @@ npm run dev -- -p 3001
 
 ## Archive Gallery
 
-`/archive-gallery` 是顶层独立模块。它不再使用早期手写的模拟档案卡片，而是直接集成固定版本的 **RhineLabUI** 作为 Three.js archive-array runtime。
-
-上游信息：
-
-- Project: `LBEILC/RhineLabUI`
-- License: MIT
-- Pinned commit: `8799b03179a9a0ebd2611843e644a5a0530b24bf`
-
-运行时同步流程：
-
-```text
-npm run sync:rhinelab
-        ↓
-.vendor/rhinelab-ui
-        ↓
-应用 Writing Time 兼容补丁
-        ↓
-Vite 构建 RhineLabUI
-        ↓
-public/rhinelab
-        ↓
-/ archive-gallery iframe / bridge
-```
-
-兼容层只负责 Writing Time 与 RhineLabUI 之间的数据桥接：
-
-- 使用 Writing Time 的本地图片档案生成 Rhine archive 数据
-- 通过 `localStorage` 提供档案元数据
-- 通过 `postMessage` 把选中 / 打开事件传回父页面
-- Embed 模式下打开档案时进入 Writing Time 的本地图片预览，而不是 RhineLabUI 原始研究文档页
-
-Three.js 场景、GLB 档案盒、相机、循环逻辑、拖动导航、材质、灯光、后处理和动画仍来自 RhineLabUI 本身。
-
-生成目录 `.vendor/rhinelab-ui` 与 `public/rhinelab` 均被 Git 忽略，不应提交到仓库。
-
-完整集成说明见 [`docs/RHINELAB_INTEGRATION.md`](docs/RHINELAB_INTEGRATION.md)。
+`/archive-gallery` 是顶层独立模块，读取 Writing Time 已有的本地图片。可以新增图片、从网格中挑选、查看大图，或将图片移出画廊。移出画廊不会删除素材库中的原图。画廊的展示区保留为后续诺瓦尔与伊登视觉元素的接入位置。
 
 ---
 
@@ -439,7 +404,7 @@ Writing-Time/
 │   │   ├── DreamHome.tsx           # Portal 主交互
 │   │   ├── RelightScene.tsx        # WebGL 重光照与粒子场景
 │   │   └── LightingSlider.tsx      # 光照参数控件
-│   ├── archive-gallery/            # RhineLabUI 外层桥接与图片预览
+│   ├── archive-gallery/            # 本地图片画廊与预览
 │   ├── workbench/                  # CodeMirror 编辑器与工具
 │   ├── content/                    # 内容类型编辑器
 │   ├── gallery/                    # 图片库与 Lightbox
@@ -465,19 +430,16 @@ Writing-Time/
 │   └── character-assets.ts         # 角色资产注册表
 │
 ├── scripts/
-│   ├── sync-rhinelab-runtime.mjs   # 同步 / patch / 构建 RhineLabUI
 │   └── prepare-character-assets.py # 角色插画预处理
 │
 ├── docs/
 │   ├── home-design.md              # Portal 与重光照设计文档
-│   ├── RHINELAB_INTEGRATION.md     # Archive Gallery 集成说明
 │   └── character-bible.md          # 角色一致性基准
 │
 ├── public/
 │   ├── assets/home/                # Portal 场景、法线图等
 │   ├── assets/characters/          # 角色插画
 │   ├── assets/decor/               # 装饰 SVG
-│   └── rhin...                     # public/rhinelab 为构建期生成，不入 Git
 │
 ├── stores/
 ├── types/
@@ -493,7 +455,6 @@ node_modules/
 .npm-cache/
 .npm-cache-*/
 .vendor/
-public/rhinelab/
 ```
 
 ---
@@ -502,9 +463,8 @@ public/rhinelab/
 
 | 命令 | 说明 |
 | --- | --- |
-| `npm run dev` | 先同步 RhineLabUI，再启动 Next.js 开发服务器 |
-| `npm run sync:rhinelab` | 同步固定 RhineLabUI revision、应用兼容 patch 并构建 runtime |
-| `npm run build` | 先同步 RhineLabUI，再执行生产构建和 TypeScript 检查 |
+| `npm run dev` | 启动 Next.js 开发服务器 |
+| `npm run build` | 执行生产构建和 TypeScript 检查 |
 | `npm run start` | 启动生产服务器 |
 | `npm run lint` | ESLint 检查 |
 | `python scripts/prepare-character-assets.py` | 预处理角色插画，需要 Pillow |
@@ -543,16 +503,6 @@ public/rhinelab/
 
 ## 开发注意事项
 
-### RhineLabUI 固定 revision
-
-不要直接跟踪上游 `main`。升级 Archive Gallery runtime 时：
-
-1. 修改 `scripts/sync-rhinelab-runtime.mjs` 中的 `UPSTREAM_COMMIT`
-2. 执行 `npm run sync:rhinelab`
-3. 确认兼容 patch 点仍然有效
-4. 实测 Archive Gallery 交互和本地图片 bridge
-5. 再提交新的固定 revision
-
 ### 不要提交缓存与生成目录
 
 当前 `.gitignore` 已覆盖：
@@ -561,15 +511,14 @@ public/rhinelab/
 .npm-cache/
 .npm-cache-*/
 .vendor/
-public/rhinelab/
 ```
 
-`.npm-cache-rhinelab` 等目录只用于本地隔离 npm 安装环境，不属于源码。
+`.npm-cache-*` 等目录只用于本地隔离 npm 安装环境，不属于源码。
 
 ### 用户数据与构建网络请求不是同一回事
 
 - 用户 Markdown、图片、设定、项目和偏好保存在 IndexedDB
-- RhineLabUI 与 npm 请求只发生在依赖同步 / 构建链路
+- npm 请求只发生在依赖安装链路
 - Writing Time 当前没有把个人内容上传到服务端的同步逻辑
 
 ---
@@ -582,7 +531,7 @@ public/rhinelab/
 
 ### 会把我的作品上传到服务器吗？
 
-当前没有用于同步个人创作数据的后端。Workshop 数据与图片都在浏览器本地。Archive Gallery 构建时会下载第三方源码和 npm 依赖，但不会把 IndexedDB 内容上传给 RhineLabUI。
+当前没有用于同步个人创作数据的后端。Workshop 数据与图片都在浏览器本地。
 
 ### 清理浏览器数据会发生什么？
 
@@ -603,10 +552,6 @@ WorkBench 使用 800ms 防抖自动保存、失焦兜底、路由跳转前强制
 ### `/gallery` 和 `/archive-gallery` 有什么区别？
 
 `/gallery` 是资源管理工具，负责导入、标签、引用和元数据；`/archive-gallery` 是沉浸式浏览界面。两者使用同一份 Writing Time 图片数据。
-
-### 为什么第一次 `npm run dev` 比普通 Next.js 项目慢？
-
-`predev` 会先执行 `sync:rhinelab`。如果本地还没有有效的固定 revision runtime，需要拉取 RhineLabUI、安装它的依赖并构建 `public/rhinelab`。之后只要 revision 与安装标记有效，就会复用本地结果。
 
 ### 新增一种内容类型要修改哪些地方？
 

@@ -3,6 +3,7 @@ import { RootShell } from "@/components/app/RootShell";
 import "./globals.css";
 import "./workflow.css";
 import "./portal.css";
+import "./map-return.css";
 
 export const metadata: Metadata = {
   title: { default: "Writing Time", template: "%s · Writing Time" },

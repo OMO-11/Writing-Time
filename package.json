@@ -3,12 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "sync:rhinelab": "node scripts/sync-rhinelab-runtime.mjs",
-    "predev": "npm run sync:rhinelab",
     "dev": "next dev",
-    "prebuild": "npm run sync:rhinelab",
     "build": "next build",
-    "start": "next start",
+    "start": "next start -H 0.0.0.0",
     "lint": "eslint ."
   },
   "dependencies": {

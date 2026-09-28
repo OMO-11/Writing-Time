@@ -22,8 +22,7 @@ export const routes = [
   { id: 'home-gallery', from: 'home', to: 'gallery', points: [{ x: 824, y: 572 }, { x: 919, y: 566 }, { x: 1004, y: 530 }, { x: 1070, y: 480 }], status: 'active' },
 ] as const;
 export const terrainAsset = '/assets/world-map/terrain-detailed.webp';
-export const pieceAssets = { noval: '/assets/world-map/pieces/noval-chess.webp', eden: '/assets/world-map/pieces/eden-chess.webp' };
-export const mapAssets = [terrainAsset, ...destinations.map(item => item.asset), ...Object.values(pieceAssets)];
+export const mapAssets = [terrainAsset, ...destinations.map(item => item.asset)];
 
 export type PlaceId = Destination['id'];
 const locationKey = 'writing-time-map-location-v2';
@@ -33,29 +32,9 @@ export function readMapLocation(): PlaceId {
     return destinations.find(item => item.id === id)?.id ?? 'home';
   } catch { return 'home'; }
 }
-export function rememberMapLocation(id: PlaceId) {
-  try { sessionStorage.setItem(locationKey, id); sessionStorage.setItem('writing-time-map-scene-v1', 'map'); } catch { /* storage unavailable */ }
+export function rememberMapLocation(id: PlaceId, restoreMap = true) {
+  try { sessionStorage.setItem(locationKey, id); if (restoreMap) sessionStorage.setItem('writing-time-map-scene-v1', 'map'); } catch { /* storage unavailable */ }
 }
-/** Routes connect through home; never send the chess pieces straight across a river. */
-export function journeyPoints(from: PlaceId, to: PlaceId): Point[] {
-  if (from === to) return [destinations.find(item => item.id === from)!.position];
-  const first = from === 'home' ? [destinations[0].position] : [...routes.find(route => route.to === from)!.points].reverse();
-  return to === 'home' ? first : [...first, ...routes.find(route => route.to === to)!.points.slice(1)];
-}
-export function pointAlongPath(points: Point[], progress: number): Point {
-  if (points.length === 1) return points[0];
-  const lengths = points.slice(1).map((p, i) => Math.hypot(p.x - points[i].x, p.y - points[i].y));
-  let remaining = lengths.reduce((sum, length) => sum + length, 0) * Math.max(0, Math.min(1, progress));
-  for (let i = 0; i < lengths.length; i++) {
-    if (remaining <= lengths[i] || i === lengths.length - 1) {
-      const t = lengths[i] ? remaining / lengths[i] : 0;
-      return { x: points[i].x + (points[i + 1].x - points[i].x) * t, y: points[i].y + (points[i + 1].y - points[i].y) * t };
-    }
-    remaining -= lengths[i];
-  }
-  return points[points.length - 1];
-}
-
 export function project(point: Point, camera: Camera, width: number, height: number): Point {
   return { x: width / 2 + (point.x - camera.x) * camera.scale, y: height / 2 + (point.y - camera.y) * camera.scale };
 }
