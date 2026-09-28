@@ -1,0 +1,9 @@
+.atlas-return-dock { position: fixed; right: max(22px,env(safe-area-inset-right)); bottom: max(22px,env(safe-area-inset-bottom)); z-index: 70; display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+.atlas-return-dock > a { display: flex; align-items: center; gap: 11px; min-height: 52px; padding: 9px 19px 9px 14px; border-radius: 20px; border: 1px solid #fffcf3c9; background: #fbfaf0df; backdrop-filter: blur(14px); color: #526376; text-decoration: none; box-shadow: 0 5px 26px #33475b1c,inset 0 1px 0 #ffffffc9; font: 13px var(--font-serif); letter-spacing: .1em; transition: background 180ms; }
+.atlas-return-dock > a:hover { background: #fffdf4; }
+.atlas-return-dock small { display: block; font: 7px var(--font-sans); letter-spacing: .17em; margin-top: 3px; opacity: .7; }
+.atlas-return-dock > span { max-width: 260px; background: #fff9ef; padding: 10px 15px; border-radius: 14px; color: #795545; font-size: 12px; }
+.atlas-return-spinner { animation: atlas-return-spin 1s linear infinite; }
+@keyframes atlas-return-spin { to { transform: rotate(360deg); } }
+@media (max-width: 760px) { .atlas-return-dock { right: 14px; bottom: max(14px,env(safe-area-inset-bottom)); } .atlas-return-dock > a { min-height: 46px; padding: 7px 12px; border-radius: 17px; font-size: 11px; } }
+@media (prefers-reduced-motion: reduce) { .atlas-return-spinner { animation: none; } }

@@ -16,7 +16,12 @@ export interface ExtractedImage {
   title?: string;
 }
 
+export interface BookRecord {
+ id: string; title: string; chapters: { id: string; title: string; workIds: string[] }[]; createdAt: number; updatedAt: number;
+}
+
 export interface WorkDocument {
+  finalizedAt?: number;
   id: string;
   slug: string;
   title: string;

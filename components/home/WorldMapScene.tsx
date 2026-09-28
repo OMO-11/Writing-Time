@@ -4,7 +4,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, ArrowUpRight, Compass, Crosshair, Minus, Plus, X } from 'lucide-react';
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties, type MouseEvent } from 'react';
-import { Camera, clampCamera, destinations, initialCamera, overviewScale, routes, WORLD, zoomAt, terrainAsset, pieceAssets, readMapLocation, type Destination, type PlaceId } from '@/lib/home/world-map';
+import { Camera, clampCamera, destinations, initialCamera, overviewScale, routes, WORLD, zoomAt, terrainAsset, readMapLocation, type Destination, type PlaceId } from '@/lib/home/world-map';
 import { useMapJourney } from './useMapJourney';
 
 type Props = { active: boolean; onReturn: () => void; onCameraChange: (camera: Camera) => void; savedCamera: Camera | null; };
@@ -24,16 +24,7 @@ export function WorldMapScene({ active, onReturn, onCameraChange, savedCamera }:
   const cameraRef = useRef(camera);
   const initialized = useRef(false);
   const setView = useCallback((next: Camera) => { cameraRef.current = next; setCamera(next); }, []);
-  const journeyState = useMapJourney(onReturn, point => {
-    const c = cameraRef.current;
-    const sx = size.width / 2 + (point.x - c.x) * c.scale;
-    const sy = size.height / 2 + (point.y - c.y) * c.scale;
-    const mx = Math.min(140, size.width * .3), my = Math.min(180, size.height * .3);
-    const dx = sx < mx ? sx - mx : sx > size.width - mx ? sx - (size.width - mx) : 0;
-    const dy = sy < my ? sy - my : sy > size.height - my ? sy - (size.height - my) : 0;
-    if (dx || dy) setView(clampCamera({ ...c, x: c.x + dx / c.scale, y: c.y + dy / c.scale }, size.width, size.height));
-  });
-  const { location, currentPlace, journey, departing, restore, cancel, travel, running } = journeyState;
+  const { location, currentPlace, departing, restore, cancel, travel, running } = useMapJourney(onReturn);
   const returnHome = () => { cancel(); onReturn(); };
   const visit = (item: Destination, event?: MouseEvent<HTMLAnchorElement | HTMLButtonElement>) => {
     if (event && (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0)) return;
@@ -64,7 +55,10 @@ export function WorldMapScene({ active, onReturn, onCameraChange, savedCamera }:
     return () => observer.disconnect();
   }, [savedCamera, restore, setView]);
   useEffect(() => { if (!laidOut) return; const timer = setTimeout(() => onCameraChange(camera), 180); return () => clearTimeout(timer); }, [camera, laidOut, onCameraChange]);
-  useEffect(() => { if (active) title.current?.focus({ preventScroll: true }); }, [active]);
+  useEffect(() => {
+    if (active) { title.current?.focus({ preventScroll: true }); queueMicrotask(() => restore(readMapLocation())); }
+    else queueMicrotask(() => { if (running.current) cancel(); });
+  }, [active, restore, cancel, running]);
   useEffect(() => {
     const node = viewport.current;
     if (!node) return;
@@ -87,7 +81,7 @@ export function WorldMapScene({ active, onReturn, onCameraChange, savedCamera }:
     if (!destination) return;
     update({ ...camera, x: destination.position.x, y: destination.position.y - 32, scale: Math.max(camera.scale, Math.min(size.width / 680, size.height / 500, 1.55)) });
     setNavOpen(false);
-    setTouchPlace(destination.id);
+    setTouchPlace(matchMedia('(hover: none)').matches ? destination.id : null);
   };
   const relative = (event: { clientX: number; clientY: number }) => {
     const bounds = viewport.current!.getBoundingClientRect();
@@ -137,10 +131,7 @@ export function WorldMapScene({ active, onReturn, onCameraChange, savedCamera }:
     } else { gesture.current = null; setDragging(false); }
   };
   const transform = `translate(${size.width / 2 - camera.x * camera.scale}px, ${size.height / 2 - camera.y * camera.scale}px) scale(${camera.scale})`;
-  const piecePoint = journey?.point ?? currentPlace.position;
-  const pieceScale = Math.max(.7, Math.min(1.08, camera.scale)) / camera.scale;
-
-  return <section className="world-map" aria-label="雾行图世界地图" data-ready={laidOut} data-location={location} data-travelling={!!journey} data-departing={departing}
+  return <section className="world-map" aria-label="雾行图世界地图" data-ready={laidOut} data-location={location} data-departing={departing}
     onKeyDownCapture={event => { if (event.key === 'Escape' && running.current) { event.stopPropagation(); cancel(); } }}>
     <div ref={viewport} className={`world-map-viewport${dragging ? ' is-dragging' : ''}`} aria-label="可拖动和缩放的地图"
       onPointerDown={onPointerDown} onPointerMove={onPointerMove} onPointerUp={endPointer} onPointerCancel={endPointer} onLostPointerCapture={endPointer}
@@ -149,7 +140,6 @@ export function WorldMapScene({ active, onReturn, onCameraChange, savedCamera }:
         <Image className="world-map-terrain" src={terrainAsset} alt="" width={3344} height={1882} unoptimized draggable={false} />
         <svg className="world-map-routes" aria-hidden="true" viewBox={`0 0 ${WORLD.width} ${WORLD.height}`}>
           {routes.map(route => <polyline key={route.id} points={route.points.map(p => `${p.x},${p.y}`).join(' ')} />)}
-          <ellipse cx={piecePoint.x} cy={piecePoint.y + 12} rx={31 * pieceScale} ry={11 * pieceScale} className="world-map-location-ring" />
         </svg>
       <div className="world-map-hotspots">
         {destinations.map(item => {
@@ -158,12 +148,7 @@ export function WorldMapScene({ active, onReturn, onCameraChange, savedCamera }:
           return item.href ? <Link data-map-place={item.id} data-revealed={touchPlace === item.id} key={item.id} className="world-map-landmark" style={style} href={item.href} onClick={event => visit(item, event)} aria-label={`前往${item.title}：${item.description}`}>{image}</Link>
             : <button data-map-place={item.id} data-revealed={touchPlace === item.id} key={item.id} type="button" className="world-map-landmark" style={style} onClick={event => visit(item, event)} aria-label="返回窗边居所">{image}</button>;
         })}
-        <div className="world-map-pieces" style={{ left: piecePoint.x, top: piecePoint.y + 12, transform: `translate(-50%,-100%) scale(${pieceScale})` }} role="img" aria-label={`当前位置：${currentPlace.title}。诺瓦尔与伊登同行。`}>
-          <span className="world-map-piece-pair" style={{ transform: `translateY(${-1 * (journey?.lift ?? 0)}px)` }}>
-            <Image src={pieceAssets.noval} alt="" width={300} height={500} unoptimized draggable={false} />
-            <Image src={pieceAssets.eden} alt="" width={300} height={500} unoptimized draggable={false} />
-          </span>
-        </div>
+
       </div>
       <div className="world-map-cloud-bank" aria-hidden="true"><span /><span /><span /><span /></div>
       </div>
@@ -171,19 +156,18 @@ export function WorldMapScene({ active, onReturn, onCameraChange, savedCamera }:
     <div className="world-map-heading"><span>WRITING TIME <i /> WORLD ATLAS</span><h2 ref={title} tabIndex={-1}>雾行图</h2><p>山川有迹，故事无尽。</p></div>
     <button data-map-control className="world-map-return" onClick={returnHome}><ArrowLeft size={16} strokeWidth={1.3} />返回窗边</button>
     <div data-map-control className="world-map-controls" aria-label="地图视野控制">
-      <button disabled={!!journey} onClick={() => zoom(1.2)} aria-label="放大地图" title="放大地图"><Plus size={18} strokeWidth={1.4} /></button>
-      <button disabled={!!journey} onClick={() => zoom(1 / 1.2)} aria-label="缩小地图" title="缩小地图"><Minus size={18} strokeWidth={1.4} /></button>
+      <button disabled={departing} onClick={() => zoom(1.2)} aria-label="放大地图" title="放大地图"><Plus size={18} strokeWidth={1.4} /></button>
+      <button disabled={departing} onClick={() => zoom(1 / 1.2)} aria-label="缩小地图" title="缩小地图"><Minus size={18} strokeWidth={1.4} /></button>
       <span />
-      <button disabled={!!journey} onClick={overview} aria-label="查看世界总览" title="世界总览"><Compass size={19} strokeWidth={1.3} /></button>
-      <button disabled={!!journey} onClick={locate} aria-label="定位当前位置" title="定位当前位置"><Crosshair size={18} strokeWidth={1.3} /></button>
+      <button disabled={departing} onClick={overview} aria-label="查看世界总览" title="世界总览"><Compass size={19} strokeWidth={1.3} /></button>
+      <button disabled={departing} onClick={locate} aria-label="定位当前位置" title="定位当前位置"><Crosshair size={18} strokeWidth={1.3} /></button>
     </div>
     <div data-map-control className="world-map-destinations"><button aria-label="目的地" aria-expanded={navOpen} aria-controls="world-map-nav" onClick={() => setNavOpen(value => !value)}><Compass size={20} strokeWidth={1.2} /><span>去往何处<small>DESTINATIONS</small></span></button>
       {navOpen && <nav id="world-map-nav" aria-label="地图目的地"><div><strong>目的地</strong><button aria-label="关闭目的地列表" onClick={() => setNavOpen(false)}><X size={17} /></button></div>
-        {destinations.map(item => <div key={item.id} className="world-map-nav-row"><button disabled={!!journey} onClick={() => focusDestination(item.id)} aria-label={`在地图上查看${item.title}`}>{item.title}<small>{location === item.id ? '此刻所在' : item.description}</small></button>{item.href ? <Link href={item.href} onClick={event => { event.preventDefault(); setTouchPlace(item.id); setNavOpen(false); travel(item); }} aria-label={`进入${item.title}`}><ArrowUpRight size={18} /></Link> : <button onClick={() => travel(item)} aria-label="返回窗边居所"><ArrowLeft size={17} /></button>}</div>)}
+        {destinations.map(item => <div key={item.id} className="world-map-nav-row"><button disabled={departing} onClick={() => focusDestination(item.id)} aria-label={`在地图上查看${item.title}`}>{item.title}<small>{location === item.id ? '此刻所在' : item.description}</small></button>{item.href ? <Link href={item.href} onClick={event => { if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return; event.preventDefault(); setTouchPlace(item.id); setNavOpen(false); travel(item); }} aria-label={`进入${item.title}`}><ArrowUpRight size={18} /></Link> : <button onClick={() => travel(item)} aria-label="返回窗边居所"><ArrowLeft size={17} /></button>}</div>)}
       </nav>}
     </div>
-    <div className="world-map-footer"><span className="world-map-current"><i />{currentPlace.title}</span><span className="world-map-hint" aria-hidden="true">拖动探索 · 悬停地标，发现下一站</span></div>
-    {journey && <div className="world-map-journey" role="status"><span>{journey.progress < 1 ? '正前往' : '已抵达'} · {destinations.find(item => item.id === journey.target)!.title}</span><button onClick={cancel} aria-label="取消旅程"><X size={14} /></button></div>}
+    <div className="world-map-footer"><span className="world-map-current"><i />{currentPlace.title}</span></div>
     <div className="world-map-departure" aria-hidden="true" />
   </section>;
 }

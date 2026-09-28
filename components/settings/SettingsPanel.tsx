@@ -21,6 +21,7 @@ export function SettingsPanel() {
     await db.settings.put({ key: "line-break-mode", value: mode });
     const works = await db.works.toArray();
     for (const work of works) {
+      if (work.finalizedAt) continue;
       const processed = await MarkdownService.process(work.markdown, mode);
       const next = { ...work, renderedHtml: processed.renderedHtml, plainText: processed.plainText, excerptHtml: processed.excerptHtml, headings: processed.headings };
       await db.works.put(next);

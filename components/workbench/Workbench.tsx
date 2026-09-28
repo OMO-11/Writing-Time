@@ -41,6 +41,8 @@ export function Workbench() {
   const positionRef = useRef<EditorPosition>(EMPTY_POSITION);
   const outlineOpenRef = useRef(true);
   const lineBreakModeRef = useRef<"standard" | "single">("standard");
+  const [finalizing, setFinalizing] = useState(false);
+  const finalizingRef = useRef(false);
   const [activeWork, setActiveWork] = useState<WorkDocument>();
   const [markdown, setMarkdown] = useState("");
   const [renderedHtml, setRenderedHtml] = useState("");
@@ -88,7 +90,7 @@ export function Workbench() {
   const saveNow = useCallback(async () => {
     if (savingRef.current) return savingRef.current;
     const work = workRef.current;
-    if (!work) return;
+    if (!work || work.finalizedAt) return;
     if (!dirtyRef.current) { persistSession(editorRef.current?.getPosition() ?? positionRef.current); return; }
     const task = (async () => {
       updateSaveState("saving");
@@ -153,6 +155,7 @@ export function Workbench() {
       await ensureStarterData();
       lineBreakModeRef.current = await getLineBreakMode();
       const found = requestedId ? await db.works.get(requestedId) : await db.works.orderBy("updatedAt").last();
+      if (found?.finalizedAt) { router.replace(`/work/${found.slug}`); return; }
       const selected = await hydrateWorkDocument(found ?? await createBlankWork());
       const session = await db.editorSessions.get(selected.id) ?? {
         workId: selected.id, cursorFrom: 0, cursorTo: 0, scrollTop: 0, editorMode: "split" as const, outlineOpen: true, updatedAt: Date.now(),
@@ -175,7 +178,7 @@ export function Workbench() {
       updateSaveState("saved");
     })();
     return () => { cancelled = true; };
-  }, [requestedId, setActiveWorkTitle, setEditorMode, updateSaveState]);
+  }, [router, requestedId, setActiveWorkTitle, setEditorMode, updateSaveState]);
 
   useEffect(() => {
     if (!activeWork || !dirtyRef.current) return;
@@ -223,14 +226,36 @@ export function Workbench() {
   useEffect(() => () => { setActiveWorkTitle(""); void saveNow(); }, [saveNow, setActiveWorkTitle]);
 
   const markDirty = () => { dirtyRef.current = true; revisionRef.current += 1; updateSaveState("saving"); setDirtyVersion((value) => value + 1); };
-  const changeMarkdown = (value: string) => { markdownRef.current = value; setMarkdown(value); markDirty(); };
+  const changeMarkdown = (value: string) => { if (finalizingRef.current) return; markdownRef.current = value; setMarkdown(value); markDirty(); };
   const patchWork = (patch: Partial<WorkDocument>) => {
     const current = workRef.current;
-    if (!current) return;
+    if (!current || finalizingRef.current) return;
     const next = { ...current, ...patch };
     workRef.current = next;
     setActiveWork(next);
     markDirty();
+  };
+
+  const finalize = async () => {
+    if (finalizingRef.current || !workRef.current || !window.confirm("完全保存后，正文、标题和属性均不可再修改。确认定稿？")) return;
+    finalizingRef.current = true; setFinalizing(true);
+    try {
+      await saveNow();
+      if (dirtyRef.current) await saveNow();
+      const id = workRef.current.id;
+      await db.transaction("rw", db.works, db.contents, async () => {
+        const work = await db.works.get(id);
+        if (!work) throw new Error("作品不存在");
+        const next = { ...work, status: "completed" as const, finalizedAt: Date.now(), updatedAt: Date.now() };
+        await db.works.put(next);
+        const content = await db.contents.get(id);
+        await db.contents.put({ ...articleContentFromWork(next), favorite: content?.favorite ?? false });
+      });
+      dirtyRef.current = false;
+      workRef.current = await db.works.get(id);
+      router.push("/library?type=finished");
+    } catch { showToast("完全保存失败，请重试。", "error"); }
+    finally { finalizingRef.current = false; setFinalizing(false); }
   };
 
   const selectWork = async (work: WorkDocument) => { await saveNow(); router.replace(`/workbench?work=${work.id}`); };
@@ -268,6 +293,7 @@ export function Workbench() {
 
   return (
     <main className="workbench" data-character-theme="noval" data-focus={focusMode} data-typewriter={typewriterMode} onDragEnter={(event) => { event.preventDefault(); setDragging(true); }} onDragOver={(event) => event.preventDefault()} onDragLeave={(event) => { if (event.currentTarget === event.target) setDragging(false); }} onDrop={(event) => { event.preventDefault(); setDragging(false); void handleFiles(event.dataTransfer.files); }}>
+      <div className="finalize-bar"><span>普通保存保留编辑能力；完全保存后可编入书籍。</span><button type="button" className="primary-paper-button" disabled={!activeWork || finalizing} onClick={() => void finalize()}>{finalizing ? "正在定稿…" : "完全保存"}</button></div>
       <EditorHeader work={activeWork} outlineOpen={outlineOpen} onTitleChange={(title) => patchWork({ title })} onToggleOutline={() => setOutlineOpen((value) => !value)} onExport={() => void exportMarkdown()} />
       {editorMode !== "preview" ? <MarkdownToolbar onCommand={(command) => editorRef.current?.applyCommand(command)} onUndo={() => editorRef.current?.undo()} onRedo={() => editorRef.current?.redo()} onFind={() => editorRef.current?.openSearch()} onPickImage={() => setImagePickerOpen(true)} /> : null}
 

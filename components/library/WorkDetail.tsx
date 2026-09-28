@@ -21,7 +21,7 @@ export function WorkDetail({ slug }: { slug: string }) {
   if (!work) return <div className="detail-loading">没有找到这篇作品。<Link href="/library">返回作品库</Link></div>;
   return (
     <div className="work-detail">
-      <header><p>{work.tags.join(" · ") || "未分类作品"}</p><h2>{work.title}</h2><span>{work.status === "draft" ? "草稿" : work.status === "completed" ? "已完成" : "已归档"}</span><Link href={`/workbench?work=${work.id}`}><AppIcon icon={PencilLine} />继续编辑</Link></header>
+      <header><p>{work.tags.join(" · ") || "未分类作品"}</p><h2>{work.title}</h2><span>{work.status === "draft" ? "草稿" : work.status === "completed" ? "已完成" : "已归档"}</span>{work.finalizedAt ? <span>已完全保存 · 只读</span> : <Link href={`/workbench?work=${work.id}`}><AppIcon icon={PencilLine} />继续编辑</Link>}</header>
       <MarkdownRenderer html={work.renderedHtml} className="mx-auto w-full max-w-[760px] px-5 py-8 sm:px-8 sm:py-10" />
     </div>
   );

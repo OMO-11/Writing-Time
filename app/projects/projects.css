@@ -1,0 +1,17 @@
+.book-projects { padding: clamp(16px, 3vw, 40px); }
+.book-projects header { display:flex; align-items:center; flex-wrap:wrap; gap:14px; margin-bottom:20px; }
+.book-projects header p,.book-projects header h2,.book-projects header h3 { flex:1; }
+.book-layout { display:grid; grid-template-columns:240px minmax(0,1fr); gap:28px; }
+.book-layout aside { display:flex; flex-direction:column; gap:12px; }
+.book-layout aside button { text-align:left; padding:18px; background:#f4f0e8; border:1px solid #dcd7ce; border-radius:12px; }
+.book-layout aside button[aria-pressed=true] { border-color:#73859f; background:#e6eaf0; }
+.book-layout small { display:block; margin-top:6px; }
+.book-editor { min-width:0; padding:24px; background:#faf7f1; border:1px solid #dfdad0; border-radius:16px; }
+.book-editor fieldset { border:0; padding:0; min-width:0; }
+.book-editor button,.book-editor select { padding:7px 10px; border:1px solid #d8d2c8; border-radius:7px; background:#fffaf3; }
+.book-editor button:disabled { opacity:.4; }
+.book-chapter { padding:20px 0; border-top:1px solid #dfdad0; }
+.book-chapter li { display:flex; justify-content:space-between; align-items:center; gap:12px; flex-wrap:wrap; padding:12px 0; }
+.book-chapter li div { display:flex; flex-wrap:wrap; gap:6px; }
+.book-chapter label { display:flex; flex-wrap:wrap; align-items:center; gap:12px; }
+@media(max-width:760px) { .book-layout { grid-template-columns:1fr; } .book-editor { padding:14px; } }

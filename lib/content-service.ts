@@ -73,6 +73,7 @@ async function rebuildAllReferences() {
 function contentToWork(content: ContentItem<"article">): WorkDocument {
   return {
     id: content.id,
+    finalizedAt: content.payload.finalizedAt,
     slug: content.payload.slug || `work-${content.id.slice(0, 8)}`,
     title: content.title,
     markdown: content.payload.markdown,
@@ -93,7 +94,7 @@ export async function ensureUnifiedContentModel() {
   const [works, images, collections] = await Promise.all([db.works.toArray(), db.images.toArray(), db.collections.toArray()]);
   const existing = new Map((await db.contents.toArray()).map((item) => [item.id, item]));
   const migrated: ContentItem[] = [
-    ...works.map((work) => ({ ...articleContentFromWork(work), favorite: existing.get(work.id)?.favorite ?? false })),
+    ...works.filter((work) => !work.finalizedAt || !existing.has(work.id)).map((work) => ({ ...articleContentFromWork(work), favorite: existing.get(work.id)?.favorite ?? false })),
     ...images.map((image) => ({ ...imageContentFromRecord(image), favorite: existing.get(image.id)?.favorite ?? false })),
     ...collections.map((collection) => ({ ...collectionContentFromRecord(collection), favorite: existing.get(collection.id)?.favorite ?? false })),
   ];
@@ -148,7 +149,7 @@ export async function createContent<T extends Exclude<ContentType, "article" | "
 export async function toggleFavorite(id: string) {
   const content = await db.contents.get(id);
   if (!content) return;
-  await db.contents.update(id, { favorite: !content.favorite, updatedAt: Date.now() });
+  await db.contents.update(id, { favorite: !content.favorite });
 }
 
 export async function getContentReferences(id: string) {

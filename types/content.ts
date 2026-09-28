@@ -18,6 +18,7 @@ export type ExhibitionTheme = "storybook" | "gallery" | "character-file" | "mini
 
 export interface ContentPayloadMap {
   article: {
+    finalizedAt?: number;
     slug: string;
     markdown: string;
     renderedHtml: string;

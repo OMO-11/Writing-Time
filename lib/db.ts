@@ -2,6 +2,7 @@ import Dexie, { type EntityTable } from "dexie";
 import { MarkdownService } from "@/lib/markdown-service";
 import type { ActivityRecord, ContentItem, ContentReference } from "@/types/content";
 import type {
+  BookRecord,
   CollectionRecord,
   EditorSession,
   ImageRecord,
@@ -41,6 +42,7 @@ function escapeHtml(value: string) {
 }
 
 class FantasyWorkshopDB extends Dexie {
+  books!: EntityTable<BookRecord, "id">;
   works!: EntityTable<WorkDocument, "id">;
   images!: EntityTable<ImageRecord, "id">;
   collections!: EntityTable<CollectionRecord, "id">;
@@ -124,6 +126,16 @@ class FantasyWorkshopDB extends Dexie {
       ];
       if (contents.length) await transaction.table<ContentItem, string>("contents").bulkPut(contents);
     });
+    this.version(4).stores({ books: "id, title, updatedAt" });
+    this.works.hook("updating", (changes, _key, work) => {
+      if (work.finalizedAt && Object.keys(changes).length) throw new Error("已完全保存的作品不能修改");
+    });
+    this.works.hook("deleting", (_key, work) => {
+      if (work.finalizedAt) throw new Error("已完全保存的作品不能删除");
+    });
+    this.contents.hook("updating", (changes, _key, content) => {
+      if (content.type === "article" && content.payload.finalizedAt && Object.keys(changes).some((key) => key !== "favorite")) throw new Error("已完全保存的作品不能修改");
+    });
   }
 }
 
@@ -143,6 +155,7 @@ export function articleContentFromWork(work: WorkDocument): ContentItem<"article
     createdAt: work.createdAt,
     updatedAt: work.updatedAt,
     payload: {
+      finalizedAt: work.finalizedAt,
       slug: work.slug,
       markdown: work.markdown,
       renderedHtml: work.renderedHtml,
@@ -223,6 +236,7 @@ export async function createBlankWork(): Promise<WorkDocument> {
 }
 
 export async function hydrateWorkDocument(work: WorkDocument): Promise<WorkDocument> {
+  if (work.finalizedAt) return work;
   const processed = await MarkdownService.process(work.markdown, await getLineBreakMode());
   const next = {
     ...work,
@@ -245,6 +259,7 @@ export async function ensureDerivedWorkData() {
   const mode = await getLineBreakMode();
   const works = await db.works.toArray();
   for (const work of works) {
+    if (work.finalizedAt) continue;
     const processed = await MarkdownService.process(work.markdown, mode);
     const next = {
       ...work,

@@ -1,0 +1,6 @@
+{
+  "maxLandmarkDriftPx": 0,
+  "navigation": "gallery → map → cancelled workshop → workshop → map → home → map",
+  "responsive": "390x844, 360x640, 844x390; reduced motion round trips",
+  "pageErrors": []
+}

@@ -5,7 +5,7 @@ import { LightingSlider } from "./LightingSlider";
 import { RelightScene } from "./RelightScene";
 import { WorldMapScene } from "./WorldMapScene";
 import { usePortalTransition } from "./usePortalTransition";
-import { Camera, prepareMapAssets } from "@/lib/home/world-map";
+import { Camera, prepareMapAssets, rememberMapLocation } from "@/lib/home/world-map";
 import Link from "next/link";
 import { useEffect, useRef, useState } from "react";
 import { ChevronRight, Compass, Moon, Pause, Play, Sun, X } from "lucide-react";
@@ -54,7 +54,7 @@ export function DreamHome() {
   }, []);
   useEffect(() => {
     if (scene === "map") wasMap.current = true;
-    else if (wasMap.current && phase === "idle") { trigger.current?.focus({ preventScroll: true }); wasMap.current = false; }
+    else if (wasMap.current && phase === "idle") { rememberMapLocation('home', false); trigger.current?.focus({ preventScroll: true }); wasMap.current = false; }
   }, [scene, phase]);
   useEffect(() => {
     try {

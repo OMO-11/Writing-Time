@@ -45,8 +45,8 @@ export function GlobalHeader() {
       </nav> : <nav className="global-primary-nav" aria-label="主要导航">
         <Link href="/workshop" aria-current={pathname === "/workshop" ? "page" : undefined}>主页</Link>
         <Link href="/workbench">创作</Link>
-        <Link href="/library">资料库</Link>
-        <Link href="/library?type=project">项目</Link>
+        <Link href="/library" aria-current={pathname === "/library" ? "page" : undefined}>工作区</Link>
+        <Link href="/projects" aria-current={pathname === "/projects" ? "page" : undefined}>项目</Link>
         <Link href="/library?type=exhibition">展览</Link>
       </nav>}
       <GlobalSearch />

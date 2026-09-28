@@ -209,3 +209,6 @@ body:has(.workbench[data-focus="true"]) .workshop-sigil { width: 36px; height: 3
   .global-save-status svg, .editor-status-save svg { animation: none !important; }
   .document-outline { transition: none; }
 }
+.finalize-bar { display:flex; align-items:center; justify-content:space-between; gap:16px; padding:8px 24px; flex-wrap:wrap; background:#f4f0e8; }
+.app-shell .workbench { grid-template-rows: auto 56px auto minmax(0, 1fr) 28px; }
+@media(max-width:760px) { .app-shell .workbench { grid-template-rows:auto auto auto minmax(0,1fr) 28px; } }
