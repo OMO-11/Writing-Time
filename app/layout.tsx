@@ -4,6 +4,7 @@ import "./globals.css";
 import "./workflow.css";
 import "./portal.css";
 import "./map-return.css";
+import "./study.css";
 
 export const metadata: Metadata = {
   title: { default: "Writing Time", template: "%s · Writing Time" },

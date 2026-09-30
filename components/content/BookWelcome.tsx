@@ -1,0 +1,13 @@
+import Link from "next/link";
+import { ArrowRight, BookOpen, Files, ListOrdered, Plus } from "lucide-react";
+import { CharacterIllustration } from "@/components/theme/CharacterIllustration";
+
+/** Lightweight vector scene stays complete even when character art is disabled. */
+export function BookWelcome({ onCreate }: { onCreate: () => void }) {
+  return <section className="book-welcome" aria-label="开始编订第一本书">
+    <div className="book-welcome-main"><div className="book-welcome-copy"><span className="book-section-label"><BookOpen size={16} aria-hidden="true" />你的故事，值得成书</span><h2>让散落的故事，<br />在这里成册。</h2><p>把一篇篇完成的作品收进书中，安排章节与次序。每次归来，都可以添上新的一页。</p><div className="book-welcome-actions"><button className="book-primary" onClick={onCreate}><Plus size={17} aria-hidden="true" />创建第一本书</button><Link href="/library?type=finished">查看已完成作品 <ArrowRight size={16} aria-hidden="true" /></Link></div><small>目录可以随时编订，定稿原文始终保留。</small></div>
+      <div className="book-welcome-art" aria-hidden="true"><div className="book-art-arch" /><svg className="book-art-scene" viewBox="0 0 440 360" fill="none"><ellipse cx="231" cy="310" rx="154" ry="14" fill="#63758b" opacity=".09"/><path d="M44 287c9-32 0-61-13-83m12 68c-17-3-23-12-23-23 15 1 21 9 23 23m1-23c14-6 20-17 17-28-12 3-18 15-17 28" stroke="#92a293" strokeWidth="2"/><g transform="rotate(-9 178 250)"><rect x="79" y="213" width="263" height="77" rx="8" fill="#b5a5bd"/><path d="M88 226h250v51H88" fill="#efe7da"/><path d="M93 235h239m-239 9h234m-234 9h239m-239 9h234" stroke="#d6cdbc"/><path d="M87 215v72" stroke="#7f6f89" strokeWidth="4"/></g><g transform="rotate(6 224 205)"><rect x="120" y="157" width="247" height="79" rx="7" fill="#667d96"/><path d="M130 170h232v53H130" fill="#faf3e5"/><path d="M135 181h220m-220 9h215m-215 9h220m-220 9h215" stroke="#d9d1c2"/><path d="M128 162v69" stroke="#445970" strokeWidth="4"/><path d="M294 159v86l14-10 13 10v-86" fill="#b6a071"/></g><path d="M328 113l5-12 5 12 12 5-12 5-5 12-5-12-12-5zM86 108l3-8 3 8 8 3-8 3-3 8-3-8-8-3z" stroke="#aa966b" strokeWidth="1.5"/><circle cx="378" cy="175" r="3" fill="#aa966b"/><path d="M173 76h95m-111 8h124" stroke="#acb8c3" opacity=".5"/></svg><CharacterIllustration character="duo" variant="project" size="md" decorative priority className="book-welcome-companions" /></div>
+    </div>
+    <ol className="book-welcome-steps">{[{ icon:BookOpen, title:"起一个书名", text:"给新的故事集一个开始" }, { icon:ListOrdered, title:"安排章节", text:"按你的叙事节奏组织目录" }, { icon:Files, title:"收录作品", text:"挑选定稿，随时续写这本书" }].map(({icon:Icon,title,text},index) => <li key={title}><span className="book-step-icon"><Icon size={20} aria-hidden="true" /></span><div><h3><span>0{index + 1}</span>{title}</h3><p>{text}</p></div></li>)}</ol>
+  </section>;
+}

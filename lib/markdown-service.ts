@@ -1,4 +1,5 @@
 import matter from "gray-matter";
+import { AsyncCache } from "@/lib/async-cache";
 import { unified } from "unified";
 import remarkParse from "remark-parse";
 import remarkGfm from "remark-gfm";
@@ -16,6 +17,10 @@ export interface ParsedMarkdown {
   tree: Root;
   offset: number;
 }
+
+// Source budget is measured in UTF-16 code units, not total heap size.
+const processedCache = new AsyncCache<ProcessedMarkdown>(16, 500_000);
+const RENDER_VERSION = 1;
 
 export interface ProcessedMarkdown extends ParsedMarkdown {
   renderedHtml: string;
@@ -137,7 +142,7 @@ export const MarkdownService = {
   async createExcerpt(input: string | ParsedMarkdown, paragraphCount = 3) {
     const parsed = typeof input === "string" ? this.parseMarkdown(input) : input;
     const paragraphs = parsed.tree.children.filter((node): node is Paragraph => node.type === "paragraph" && Boolean(nodeText(node).trim()));
-    const excerptTree: Root = { type: "root", children: paragraphs.slice(0, paragraphCount) };
+    const excerptTree: Root = { type: "root", children: structuredClone(paragraphs.slice(0, paragraphCount)) };
     return renderTree(excerptTree);
   },
 
@@ -187,19 +192,21 @@ export const MarkdownService = {
   },
 
   async process(markdown: string, lineBreakMode: LineBreakMode = "standard"): Promise<ProcessedMarkdown> {
-    const parsed = this.parseMarkdown(markdown);
-    const [renderedHtml, excerptHtml] = await Promise.all([
-      this.renderHtml(markdown, lineBreakMode),
-      this.createExcerpt(parsed),
-    ]);
-    return {
-      ...parsed,
-      renderedHtml,
-      plainText: this.extractPlainText(parsed),
-      excerptHtml,
-      headings: this.extractHeadings(parsed),
-      images: this.extractImages(parsed),
-    };
+    return processedCache.get(`${RENDER_VERSION}:${lineBreakMode}:${markdown}`, async () => {
+      const parsed = this.parseMarkdown(markdown);
+      const [renderedHtml, excerptHtml] = await Promise.all([
+        this.renderHtml(markdown, lineBreakMode),
+        this.createExcerpt(parsed),
+      ]);
+      return {
+        ...parsed,
+        renderedHtml,
+        plainText: this.extractPlainText(parsed),
+        excerptHtml,
+        headings: this.extractHeadings(parsed),
+        images: this.extractImages(parsed),
+      };
+    });
   },
 };
 

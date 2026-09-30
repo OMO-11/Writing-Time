@@ -1,0 +1,5 @@
+Tool: built-in image_gen
+Edit target: original gallery-specific Noval portrait, exec-006bdd18-2bad-46ad-856a-c2ce51410958.png
+Final asset: public/assets/gallery/noval-gallery-portrait.png
+
+undefined

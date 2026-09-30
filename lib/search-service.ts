@@ -66,10 +66,12 @@ class LocalSearchService {
   private subscription?: Subscription;
   private ready?: Promise<void>;
   private generation = 0;
+  private appliedGeneration = 0;
   private documents = new Map<string, string>();
 
   private async buildDocuments() {
-    const contents = await db.contents.toArray();
+    const [contents, books] = await db.transaction("r", db.contents, db.books, () =>
+      Promise.all([db.contents.toArray(), db.books.toArray()]));
     const collectionNames = new Map(contents.filter((item) => item.type === "collection").map((item) => [item.id, item.title]));
     const documents: SearchDocument[] = contents.map((content) => {
       const text = payloadText(content);
@@ -95,7 +97,6 @@ class LocalSearchService {
       href: `/search?q=${encodeURIComponent(tag)}&tag=${encodeURIComponent(tag)}`,
       title: `#${tag}`, plainText: tag, tags: tag, collectionNames: "", imageCaptions: "", frontmatter: "", status: "", updatedAt: 0, collectionIds: [],
     })));
-    const books = await db.books.toArray();
     documents.push(...books.map((book) => ({ id: "book:" + book.id, entityId: book.id, type: "book" as const, href: "/books/" + book.id, title: book.title, plainText: book.chapters.map((chapter) => chapter.title).join(" "), tags: "", collectionNames: "", imageCaptions: "", frontmatter: "", status: "active", updatedAt: book.updatedAt, collectionIds: [] })));
     return documents;
   }
@@ -103,20 +104,42 @@ class LocalSearchService {
   async rebuild() {
     const generation = ++this.generation;
     const documents = await this.buildDocuments();
-    if (generation !== this.generation) return;
+    this.applyDocuments(documents, generation);
+  }
+
+  private applyDocuments(documents: SearchDocument[], generation: number) {
+    if (generation < this.appliedGeneration) return;
     const next = new Map(documents.map((document) => [document.id, JSON.stringify(document)]));
     for (const id of this.documents.keys()) if (!next.has(id)) this.index.discard(id);
     for (const document of documents) if (this.documents.get(document.id) !== next.get(document.id)) {
       if (this.index.has(document.id)) this.index.replace(document); else this.index.add(document);
     }
     this.documents = next;
+    this.appliedGeneration = generation;
   }
 
   async initialize() {
     if (this.ready) return this.ready;
-    this.ready = this.rebuild();
-    if (typeof window !== "undefined" && !this.subscription) {
-      this.subscription = liveQuery(() => Promise.all([db.contents.toArray(), db.books.toArray()])).subscribe({ next: () => { void this.rebuild(); } });
+    if (typeof window === "undefined") {
+      this.ready = this.rebuild().catch((error) => { this.ready = undefined; throw error; });
+    } else {
+      this.ready = new Promise<void>((resolve, reject) => {
+        this.subscription = liveQuery(async () => {
+          const generation = ++this.generation;
+          return { generation, documents: await this.buildDocuments() };
+        }).subscribe({
+          next: ({ documents, generation }) => {
+            this.applyDocuments(documents, generation);
+            resolve();
+          },
+          error: (error) => {
+            this.subscription?.unsubscribe();
+            this.subscription = undefined;
+            this.ready = undefined;
+            reject(error);
+          },
+        });
+      });
     }
     return this.ready;
   }

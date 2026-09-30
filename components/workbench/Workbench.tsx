@@ -14,6 +14,7 @@ import { MarkdownToolbar } from "@/components/workbench/MarkdownToolbar";
 import { WorkDrawer } from "@/components/workbench/WorkDrawer";
 import { RecoveryHistory } from "@/components/workbench/RecoveryHistory";
 import { ImagePicker } from "@/components/content/ImagePicker";
+import { PaperDialog } from "@/components/ui/PaperDialog";
 import { CharacterIllustration } from "@/components/theme/CharacterIllustration";
 import { articleContentFromWork, createBlankWork, createRecoverySnapshot, db, ensureStarterData, getLineBreakMode, hydrateWorkDocument, importImageFile, recordActivity } from "@/lib/db";
 import { frontmatterTags, MarkdownService } from "@/lib/markdown-service";
@@ -43,9 +44,12 @@ export function Workbench() {
   const outlineOpenRef = useRef(true);
   const lineBreakModeRef = useRef<"standard" | "single">("standard");
   const [finalizing, setFinalizing] = useState(false);
+  const [confirmFinalize, setConfirmFinalize] = useState(false);
+  const [finalizeError, setFinalizeError] = useState("");
   const finalizingRef = useRef(false);
   const switchingRef = useRef(false);
   const [activeWork, setActiveWork] = useState<WorkDocument>();
+  const [loadingWork, setLoadingWork] = useState(true);
   const [markdown, setMarkdown] = useState("");
   const [renderedHtml, setRenderedHtml] = useState("");
   const [headings, setHeadings] = useState<HeadingItem[]>([]);
@@ -62,8 +66,8 @@ export function Workbench() {
     setActiveWorkTitle, showToast,
   } = useUIStore();
 
-  useEffect(() => { workRef.current = activeWork; }, [activeWork]);
-  useEffect(() => { markdownRef.current = markdown; }, [markdown]);
+  // Input and load/save paths update these refs synchronously. A delayed passive
+  // effect must not overwrite a newer input with the preceding render's value.
   useEffect(() => { positionRef.current = position; }, [position]);
   useEffect(() => { outlineOpenRef.current = outlineOpen; }, [outlineOpen]);
 
@@ -164,6 +168,9 @@ export function Workbench() {
   useEffect(() => {
     let cancelled = false;
     switchingRef.current = true;
+    // Clear stale controls before an asynchronously loaded revision becomes editable.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLoadingWork(true);
     void (async () => {
       await saveNow();
       await ensureStarterData();
@@ -192,6 +199,7 @@ export function Workbench() {
       dirtyRef.current = false;
       updateSaveState("saved");
       switchingRef.current = false;
+      setLoadingWork(false);
     })().catch((error) => { if (!cancelled) { switchingRef.current = false; showToast(String(error), "error"); } });
     return () => { cancelled = true; };
   }, [router, requestedId, setActiveWorkTitle, setEditorMode, updateSaveState, saveNow, showToast]);
@@ -253,7 +261,8 @@ export function Workbench() {
   };
 
   const finalize = async () => {
-    if (finalizingRef.current || switchingRef.current || !workRef.current || !window.confirm("完全保存后，正文、标题和属性均不可再修改。确认定稿？")) return;
+    if (finalizingRef.current || switchingRef.current || !workRef.current) return;
+    setFinalizeError("");
     finalizingRef.current = true; setFinalizing(true);
     try {
       await saveNow();
@@ -271,7 +280,7 @@ export function Workbench() {
       dirtyRef.current = false;
       workRef.current = await db.works.get(id);
       router.push("/library?type=finished");
-    } catch { showToast("完全保存失败，请重试。", "error"); }
+    } catch (error) { setFinalizeError(error instanceof Error ? error.message : "完全保存失败，请重试。"); }
     finally { finalizingRef.current = false; setFinalizing(false); }
   };
 
@@ -307,12 +316,14 @@ export function Workbench() {
     return han + words;
   }, [markdown]);
   const showEmptyCompanion = !focusMode && editorMode !== "preview" && (markdown === STARTER_MARKDOWN || markdown.trim() === "");
+  const readyWork = !loadingWork && (!requestedId || activeWork?.id === requestedId) ? activeWork : undefined;
 
   return (
     <main className="workbench" data-character-theme="noval" data-focus={focusMode} data-typewriter={typewriterMode} onDragEnter={(event) => { event.preventDefault(); setDragging(true); }} onDragOver={(event) => event.preventDefault()} onDragLeave={(event) => { if (event.currentTarget === event.target) setDragging(false); }} onDrop={(event) => { event.preventDefault(); setDragging(false); void handleFiles(event.dataTransfer.files); }}>
-      <div className="finalize-bar"><span>普通保存保留编辑能力；完全保存后可编入书籍。</span><button type="button" className="primary-paper-button" disabled={!activeWork || finalizing} onClick={() => void finalize()}>{finalizing ? "正在定稿…" : "完全保存"}</button></div>
+      {confirmFinalize && <PaperDialog title="完全保存作品" busy={finalizing} onClose={() => setConfirmFinalize(false)}><div className="paper-dialog-body"><p>即将定稿「{activeWork?.title}」。</p><p>正文、标题和属性将不可再修改。之后可创建独立修订草稿，原稿仍保持只读。</p><p>作品保存在本机浏览器中，请继续定期导出备份。</p>{finalizeError && <p className="paper-error" role="alert">{finalizeError}</p>}</div><footer className="paper-dialog-actions"><button disabled={finalizing} onClick={() => setConfirmFinalize(false)}>继续编辑</button><button className="book-primary" disabled={finalizing} onClick={() => void finalize()}>{finalizing ? "正在定稿…" : "确认完全保存"}</button></footer></PaperDialog>}
+      <div className="finalize-bar"><span>原稿定稿后只读，可收录到书籍。</span><button type="button" className="finalize-action" disabled={!readyWork || finalizing} onClick={() => { setFinalizeError(""); setConfirmFinalize(true); }}>{finalizing ? "正在定稿…" : "完全保存"}</button></div>
       {activeWork && <RecoveryHistory workId={activeWork.id} markdown={markdown} />}
-      <EditorHeader work={activeWork} outlineOpen={outlineOpen} onTitleChange={(title) => patchWork({ title })} onToggleOutline={() => setOutlineOpen((value) => !value)} onExport={() => void exportMarkdown()} />
+      <EditorHeader work={readyWork} outlineOpen={outlineOpen} onTitleChange={(title) => patchWork({ title })} onToggleOutline={() => setOutlineOpen((value) => !value)} onExport={() => void exportMarkdown()} />
       {editorMode !== "preview" ? <MarkdownToolbar onCommand={(command) => editorRef.current?.applyCommand(command)} onUndo={() => editorRef.current?.undo()} onRedo={() => editorRef.current?.redo()} onFind={() => editorRef.current?.openSearch()} onPickImage={() => setImagePickerOpen(true)} /> : null}
 
       <button className="drawer-tab drawer-tab-left" aria-label={worksDrawerOpen ? "收起作品抽屉" : "展开作品抽屉"} aria-expanded={worksDrawerOpen} onClick={toggleWorksDrawer}><ChevronRight aria-hidden="true" size={17} /></button>

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useLiveQuery } from "dexie-react-hooks";
-import { Filter, Plus, Search, Star } from "lucide-react";
+import { Filter, LockKeyhole, Plus, Search, Star } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { ContentIcon } from "@/components/content/ContentIcon";
 import { CharacterEmptyState } from "@/components/theme/CharacterEmptyState";
@@ -45,14 +45,15 @@ export function ContentWorkspace({ initialType }: { initialType?: string }) {
     <section className="content-workspace" aria-label="统一内容工作区">
       <aside className="content-type-rail" aria-label="内容类型">
         <button type="button" data-active={type === "all"} onClick={() => setType("all")}><Filter aria-hidden="true" size={17} /><span>全部内容</span><b>{contents.filter((content) => content.type !== "project").length}</b></button>
-        {CONTENT_TYPES.filter((item) => item !== "project").map((item) => <button key={item} type="button" data-active={type === item} onClick={() => setType(item)}><ContentIcon type={item} /><span>{CONTENT_TYPE_REGISTRY[item].pluralLabel}</span><b>{contents.filter((content) => content.type === item).length}</b></button>)}
-        <button type="button" data-active={type === "finished"} onClick={() => setType("finished")}><ContentIcon type="article" /><span>已完成作品</span><b>{contents.filter((item) => item.type === "article" && item.payload.finalizedAt).length}</b></button>
+        {[{ title: "创作内容", items: CONTENT_TYPES.filter((item) => item === "article" || item === "note") }, { title: "素材与设定", items: CONTENT_TYPES.filter((item) => !["project", "article", "note"].includes(item)) }].map((group) => <div className="content-rail-group" key={group.title}><h2>{group.title}</h2>{group.items.map((item) => <button key={item} type="button" aria-pressed={type === item} data-active={type === item} onClick={() => setType(item)}><ContentIcon type={item} /><span>{CONTENT_TYPE_REGISTRY[item].pluralLabel}</span><b>{contents.filter((content) => content.type === item).length}</b></button>)}</div>)}
+        <div className="content-rail-group"><h2>定稿档案</h2><button type="button" aria-pressed={type === "finished"} data-active={type === "finished"} onClick={() => setType("finished")}><LockKeyhole size={17} aria-hidden="true" /><span>已完成作品</span><b>{contents.filter((item) => item.type === "article" && item.payload.finalizedAt).length}</b></button></div>
         <Link href="/projects">前往项目 · 编订书籍 →</Link>
       </aside>
       <div className="content-catalog">
+        <div className="content-section-intro"><h2>{type === "finished" ? "已完成作品" : "手稿与资料，各归其位"}</h2><p>{type === "finished" ? "原稿只读，可创建修订草稿或收录到书籍。" : "整理创作中的故事、旅途拾起的素材与世界设定。"}</p></div>
         <header className="content-catalog-tools">
           <label><Search aria-hidden="true" size={17} /><span className="sr-only">筛选内容</span><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="筛选标题、摘要或标签…" /></label>
-          <select aria-label="按状态筛选" value={status} onChange={(event) => setStatus(event.target.value)}><option value="all">全部状态</option><option value="draft">草稿</option><option value="active">进行中</option><option value="completed">已完成</option><option value="archived">已归档</option></select>
+          <select aria-label="按状态筛选" value={status} onChange={(event) => setStatus(event.target.value)}><option value="all">全部状态</option><option value="draft">草稿</option><option value="active">进行中</option><option value="completed">完成状态（含定稿）</option><option value="archived">已归档</option></select>
           <div className="content-create-menu">
             <button className="primary-paper-button" type="button" aria-expanded={creating} onClick={() => setCreating((value) => !value)}><Plus aria-hidden="true" size={17} />创建内容</button>
             {creating ? <div role="menu">{CONTENT_TYPES.filter((item) => item !== "project").map((item) => <button key={item} type="button" role="menuitem" onClick={() => void create(item)}><ContentIcon type={item} /><span><strong>{CONTENT_TYPE_REGISTRY[item].label}</strong><small>{CONTENT_TYPE_REGISTRY[item].description}</small></span></button>)}</div> : null}
@@ -63,8 +64,10 @@ export function ContentWorkspace({ initialType }: { initialType?: string }) {
             <article className="content-card" data-accent={CONTENT_TYPE_REGISTRY[content.type].accent} key={content.id}>
               <div className="content-card-meta"><span><ContentIcon type={content.type} size={15} />{CONTENT_TYPE_REGISTRY[content.type].label}</span><button type="button" aria-label={content.favorite ? "取消收藏" : "收藏"} aria-pressed={content.favorite} onClick={() => void toggleFavorite(content.id)}><Star aria-hidden="true" size={16} fill={content.favorite ? "currentColor" : "none"} /></button></div>
               <h2><Link href={content.type === "article" && content.payload.finalizedAt ? `/work/${content.payload.slug}` : getContentHref(content)}>{content.title}</Link></h2>
+              {content.type === "article" && <div className="content-work-state">{content.payload.finalizedAt ? <span className="finalized-badge"><LockKeyhole size={12} aria-hidden="true" />已定稿 · 只读</span> : <span>{content.status === "completed" ? "写作完成 · 可编辑" : content.status === "archived" ? "已归档" : "草稿 · 可编辑"}</span>}</div>}
               <p>{content.summary || CONTENT_TYPE_REGISTRY[content.type].description}</p>
               <footer><span>{content.tags.length ? content.tags.slice(0, 3).map((tag) => `#${tag}`).join(" · ") : "尚未归类"}</span><time dateTime={new Date(content.updatedAt).toISOString()}>{new Intl.DateTimeFormat("zh-CN", { month: "short", day: "numeric" }).format(content.updatedAt)}</time></footer>
+              {content.type === "article" && content.payload.finalizedAt && <Link className="content-collect-link" href={`/projects?collect=${encodeURIComponent(content.id)}`}>收录到书籍 →</Link>}
             </article>
           ))}
           {!filtered.length ? contents.length ? (
@@ -72,6 +75,7 @@ export function ContentWorkspace({ initialType }: { initialType?: string }) {
               <ContentIcon type={type === "all" || type === "finished" ? "note" : type} size={28} />
               <h2>这一区还很安静</h2>
               <p>调整筛选条件，或创建一种新的内容。</p>
+              <button type="button" className="primary-paper-button" onClick={() => { setQuery(""); setStatus("all"); setType("all"); }}>清除筛选</button>
             </div>
           ) : (
             <div className="content-empty-character">

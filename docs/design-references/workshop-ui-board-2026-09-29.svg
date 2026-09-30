@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1120" viewBox="0 0 1600 1120">
+<defs><style>text{font-family:'Microsoft YaHei',sans-serif;fill:#363D49}.muted{fill:#626976}.small{font-size:14px}.label{font-size:17px}.title{font-size:28px;font-weight:600}.serif{font-family:'Songti SC','SimSun',serif}.white{fill:#FBF8F2}.blue{fill:#526680}.gold{fill:#786139}</style></defs>
+<rect width="1600" height="1120" fill="#EDE8DF"/>
+<text x="56" y="64" font-size="14" letter-spacing="4" class="blue">FANTASY WORKSHOP / DESIGN STUDY 01</text>
+<text x="56" y="112" font-size="40" class="serif">晨雾书房 · 从手稿到成书</text>
+<text x="56" y="149" class="label muted">暖纸承载故事，雾蓝组织操作，旧金标记定稿。人物用于空状态，编订台留给作品。</text>
+<text x="56" y="202" class="label">01 / 书籍项目 · 桌面编订台</text>
+<rect x="56" y="224" width="1120" height="660" rx="16" fill="#F4F0E8" stroke="#D7D3CA"/>
+<path d="M56 288H1176" stroke="#D7D3CA"/>
+<text x="80" y="264" font-size="20" class="serif">幻想工坊</text>
+<text x="240" y="263" class="small muted">主页　　创作　　工作区</text>
+
+<text x="453" y="263" class="small blue">项目</text><path d="M451 278h32" stroke="#526680" stroke-width="2"/>
+<text x="517" y="263" class="small muted">展览</text><text x="1000" y="263" class="small muted">搜索作品…</text>
+<text x="80" y="334" class="title serif">书籍项目</text><text x="80" y="362" class="small muted">把已完成的故事，编成一路同行的书。</text>
+<rect x="1030" y="312" width="122" height="44" rx="8" fill="#526680"/><text x="1054" y="340" class="small white">＋ 创建书籍</text>
+<rect x="80" y="389" width="235" height="469" rx="12" fill="#EDE8DF"/>
+<text x="96" y="423" class="small muted">我的书架 / 02</text>
+<rect x="92" y="440" width="211" height="130" rx="8" fill="#E4EAF1" stroke="#526680"/>
+<rect x="105" y="454" width="62" height="99" rx="3" fill="#526680"/><path d="M113 460v88m6-79h39v68h-39z" stroke="#AEBED2" fill="none"/><text x="127" y="502" class="white" font-size="15">雾</text><text x="127" y="523" class="white" font-size="15">行</text>
+<text x="180" y="479" class="label">雾行手记</text><text x="180" y="508" class="small muted">3 章 · 8 篇</text><text x="180" y="540" class="small blue">正在编订</text>
+<rect x="105" y="591" width="62" height="99" rx="3" fill="#695C79"/><path d="M113 599v83" stroke="#B9AEC6"/><text x="127" y="633" class="white" font-size="15">星</text><text x="127" y="654" class="white" font-size="15">夜</text>
+<text x="180" y="618" class="label">星夜来信</text><text x="180" y="646" class="small muted">2 章 · 5 篇</text><text x="180" y="678" class="small muted">昨天更新</text>
+<text x="98" y="820" class="small blue">查看已完成作品 →</text>
+<rect x="335" y="389" width="817" height="469" rx="12" fill="#FBF8F2" stroke="#D7D3CA"/>
+<text x="359" y="431" class="title serif">雾行手记</text><text x="359" y="459" class="small muted">已保存到本机 · 刚刚</text>
+<text x="824" y="429" class="small blue">整书阅读　　导出 ▾　　更多 ···</text>
+<path d="M359 483h769" stroke="#D7D3CA"/>
+<text x="359" y="519" class="label">书籍目录</text>
+<rect x="842" y="497" width="122" height="40" rx="8" fill="#FBF8F2" stroke="#B8BEC7"/><text x="869" y="523" class="small blue">添加章节</text>
+<rect x="980" y="497" width="148" height="40" rx="8" fill="#526680"/><text x="1012" y="523" class="small white">＋ 收录作品</text>
+<rect x="359" y="555" width="769" height="48" rx="6" fill="#EDE8DF"/>
+<text x="375" y="585" class="label">⌄　01　沿着道路进入工坊</text><text x="1020" y="585" class="small muted">3 篇　 ···</text>
+<text x="386" y="638" class="small muted">01</text><text x="430" y="638" class="label">晨雾中的第一封信</text><rect x="877" y="617" width="104" height="28" rx="5" fill="#F0E7D3"/><text x="890" y="636" class="small gold">已定稿 · 只读</text><text x="1077" y="637" class="label muted">···</text>
+<path d="M380 657h726" stroke="#E5E0D7"/>
+<text x="386" y="689" class="small muted">02</text><text x="430" y="689" class="label">旅人和她的魔法书</text><rect x="877" y="668" width="104" height="28" rx="5" fill="#F0E7D3"/><text x="890" y="687" class="small gold">已定稿 · 只读</text><text x="1077" y="688" class="label muted">···</text>
+<path d="M380 708h726" stroke="#E5E0D7"/>
+<text x="386" y="740" class="small muted">03</text><text x="430" y="740" class="label">在森林边缘停留</text><rect x="877" y="719" width="104" height="28" rx="5" fill="#F0E7D3"/><text x="890" y="738" class="small gold">已定稿 · 只读</text><text x="1077" y="739" class="label muted">···</text>
+<rect x="359" y="778" width="769" height="48" rx="6" fill="#EDE8DF"/><text x="375" y="808" class="label">›　02　星夜与远行</text><text x="1020" y="808" class="small muted">5 篇　 ···</text>
+<text x="1210" y="202" class="label">02 / 手机收录面板</text>
+<rect x="1210" y="224" width="334" height="660" rx="22" fill="#FBF8F2" stroke="#C8C3BA"/>
+<text x="1234" y="268" class="label">收录作品</text><text x="1497" y="268" class="label">×</text>
+<rect x="1234" y="294" width="286" height="44" rx="8" fill="#F4F0E8" stroke="#C8C3BA"/><text x="1248" y="321" class="small muted">搜索已完成作品…</text>
+<text x="1234" y="372" class="small muted">目标章节</text><rect x="1234" y="387" width="286" height="44" rx="8" fill="#FBF8F2" stroke="#C8C3BA"/><text x="1248" y="415" class="small">01 · 沿着道路进入工坊　 ▾</text>
+<text x="1234" y="466" class="small blue">全部候选　　仅看已选 2</text>
+<rect x="1234" y="491" width="286" height="72" rx="8" fill="#E4EAF1"/><rect x="1248" y="514" width="22" height="22" rx="4" fill="#526680"/><path d="m1253 525 4 4 8-9" fill="none" stroke="white" stroke-width="2"/><text x="1283" y="520" class="label">风从山谷中来</text><text x="1283" y="546" class="small muted">已定稿 · 今天</text>
+<rect x="1234" y="574" width="286" height="72" rx="8" fill="#E4EAF1"/><rect x="1248" y="597" width="22" height="22" rx="4" fill="#526680"/><path d="m1253 608 4 4 8-9" fill="none" stroke="white" stroke-width="2"/><text x="1283" y="603" class="label">白花书签</text><text x="1283" y="629" class="small muted">已定稿 · 昨天</text>
+<rect x="1248" y="680" width="22" height="22" rx="4" fill="none" stroke="#626976"/><text x="1283" y="688" class="label">新月之前</text><text x="1283" y="714" class="small muted">已定稿 · 昨天</text>
+<path d="M1210 762h334" stroke="#D7D3CA"/><text x="1234" y="791" class="small muted">已选 2 篇 · 按勾选顺序收录</text><rect x="1234" y="809" width="286" height="48" rx="8" fill="#526680"/><text x="1331" y="839" class="label white">收录到章节</text>
+<text x="56" y="937" class="label">03 / 视觉语言</text>
+<rect x="56" y="958" width="54" height="54" rx="10" fill="#FBF8F2"/><rect x="126" y="958" width="54" height="54" rx="10" fill="#526680"/><rect x="196" y="958" width="54" height="54" rx="10" fill="#695C79"/><rect x="266" y="958" width="54" height="54" rx="10" fill="#786139"/>
+<text x="56" y="1038" class="small muted">纸白 / 雾蓝 / 灰紫 / 旧金</text>
+<text x="375" y="979" class="label serif">书页般的标题，清楚克制的操作。</text><text x="375" y="1008" class="small muted">正文纯色底 · 低密度装饰 · 原稿只读 · 编排可继续</text>
+<text x="1050" y="979" class="label">人物与美术</text><text x="1050" y="1008" class="small muted">沿用诺瓦尔 / 伊登；主要人物仅用于空状态。</text>
+<text x="56" y="1084" font-size="12" class="muted">2026-09-29 · 矢量概念稿 / 示例内容 / 非生产截图 · 详细交互、素材规格和文件修改映射见配套 Markdown</text>
+</svg>
+

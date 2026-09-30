@@ -1,158 +1,221 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useLiveQuery } from "dexie-react-hooks";
-import { ArrowLeft, ImagePlus, Maximize2, Trash2, X } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Flower2, ImagePlus, LoaderCircle, Maximize2, MoonStar, Trash2, X } from "lucide-react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { db, importImageFile } from "@/lib/db";
 import type { ImageRecord } from "@/types/workshop";
 
 const GALLERY_SETTING_KEY = "archive-gallery-image-ids";
+const ATMOSPHERE_SETTING_KEY = "archive-gallery-atmosphere";
 
-function GalleryImage({ image }: { image: ImageRecord }) {
+function GalleryImage({ image, thumbnail = false }: { image: ImageRecord; thumbnail?: boolean }) {
   const imageRef = useRef<HTMLImageElement>(null);
+  const blob = thumbnail ? image.thumbnail ?? image.blob : image.blob;
   useEffect(() => {
-    const url = URL.createObjectURL(image.blob);
+    const url = URL.createObjectURL(blob);
     if (imageRef.current) imageRef.current.src = url;
     return () => URL.revokeObjectURL(url);
-  }, [image.blob]);
-  return <img ref={imageRef} alt={image.altText || image.title} draggable={false} />;
+  }, [blob]);
+  // IndexedDB blob URLs stay local and cannot use the Next.js image optimizer.
+  // eslint-disable-next-line @next/next/no-img-element
+  return <img ref={imageRef} alt={image.altText || image.title} draggable={false} decoding="async" loading={thumbnail ? "lazy" : "eager"} />;
+}
+
+function GalleryLightbox({ images, selected, onSelect, onClose }: {
+  images: ImageRecord[];
+  selected: ImageRecord;
+  onSelect: (id: string) => void;
+  onClose: () => void;
+}) {
+  const dialogRef = useRef<HTMLDialogElement>(null);
+  const index = images.findIndex((image) => image.id === selected.id);
+  const navigate = (step: number) => onSelect(images[(index + step + images.length) % images.length].id);
+  useEffect(() => {
+    const dialog = dialogRef.current;
+    const previousFocus = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const previousOverflow = document.body.style.overflow;
+    dialog?.showModal();
+    document.body.style.overflow = "hidden";
+    return () => {
+      dialog?.close();
+      document.body.style.overflow = previousOverflow;
+      if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
+    };
+  }, []);
+
+  return <dialog ref={dialogRef} className="archive-gallery-lightbox" aria-labelledby="gallery-lightbox-title" onCancel={onClose} onKeyDown={(event) => {
+    if (event.key === "ArrowLeft" || event.key === "ArrowRight") {
+      event.preventDefault();
+      navigate(event.key === "ArrowLeft" ? -1 : 1);
+    }
+  }}>
+    <div className="archive-lightbox-top"><span>拾光画廊 <i>/</i> {String(index + 1).padStart(2, "0")} — {String(images.length).padStart(2, "0")}</span><button type="button" onClick={onClose} aria-label="关闭大图"><X size={22} /></button></div>
+    <div className="archive-lightbox-art"><GalleryImage image={selected} /></div>
+    <div className="archive-lightbox-bottom">
+      <div><h2 id="gallery-lightbox-title">{selected.title}</h2><p>{selected.caption || "把目光停留的瞬间，留在这里。"}</p></div>
+      <div className="archive-lightbox-navigation"><button type="button" onClick={() => navigate(-1)} disabled={images.length < 2} aria-label="上一张图片"><ChevronLeft size={22} /></button><button type="button" onClick={() => navigate(1)} disabled={images.length < 2} aria-label="下一张图片"><ChevronRight size={22} /></button></div>
+    </div>
+  </dialog>;
 }
 
 export function ArchiveGallery() {
   const inputRef = useRef<HTMLInputElement>(null);
-  const allImages = useLiveQuery(() => db.images.orderBy("createdAt").toArray(), [], []);
-  const [galleryIds, setGalleryIds] = useState<string[]>([]);
-  const [initialized, setInitialized] = useState(false);
+  const noticeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const importInFlight = useRef(false);
+  const data = useLiveQuery(async () => {
+    const [images, membership] = await Promise.all([
+      db.images.orderBy("createdAt").toArray(),
+      db.settings.get(GALLERY_SETTING_KEY),
+    ]);
+    return { images, ids: Array.isArray(membership?.value) ? membership.value as string[] : images.map((image) => image.id) };
+  }, []);
+  const atmosphereSetting = useLiveQuery(() => db.settings.get(ATMOSPHERE_SETTING_KEY), []);
+  const atmosphere = atmosphereSetting?.value === "night" ? "night" : "morning";
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
   const [notice, setNotice] = useState("");
   const [lightboxOpen, setLightboxOpen] = useState(false);
 
-  useEffect(() => {
-    if (initialized) return;
-    void db.settings.get(GALLERY_SETTING_KEY).then(async (record) => {
-      const existingIds = new Set(allImages.map((image) => image.id));
-      const ids = Array.isArray(record?.value)
-        ? (record.value as string[]).filter((id) => existingIds.has(id))
-        : allImages.map((image) => image.id);
-      setGalleryIds(ids);
-      if (!Array.isArray(record?.value)) await db.settings.put({ key: GALLERY_SETTING_KEY, value: ids });
-      setInitialized(true);
-    });
-  }, [allImages, initialized]);
-
-  const imageMap = useMemo(() => new Map(allImages.map((image) => [image.id, image])), [allImages]);
-  const galleryImages = useMemo(
-    () => galleryIds.map((id) => imageMap.get(id)).filter((image): image is ImageRecord => Boolean(image)),
-    [galleryIds, imageMap],
-  );
+  const galleryImages = useMemo(() => {
+    const imageMap = new Map(data?.images.map((image) => [image.id, image]));
+    return (data?.ids ?? []).map((id) => imageMap.get(id)).filter((image): image is ImageRecord => Boolean(image));
+  }, [data]);
   const selected = galleryImages.find((image) => image.id === selectedId) ?? galleryImages[0];
+  const selectedIndex = selected ? galleryImages.indexOf(selected) : 0;
+  const isNight = atmosphere === "night";
+  const portrait = isNight ? "/assets/gallery/eden-gallery-portrait.png" : "/assets/gallery/noval-gallery-portrait.png";
 
+  useEffect(() => () => { if (noticeTimer.current) clearTimeout(noticeTimer.current); }, []);
   const announce = useCallback((message: string) => {
+    if (noticeTimer.current) clearTimeout(noticeTimer.current);
     setNotice(message);
-    window.setTimeout(() => setNotice(""), 2800);
+    noticeTimer.current = setTimeout(() => setNotice(""), 4500);
   }, []);
 
-  const persistIds = useCallback(async (ids: string[]) => {
-    setGalleryIds(ids);
-    await db.settings.put({ key: GALLERY_SETTING_KEY, value: ids });
-  }, []);
+  const setAtmosphere = async (value: "morning" | "night") => {
+    try { await db.settings.put({ key: ATMOSPHERE_SETTING_KEY, value }); }
+    catch { announce("展示偏好未能保存，请重试。"); }
+  };
 
-  const importFiles = useCallback(async (files: FileList | File[]) => {
+  const importFiles = async (files: FileList | File[]) => {
+    if (!data || importInFlight.current) return;
     const candidates = Array.from(files).filter((file) => file.type.startsWith("image/"));
-    if (!candidates.length) return announce("没有找到可导入的图片文件。");
+    if (!candidates.length) return announce("请选择图片文件。");
+    importInFlight.current = true;
     setImporting(true);
+    const imported: ImageRecord[] = [];
+    let failed = 0;
     try {
-      const imported: ImageRecord[] = [];
-      for (const file of candidates) imported.push(await importImageFile(file));
-      await persistIds([...galleryIds, ...imported.map((image) => image.id)]);
-      setSelectedId(imported[0]?.id ?? selectedId);
-      announce(`已加入 ${imported.length} 张图片。`);
-    } catch (error) {
-      console.error(error);
-      announce("导入失败，请检查图片后重试。");
+      for (const file of candidates) {
+        try { imported.push(await importImageFile(file)); }
+        catch { failed += 1; }
+      }
+      if (imported.length) {
+        await db.transaction("rw", db.settings, async () => {
+          const latest = await db.settings.get(GALLERY_SETTING_KEY);
+          const ids = Array.isArray(latest?.value) ? latest.value as string[] : data.ids;
+          await db.settings.put({ key: GALLERY_SETTING_KEY, value: [...new Set([...ids, ...imported.map((image) => image.id)])] });
+        });
+        setSelectedId(imported[0].id);
+      }
+      announce(failed ? `已收藏 ${imported.length} 张图片，${failed} 张导入失败，请重试。` : `已收藏 ${imported.length} 张图片，让新的故事留在这里。`);
+    } catch {
+      announce("图片已导入素材库，但未能加入画廊，请稍后重试。");
     } finally {
       setImporting(false);
+      importInFlight.current = false;
     }
-  }, [announce, galleryIds, persistIds, selectedId]);
+  };
 
-  const removeSelected = useCallback(async () => {
-    if (!selected) return;
-    const next = galleryIds.filter((id) => id !== selected.id);
-    await persistIds(next);
-    setSelectedId(next[0] ?? null);
-    setLightboxOpen(false);
-    announce(`已将「${selected.title}」移出画廊，原图片仍保留在素材库。`);
-  }, [announce, galleryIds, persistIds, selected]);
+  const removeSelected = async () => {
+    if (!selected || !data) return;
+    try {
+      await db.transaction("rw", db.settings, async () => {
+        const latest = await db.settings.get(GALLERY_SETTING_KEY);
+        const ids = Array.isArray(latest?.value) ? latest.value as string[] : data.ids;
+        await db.settings.put({ key: GALLERY_SETTING_KEY, value: ids.filter((id) => id !== selected.id) });
+      });
+      setSelectedId(null);
+      setLightboxOpen(false);
+      announce(`已将「${selected.title}」移出画廊，原图仍保留在素材库。`);
+    } catch { announce("暂时无法移出这张图片，请重试。"); }
+  };
 
   return (
-    <main className="archive-gallery-shell">
-      <header className="archive-gallery-toolbar">
-        <Link href="/" className="archive-gallery-back"><ArrowLeft size={17} /> 返回总主页</Link>
-        <div className="archive-gallery-title"><span>WRITING TIME / GALLERY</span><strong>拾光画廊</strong></div>
-        <div className="archive-gallery-actions">
-          <span>{galleryImages.length.toString().padStart(2, "0")} IMAGES</span>
-          <button type="button" onClick={() => inputRef.current?.click()} disabled={importing}><ImagePlus size={17} />{importing ? "导入中" : "新增档案"}</button>
-        </div>
-      </header>
+    <main className="archive-gallery-shell" data-atmosphere={atmosphere}>
+      <div className="archive-gallery-wrap">
+        <header className="archive-gallery-toolbar">
+          <Link href="/" className="archive-gallery-back" aria-label="返回地图"><ArrowLeft size={16} /><span>WRITING TIME<small>返回地图</small></span></Link>
+          <div className="archive-atmosphere" role="group" aria-label="画廊氛围">
+            <button type="button" aria-pressed={!isNight} onClick={() => void setAtmosphere("morning")}><Flower2 size={16} />晨光<span>诺瓦尔</span></button>
+            <button type="button" aria-pressed={isNight} onClick={() => void setAtmosphere("night")}><MoonStar size={16} />星夜<span>伊登</span></button>
+          </div>
+        </header>
 
-      {initialized && galleryImages.length ? (
-        <section className="archive-gallery-layout">
-          <div className="archive-gallery-grid" aria-label="画廊图片">
-            {galleryImages.map((image) => (
-              <button
-                key={image.id}
-                className="archive-gallery-item"
-                data-selected={selected?.id === image.id}
-                type="button"
-                onClick={() => setSelectedId(image.id)}
-                onDoubleClick={() => { setSelectedId(image.id); setLightboxOpen(true); }}
-                aria-label={`选择图片：${image.title}`}
-                aria-pressed={selected?.id === image.id}
-              >
-                <GalleryImage image={image} />
-                <span>{image.title}</span>
-              </button>
-            ))}
+        <section className="archive-gallery-hero" aria-labelledby="archive-gallery-title">
+          <div className="archive-hero-copy">
+            <div className="archive-hero-eyebrow"><Image src="/assets/gallery/companions-seal.svg" alt="" width={48} height={48} /><span>A LITTLE LIGHT, KEPT FOREVER</span></div>
+            <h1 id="archive-gallery-title">拾光<span>画廊</span><i aria-hidden="true">.</i></h1>
+            <p>把沿途的光，收进画框。</p>
+            <div className="archive-hero-signature"><span aria-hidden="true" /><small>晨花记下相遇 · 星夜妥善珍藏</small></div>
+          </div>
+          <div className="archive-hero-portrait">
+            <Image className="archive-portrait-arch" src="/assets/gallery/celestial-arch.svg" alt="" width={380} height={340} />
+            <div key={atmosphere} className="archive-portrait-figure">
+              <Image className="archive-portrait-bleed" src={portrait} alt="" aria-hidden="true" width={1024} height={1024} sizes="(max-width: 600px) 150px, 290px" draggable={false} />
+              <Image className="archive-portrait-character" src={portrait} alt={isNight ? "伊登将画片轻轻收进相册，珍藏旅途中的片刻" : "诺瓦尔展示手中的风景画片，温柔地看向观众"} width={1024} height={1024} sizes="(max-width: 600px) 150px, 290px" draggable={false} priority />
+            </div>
+            <div className="archive-portrait-name"><span>{isNight ? "EDEN" : "NOVAL"}</span><small>{isNight ? "星夜的珍藏者" : "晨光的记录者"}</small></div>
+          </div>
+        </section>
+
+        <section className="archive-collection" aria-labelledby="archive-collection-title">
+          <div className="archive-collection-toolbar">
+            <div className="archive-collection-title"><Flower2 size={19} strokeWidth={1.2} /><h2 id="archive-collection-title">沿途拾光</h2><span className="archive-count">{String(galleryImages.length).padStart(2, "0")} 张珍藏</span></div>
+            <button className="archive-primary-button" type="button" onClick={() => inputRef.current?.click()} disabled={importing || !data}>{importing ? <LoaderCircle className="archive-spinner" size={17} /> : <ImagePlus size={17} />}{importing ? "正在收藏…" : "收藏图片"}</button>
           </div>
 
-          <aside className="archive-image-inspector">
-            {selected ? <>
-              <div className="archive-image-heading"><span>SELECTED IMAGE</span><b>{selected.title}</b></div>
-              <button className="archive-image-preview" type="button" onClick={() => setLightboxOpen(true)}><GalleryImage image={selected} /></button>
-              <div className="archive-image-meta">
-                <span>{selected.name}</span>
-                <span>{selected.width ?? "?"} × {selected.height ?? "?"} · {selected.mimeType || "IMAGE"}</span>
-                <span>{selected.tags.length ? selected.tags.join(" · ") : "无标签"}</span>
+          {data && galleryImages.length ? (
+            <div className="archive-gallery-layout">
+              <div className="archive-gallery-grid" aria-label="画廊图片">
+                {galleryImages.map((image, index) => (
+                  <button key={image.id} className="archive-gallery-item" data-selected={selected?.id === image.id} type="button" onClick={() => { setSelectedId(image.id); setLightboxOpen(true); }} aria-label={`查看图片：${image.title}`} aria-haspopup="dialog">
+                    <span className="archive-card-image"><GalleryImage image={image} thumbnail /><span className="archive-card-open"><Maximize2 size={18} /></span>{selected?.id === image.id && <span className="archive-card-selected" aria-label="当前图片"><Check size={12} /></span>}</span>
+                    <span className="archive-card-caption"><span className="archive-card-number">{String(index + 1).padStart(2, "0")}</span><span className="archive-card-title">{image.title}</span><ArrowRight size={15} /></span>
+                  </button>
+                ))}
               </div>
-              <div className="archive-image-controls">
-                <button type="button" onClick={() => setLightboxOpen(true)}><Maximize2 size={16} /> 浏览大图</button>
-                <button className="danger" type="button" onClick={() => void removeSelected()}><Trash2 size={16} /> 移出画廊</button>
-              </div>
-            </> : null}
-          </aside>
-        </section>
-      ) : initialized ? (
-        <section className="archive-gallery-empty">
-          <ImagePlus size={38} strokeWidth={1.3} />
-          <h2>画廊中还没有图片</h2>
-          <p>添加图片后，就可以在这里挑选和浏览。</p>
-          <button type="button" onClick={() => inputRef.current?.click()}>选择图片</button>
-        </section>
-      ) : <div className="archive-gallery-loading">正在读取本地图片……</div>}
 
-      <input ref={inputRef} hidden type="file" multiple accept="image/*" onChange={(event) => {
-        if (event.currentTarget.files) void importFiles(event.currentTarget.files);
-        event.currentTarget.value = "";
-      }} />
-      <p className="archive-gallery-toast" data-visible={Boolean(notice)}>{notice}</p>
+              {selected && <aside className="archive-image-inspector" aria-label="当前图片详情">
+                <div className="archive-inspector-heading"><MoonStar size={17} /><span>画中一页</span><small>NO. {String(selectedIndex + 1).padStart(2, "0")}</small></div>
+                <button className="archive-image-preview" type="button" onClick={() => setLightboxOpen(true)} aria-label={`放大查看：${selected.title}`}><GalleryImage image={selected} thumbnail /></button>
+                <h3>{selected.title}</h3>
+                <p className="archive-image-caption">{selected.caption || "目光曾在这里停留，故事便有了形状。"}</p>
+                <dl className="archive-image-meta"><div><dt>入藏日期</dt><dd>{new Date(selected.createdAt).toLocaleDateString("zh-CN")}</dd></div><div><dt>画面尺寸</dt><dd>{selected.width ?? "—"} × {selected.height ?? "—"}</dd></div></dl>
+                {!!selected.tags.length && <div className="archive-image-tags">{selected.tags.map((tag) => <span key={tag}>{tag}</span>)}</div>}
+                <div className="archive-image-controls"><button type="button" onClick={() => setLightboxOpen(true)}><Maximize2 size={15} />静静看一会儿<ArrowRight size={15} /></button><button className="archive-remove" type="button" onClick={() => void removeSelected()}><Trash2 size={14} />移出画廊</button></div>
+                <p className="archive-remove-hint">移出后，原图仍在素材库中。</p>
+              </aside>}
+            </div>
+          ) : data ? (
+            <div className="archive-gallery-empty">
+              <div className="archive-empty-frame" aria-hidden="true"><span className="archive-empty-moon"><MoonStar size={35} strokeWidth={.8} /></span><span className="archive-empty-flower"><Flower2 size={29} strokeWidth={1} /></span><Image src="/assets/gallery/crystal-ribbon.svg" alt="" width={40} height={100} /><span className="archive-empty-frame-inner" /></div>
+              <span className="archive-empty-eyebrow">THE FIRST PAGE IS YOURS</span>
+              <h2>为下一次心动，留一面画墙。</h2>
+              <p>也许是一张旅途的照片，也许是刚完成的画。<br />从第一张图片开始，慢慢收藏你的世界。</p>
+              <button type="button" className="archive-empty-button" onClick={() => inputRef.current?.click()} disabled={importing}><ImagePlus size={17} />{importing ? "正在收藏…" : "放入第一张图片"}<ArrowRight size={16} /></button>
+            </div>
+          ) : <div className="archive-gallery-loading" role="status"><LoaderCircle className="archive-spinner" size={22} />正在翻开你的相册……</div>}
+        </section>
 
-      {lightboxOpen && selected ? <div className="archive-gallery-lightbox" role="dialog" aria-modal="true">
-        <button type="button" className="archive-lightbox-close" onClick={() => setLightboxOpen(false)} aria-label="关闭"><X /></button>
-        <GalleryImage image={selected} />
-        <div><strong>{selected.title}</strong><span>{selected.width ?? "?"} × {selected.height ?? "?"}</span></div>
-      </div> : null}
+        <footer className="archive-gallery-footer"><Flower2 size={14} /><span>晨花与星藏</span><i /><span>NOVAL & EDEN</span><MoonStar size={14} /></footer>
+      </div>
+      <input ref={inputRef} hidden type="file" multiple accept="image/*" aria-label="选择要收藏的图片" onChange={(event) => { if (event.currentTarget.files) void importFiles(event.currentTarget.files); event.currentTarget.value = ""; }} />
+      <p className="archive-gallery-toast" data-visible={Boolean(notice)} role="status" aria-live="polite">{notice}</p>
+      {lightboxOpen && selected && <GalleryLightbox images={galleryImages} selected={selected} onSelect={setSelectedId} onClose={() => setLightboxOpen(false)} />}
     </main>
   );
 }
