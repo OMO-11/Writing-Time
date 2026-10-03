@@ -2,7 +2,7 @@
 const { chromium } = require('playwright');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
-const dir = process.env.EVIDENCE_DIR || 'docs/workshop-ui-evidence/atelier';
+const dir = process.env.ATELIER_EVIDENCE_DIR || 'docs/workshop-ui-evidence/atelier';
 const base = process.env.BASE_URL || 'http://localhost:3101';
 (async () => {
   fs.mkdirSync(dir, {recursive:true});
@@ -38,8 +38,26 @@ const base = process.env.BASE_URL || 'http://localhost:3101';
     await page.screenshot({path:`${dir}/reading-390.png`,fullPage:true});
     await page.setViewportSize({width:1440,height:1000});
     await page.screenshot({path:`${dir}/reading-1440.png`,fullPage:true});
+    for (const [label,slug] of [['灵感','note'],['设定卡','record'],['时间线','timeline'],['展览','exhibition'],['合集','collection'],['图片集','image-collection']]) {
+      await page.goto(base+'/library');
+      await page.getByRole('button',{name:'创建内容',exact:true}).click();
+      await page.getByRole('menuitem',{name:new RegExp('^'+label)}).click();
+      await page.waitForURL('**/content/*');
+      await page.locator('.typed-editor').waitFor();
+      for(const width of [1440,390,320]) {
+        await page.setViewportSize({width,height:1000});
+        assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,slug+' overflow '+width);
+        if(width!==320) await page.screenshot({path:`${dir}/${slug}-${width}.png`,fullPage:true});
+      }
+    }
+    for (const route of ['workshop','library']) {
+      await page.goto(base+'/'+route);
+      await page.locator(route==='library'?'.content-card':'.continue-editing').first().waitFor();
+      await page.setViewportSize({width:1440,height:1000});
+      await page.screenshot({path:`${dir}/${route}-populated-1440.png`,fullPage:true});
+    }
     assert.deepEqual(errors,[]);
-    console.log('PASS 8 routes / 4 widths / finalize-to-read flow / no browser errors');
+    console.log('PASS 8 routes / 4 widths / 6 content editors / populated states / finalize-to-read / no browser errors');
   } finally { await browser.close(); }
 })().catch(error=>{console.error(error);process.exit(1);});
 

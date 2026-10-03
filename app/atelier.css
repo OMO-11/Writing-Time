@@ -258,3 +258,29 @@ body { font-family:var(--font-workshop); }
   .atelier-shell .atelier-observatory { order:1; }
   .atelier-first-page b { font-size:30px; }
 }
+.atlas-return-dock > a { border-radius:3px; box-shadow:0 4px 16px #3447500c; font-family:var(--font-workshop); border-color:#d8ded9; background:#fafbf6ed; }
+@media(max-width:767px) {
+  .character-theme-root:has(.workbench) + .atlas-return-dock { bottom:44px; }
+  .character-theme-root:has(.workbench) + .atlas-return-dock > a { width:44px; padding:0; justify-content:center; }
+  .character-theme-root:has(.workbench) + .atlas-return-dock > a > span { display:none; }
+}
+/* Content-specific surfaces retain the editor's functional hierarchy. */
+.atelier-shell .typed-editor > header { position:relative; border-bottom:1px solid var(--atelier-line); padding-bottom:22px; margin-bottom:24px; }
+.atelier-shell .typed-editor > header:after { content:""; position:absolute; bottom:-1px; left:0; width:44px; height:1px; background:var(--atelier-violet); }
+.atelier-shell .typed-editor > header h2 { font-size:25px; font-weight:400; }
+.atelier-shell .typed-editor > header > div > span { font-size:9px; letter-spacing:.17em; }
+.atelier-shell .typed-editor { border:0; box-shadow:none; }
+.atelier-shell .record-field-grid label { border-radius:0; background:none; border:0; border-bottom:1px solid var(--atelier-line); }
+.atelier-shell .exhibition-blocks { border-radius:0; background:#eef0ec; }
+.atelier-shell .exhibition-blocks > article { background:#fcfcf8; border:1px solid var(--atelier-line); box-shadow:none; }
+.atelier-shell .asset-library > nav[aria-label="图片分页"] { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:16px; margin-top:32px; padding-top:20px; border-top:1px solid var(--atelier-line); font-size:12px; color:var(--atelier-muted); }
+.atelier-shell .asset-library > nav[aria-label="图片分页"] button { min-height:44px; padding:8px 12px; border:1px solid var(--atelier-line); border-radius:2px; }
+.atelier-shell .asset-library > nav[aria-label="图片分页"] button:disabled { opacity:.45; }
+.atelier-shell :is(.common-content-fields,.typed-editor,.content-links-panel) { border-radius:0; box-shadow:none; }
+.atelier-shell .common-content-fields { background:#f0f3ef; border:0; border-top:2px solid #a1b3b7; }
+.atelier-shell .common-content-fields :is(input,textarea,button,select) { border-radius:2px; }
+.atelier-shell .common-content-fields h2 { font-weight:400; }
+.atelier-shell .content-links-panel { background:none; border:0; border-top:1px solid #b5a9c3; }
+.atelier-shell .content-detail-header :is(button,summary,a) { border-radius:2px; }
+.atelier-shell .content-links-panel h2 { font-weight:400; }
+.atelier-shell .typed-editor label > span { font-size:12px; }

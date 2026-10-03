@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const base = process.env.GALLERY_URL || 'http://localhost:3104';
-const output = path.join(process.cwd(), 'docs/gallery-evidence');
+const output = path.join(process.cwd(), process.env.GALLERY_EVIDENCE_DIR || 'docs/gallery-evidence');
 fs.mkdirSync(output, { recursive: true });
 const fixtures = [
   ['窗边拾光.webp', 'public/assets/home/enhance-noval-observatory.webp'],
@@ -96,7 +96,7 @@ async function noOverflow(page) {
     await noOverflow(page);
     await page.getByRole('button', { name: '关闭大图' }).click();
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    assert.equal(await page.locator('.archive-portrait-character').evaluate(element => getComputedStyle(element).animationName), 'none');
+    assert.equal(await page.locator('.archive-hero-portrait .atelier-drawing').evaluate(element => getComputedStyle(element).animationName), 'none');
     assert.deepEqual(errors, []);
     assert.deepEqual(failedAssets, []);
     const result = { result: 'PASS', checks: ['empty state', 'morning and night themes', 'theme and gallery persistence', 'batch import', 'image preview and keyboard navigation', 'modal focus restore', 'remove keeps original', '1440/768/390/320 layouts', 'mobile lightbox', 'reduced motion', 'no page errors or failed assets'] };
