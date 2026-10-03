@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Settings2 } from "lucide-react";
 import type { MouseEvent } from "react";
 import { GlobalSearch } from "@/components/app/GlobalSearch";
 import { HomeButton } from "@/components/app/HomeButton";
@@ -50,7 +50,7 @@ export function GlobalHeader() {
         <Link href="/library?type=exhibition">展览</Link>
       </nav>}
       <GlobalSearch />
-      <div className="global-header-tools"><ToastAndSaveStatus /><QuickCreate /></div>
+      <div className="global-header-tools"><Link href="/settings" className="atelier-settings-link" aria-label="工坊设置"><Settings2 size={17} aria-hidden="true" /></Link><ToastAndSaveStatus /><QuickCreate /></div>
     </header>
   );
 }

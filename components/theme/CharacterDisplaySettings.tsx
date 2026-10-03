@@ -4,7 +4,6 @@ import { Eye, ImageOff, Sparkles, WandSparkles } from "lucide-react";
 import { db } from "@/lib/db";
 import { useUIStore } from "@/stores/ui-store";
 import type { CharacterDisplayPreferences } from "@/types/theme";
-import { CharacterIllustration } from "@/components/theme/CharacterIllustration";
 
 export function CharacterDisplaySettings() {
   const illustrationMode = useUIStore((state) => state.illustrationMode);
@@ -51,7 +50,6 @@ export function CharacterDisplaySettings() {
           </label>
         </div>
       </div>
-      <CharacterIllustration character="eden" variant="housework" placement="right" size="md" fade />
     </section>
   );
 }

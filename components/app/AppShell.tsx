@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
 import { CommandPalette } from "@/components/app/CommandPalette";
 import { GlobalHeader } from "@/components/app/GlobalHeader";
@@ -11,6 +11,7 @@ import { CharacterThemeProvider } from "@/components/theme/CharacterThemeProvide
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const router = useRouter();
+  const pathname = usePathname();
   const setCommandPaletteOpen = useUIStore((state) => state.setCommandPaletteOpen);
   const flushSave = useUIStore((state) => state.flushSave);
 
@@ -49,7 +50,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [flushSave, router, setCommandPaletteOpen]);
 
   return (
-    <CharacterThemeProvider><div className="app-shell">
+    <CharacterThemeProvider><div className="app-shell atelier-shell" data-surface={pathname.split("/")[1] || "workshop"}>
       <a className="skip-link" href="#app-content">跳到主要内容</a>
       <GlobalHeader />
       <div id="app-content" className="app-shell-content" tabIndex={-1}>{children}</div>

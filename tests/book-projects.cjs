@@ -44,7 +44,7 @@ const baseUrl = process.env.BASE_URL || "http://localhost:3000";
    await page.goto(baseUrl+'/work/'+record.slug);
    await page.getByRole('button',{name:'创建修订草稿',exact:true}).click();
    await page.waitForURL('**/workbench?work=*');
-   await page.getByRole('textbox',{name:'作品标题',exact:true}).filter({visible:true}).waitFor();
+   await page.waitForFunction(()=>{const input=document.querySelector('.editor-title-field input');return input && !input.disabled && input.value==='定稿验证作品（修订）';});
    await page.getByRole('textbox',{name:'作品标题',exact:true}).fill(title);
    assert.equal(await page.getByRole('textbox',{name:'作品标题',exact:true}).inputValue(),title);
    await page.getByRole('button',{name:'完全保存',exact:true}).click();

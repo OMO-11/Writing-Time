@@ -15,7 +15,7 @@ import { WorkDrawer } from "@/components/workbench/WorkDrawer";
 import { RecoveryHistory } from "@/components/workbench/RecoveryHistory";
 import { ImagePicker } from "@/components/content/ImagePicker";
 import { PaperDialog } from "@/components/ui/PaperDialog";
-import { CharacterIllustration } from "@/components/theme/CharacterIllustration";
+import { AtelierDrawing } from "@/components/ui/AtelierDrawing";
 import { articleContentFromWork, createBlankWork, createRecoverySnapshot, db, ensureStarterData, getLineBreakMode, hydrateWorkDocument, importImageFile, recordActivity } from "@/lib/db";
 import { frontmatterTags, MarkdownService } from "@/lib/markdown-service";
 import { rebuildAllReferences, rebuildReferencesFor } from "@/lib/content-service";
@@ -70,6 +70,13 @@ export function Workbench() {
   // effect must not overwrite a newer input with the preceding render's value.
   useEffect(() => { positionRef.current = position; }, [position]);
   useEffect(() => { outlineOpenRef.current = outlineOpen; }, [outlineOpen]);
+
+  useEffect(() => {
+    const narrow = window.matchMedia("(max-width: 767px)");
+    const closeOnNarrow = () => { if (narrow.matches) setOutlineOpen(false); };
+    narrow.addEventListener("change", closeOnNarrow);
+    return () => narrow.removeEventListener("change", closeOnNarrow);
+  }, []);
 
   const updateSaveState = useCallback((next: SaveState) => {
     setSaveState(next);
@@ -193,8 +200,9 @@ export function Workbench() {
       setPosition({ cursorFrom: session.cursorFrom, cursorTo: session.cursorTo, scrollTop: session.scrollTop, line: 1, column: 1 });
       positionRef.current = { cursorFrom: session.cursorFrom, cursorTo: session.cursorTo, scrollTop: session.scrollTop, line: 1, column: 1 };
       setEditorMode(session.editorMode);
-      setOutlineOpen(session.outlineOpen);
-      outlineOpenRef.current = session.outlineOpen;
+      const showOutline = session.outlineOpen && !window.matchMedia("(max-width: 767px)").matches;
+      setOutlineOpen(showOutline);
+      outlineOpenRef.current = showOutline;
       setActiveWorkTitle(selected.title);
       dirtyRef.current = false;
       updateSaveState("saved");
@@ -338,11 +346,12 @@ export function Workbench() {
           {editorMode === "split" ? <div className="page-seam" aria-hidden="true" /> : null}
           {editorMode !== "edit" ? <div className="preview-pane" data-solo={editorMode === "preview"}><MarkdownPreview html={renderedHtml} /></div> : null}
         </section>
-        {showEmptyCompanion ? <aside className="editor-empty-companion" aria-label="空白文档引导">
-          <CharacterIllustration character="noval" variant="empty" placement="left" size="md" fade />
-          <div><p>诺瓦尔已经翻开新的旅行手记。</p><strong>从第一个发现开始写吧。</strong><span><button type="button" onClick={() => editorRef.current?.focus()}>开始书写</button><button type="button" onClick={() => editorRef.current?.applyCommand("template")}>插入场景模板</button></span></div>
-        </aside> : null}
+
       </div>
+        {showEmptyCompanion ? <aside className="editor-empty-companion" aria-label="空白文档引导">
+          <AtelierDrawing motif="writing" />
+          <div><p>稿纸已备好，留一点空白给想象。</p><strong>从第一个发现开始写吧。</strong><span><button type="button" onClick={() => editorRef.current?.focus()}>开始书写</button><button type="button" onClick={() => editorRef.current?.applyCommand("template")}>插入场景模板</button></span></div>
+        </aside> : null}
       <EditorStatusBar wordCount={wordCount} paragraphCount={paragraphCount} line={position.line} column={position.column} saveState={saveState} />
       {dragging ? <div className="drop-overlay" role="status"><div><FileDown aria-hidden="true" size={25} /><ImageIcon aria-hidden="true" size={25} /><strong>把手稿或图片放在这里</strong><span>支持 .md、png、jpg、jpeg、webp</span></div></div> : null}
       <ImagePicker open={imagePickerOpen} onClose={() => setImagePickerOpen(false)} onSelect={(ids) => { const imageId = ids[0]; if (!imageId) return; void db.images.get(imageId).then((image) => { if (image) editorRef.current?.insertText(`![${image.altText || image.title}](fw-asset://${image.id})`); }); }} />
