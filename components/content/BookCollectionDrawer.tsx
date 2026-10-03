@@ -16,7 +16,7 @@ export function BookCollectionDrawer({ book, works, initialChapter, initialWork,
   const visible = onlySelected ? chosen.map((id) => candidates.find((work) => work.id === id)!) : matching;
   const hidden = chosen.filter((id) => !matching.some((work) => work.id === id)).length;
   const destination = book.chapters.find((chapter) => chapter.id === chapterId);
-  return <PaperDialog title="收录作品" drawer busy={busy} onClose={() => chosen.length ? setConfirmClose(true) : onClose()}>
+  return <PaperDialog folio title="收录作品" drawer busy={busy} onClose={() => chosen.length ? setConfirmClose(true) : onClose()}>
     <fieldset disabled={busy} className="collection-body"><legend className="sr-only">选择已完成作品</legend>
       <p className="book-muted">原稿保持只读，按勾选顺序追加到目录。</p>
       <label className="book-field">搜索候选作品<span className="book-search"><Search size={17} aria-hidden="true" /><input type="search" value={query} onChange={(event) => setQuery(event.target.value)} placeholder="搜索已完成作品…" /></span></label>

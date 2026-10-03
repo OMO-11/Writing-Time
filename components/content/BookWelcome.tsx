@@ -1,13 +1,20 @@
 import Link from "next/link";
-import { ArrowRight, BookOpen, Files, ListOrdered, Plus } from "lucide-react";
-import { CharacterIllustration } from "@/components/theme/CharacterIllustration";
+import { ArrowUpRight } from "lucide-react";
 
-/** Lightweight vector scene stays complete even when character art is disabled. */
+/** A bespoke colophon: Noval's flower/crystal and Eden's lunar archive. */
 export function BookWelcome({ onCreate }: { onCreate: () => void }) {
-  return <section className="book-welcome" aria-label="开始编订第一本书">
-    <div className="book-welcome-main"><div className="book-welcome-copy"><span className="book-section-label"><BookOpen size={16} aria-hidden="true" />你的故事，值得成书</span><h2>让散落的故事，<br />在这里成册。</h2><p>把一篇篇完成的作品收进书中，安排章节与次序。每次归来，都可以添上新的一页。</p><div className="book-welcome-actions"><button className="book-primary" onClick={onCreate}><Plus size={17} aria-hidden="true" />创建第一本书</button><Link href="/library?type=finished">查看已完成作品 <ArrowRight size={16} aria-hidden="true" /></Link></div><small>目录可以随时编订，定稿原文始终保留。</small></div>
-      <div className="book-welcome-art" aria-hidden="true"><div className="book-art-arch" /><svg className="book-art-scene" viewBox="0 0 440 360" fill="none"><ellipse cx="231" cy="310" rx="154" ry="14" fill="#63758b" opacity=".09"/><path d="M44 287c9-32 0-61-13-83m12 68c-17-3-23-12-23-23 15 1 21 9 23 23m1-23c14-6 20-17 17-28-12 3-18 15-17 28" stroke="#92a293" strokeWidth="2"/><g transform="rotate(-9 178 250)"><rect x="79" y="213" width="263" height="77" rx="8" fill="#b5a5bd"/><path d="M88 226h250v51H88" fill="#efe7da"/><path d="M93 235h239m-239 9h234m-234 9h239m-239 9h234" stroke="#d6cdbc"/><path d="M87 215v72" stroke="#7f6f89" strokeWidth="4"/></g><g transform="rotate(6 224 205)"><rect x="120" y="157" width="247" height="79" rx="7" fill="#667d96"/><path d="M130 170h232v53H130" fill="#faf3e5"/><path d="M135 181h220m-220 9h215m-215 9h220m-220 9h215" stroke="#d9d1c2"/><path d="M128 162v69" stroke="#445970" strokeWidth="4"/><path d="M294 159v86l14-10 13 10v-86" fill="#b6a071"/></g><path d="M328 113l5-12 5 12 12 5-12 5-5 12-5-12-12-5zM86 108l3-8 3 8 8 3-8 3-3 8-3-8-8-3z" stroke="#aa966b" strokeWidth="1.5"/><circle cx="378" cy="175" r="3" fill="#aa966b"/><path d="M173 76h95m-111 8h124" stroke="#acb8c3" opacity=".5"/></svg><CharacterIllustration character="duo" variant="project" size="md" decorative priority className="book-welcome-companions" /></div>
-    </div>
-    <ol className="book-welcome-steps">{[{ icon:BookOpen, title:"起一个书名", text:"给新的故事集一个开始" }, { icon:ListOrdered, title:"安排章节", text:"按你的叙事节奏组织目录" }, { icon:Files, title:"收录作品", text:"挑选定稿，随时续写这本书" }].map(({icon:Icon,title,text},index) => <li key={title}><span className="book-step-icon"><Icon size={20} aria-hidden="true" /></span><div><h3><span>0{index + 1}</span>{title}</h3><p>{text}</p></div></li>)}</ol>
+  return <section className="book-colophon" aria-label="开始编订第一本书">
+    <div className="colophon-copy"><p className="colophon-index">序 / 00</p><h2>尚未命名的故事，<br />从这里开始。</h2><p className="colophon-description">为完成的文字留一个位置。<br />收录、编排，慢慢成为一本书。</p><button className="colophon-create" onClick={onCreate}>创建第一本书<ArrowUpRight size={20} strokeWidth={1.25} aria-hidden="true" /></button><Link className="colophon-library" href="/library?type=finished">浏览已完成作品</Link></div>
+    <figure className="colophon-emblem"><svg viewBox="0 0 400 430" fill="none" aria-hidden="true">
+      <path d="M222 57c78 11 132 72 132 143 0 80-59 146-139 152 63-26 103-84 103-152 0-61-36-115-96-143Z" fill="#d8d7e1" fillOpacity=".38" stroke="#9b9aa9" strokeWidth=".8" />
+      <path d="M289 96c-29-30-70-43-114-37M99 326c37 27 83 37 128 24" stroke="#c5c5cd" strokeWidth=".7" />
+      <path d="M107 336c19-55 54-100 71-151 9-27 11-60 1-90" stroke="#7d939c" strokeWidth="1.2" />
+      <path d="M149 258c-30 1-51-12-56-35 28 1 48 13 56 35ZM162 223c27-8 42-25 40-49-26 10-38 27-40 49ZM122 301c-23-5-37-19-37-37 23 5 33 18 37 37Z" fill="#e6ebeb" stroke="#9caeb2" strokeWidth=".8" />
+      <g transform="translate(179 123)" stroke="#879ca4" strokeWidth=".9" fill="#faf9f5"><path d="M0-5C-27-35-16-59 0-56 18-53 21-28 0-5Z"/><path d="M5 0C32-34 57-29 55-12 53 7 28 14 5 0Z"/><path d="M3 6C44 17 47 43 30 48 12 53-3 31 3 6Z"/><path d="M-4 6C-4 49-27 60-37 45-48 28-30 8-4 6Z"/><path d="M-6-1C-47 12-65-7-52-21-39-35-14-24-6-1Z"/><circle r="5" fill="#c6b68f" stroke="#b6a27a"/></g>
+      <path d="M196 233v96m0 0-14 25 14 36 14-36-14-25Zm-14 25h28m-14-25v61" stroke="#829cae" strokeWidth=".9" /><path d="m196 329-14 25 14 36V329Z" fill="#b6cad7" fillOpacity=".28" />
+      <path d="m279 171 3 10 10 3-10 3-3 10-3-10-10-3 10-3 3-10Zm-27 64 2 6 6 2-6 2-2 6-2-6-6-2 6-2 2-6Z" stroke="#a39bb1" strokeWidth=".8"/><path d="m282 188-29 53 37 40" stroke="#c4becd" strokeDasharray="2 6" strokeWidth=".7"/><circle cx="290" cy="281" r="2" fill="#a59bae" />
+      <path d="M48 390h77m151 0h76" stroke="#c9c5be" strokeWidth=".7"/><circle cx="59" cy="120" r="2" fill="#acb8bd" />
+    </svg></figure>
+    <footer className="colophon-note"><span>文字由你写下，次序也由你决定。</span><span>定稿原文保留 · 目录可随时编订</span></footer>
   </section>;
 }

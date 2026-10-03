@@ -1,6 +1,8 @@
 /* eslint-disable @typescript-eslint/no-require-imports -- Optional Playwright browser regression. */
 const {chromium}=require("playwright");
 const assert=require('node:assert/strict');
+const evidenceDir = process.env.EVIDENCE_DIR || 'tmp';
+require('node:fs').mkdirSync(evidenceDir, {recursive:true});
 const baseUrl = process.env.BASE_URL || "http://localhost:3000";
 (async()=>{
  const browser=await chromium.launch({headless:true, channel:process.env.BROWSER_CHANNEL || "msedge"});
@@ -41,6 +43,8 @@ const baseUrl = process.env.BASE_URL || "http://localhost:3000";
  for (const title of ['批量作品甲', '批量作品乙']) {
    await page.goto(baseUrl+'/work/'+record.slug);
    await page.getByRole('button',{name:'创建修订草稿',exact:true}).click();
+   await page.waitForURL('**/workbench?work=*');
+   await page.getByRole('textbox',{name:'作品标题',exact:true}).filter({visible:true}).waitFor();
    await page.getByRole('textbox',{name:'作品标题',exact:true}).fill(title);
    assert.equal(await page.getByRole('textbox',{name:'作品标题',exact:true}).inputValue(),title);
    await page.getByRole('button',{name:'完全保存',exact:true}).click();
@@ -58,7 +62,7 @@ const baseUrl = process.env.BASE_URL || "http://localhost:3000";
  await page.getByText(/已选 2 篇/).waitFor();
  await page.getByLabel('目标章节').selectOption({label:'第二章'});
  await page.getByRole('button',{name:'收录到章节',exact:true}).click();
- const second = page.locator('.book-chapter').filter({has:page.getByRole('heading',{name:'2. 第二章',exact:true})});
+ const second = page.locator('.book-chapter').filter({has:page.getByRole('heading',{name:'第二章',exact:true})});
  await second.getByRole('link',{name:/批量作品甲/}).waitFor();
  assert.deepEqual(await second.locator('li > a').allTextContents(),['批量作品乙','批量作品甲']);
  await second.getByRole('button',{name:'上移作品 批量作品甲',exact:true}).click();
@@ -81,7 +85,7 @@ const baseUrl = process.env.BASE_URL || "http://localhost:3000";
  await page.getByRole('button',{name:'关闭对话框',exact:true}).click();
  for (const width of [320,390,768,1440]) {
    await page.setViewportSize({width,height:1000});
-   await page.screenshot({path:'tmp/books-ui-'+width+'.png',fullPage:true});
+   await page.screenshot({path:evidenceDir+'/books-ui-'+width+'.png',fullPage:true});
    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false,'overflow at '+width);
  }
  // New dialogs: cancellation, focus restoration, search-retained selection and mobile reader.
@@ -99,7 +103,7 @@ const baseUrl = process.env.BASE_URL || "http://localhost:3000";
  await page.getByRole('button',{name:'仅看已选 1',exact:true}).click();
  assert.equal(await page.getByRole('checkbox',{name:/批量作品乙/}).isChecked(),true);
  await page.setViewportSize({width:390,height:844});
- await page.screenshot({path:'tmp/books-drawer-mobile.png'});
+ await page.screenshot({path:evidenceDir+'/books-drawer-mobile.png'});
  await page.keyboard.press('Escape');
  await page.getByText('还有未收录的选择，是否放弃？',{exact:true}).waitFor();
  await page.getByRole('button',{name:'继续选择',exact:true}).click();
@@ -111,12 +115,21 @@ const baseUrl = process.env.BASE_URL || "http://localhost:3000";
  await page.getByRole('dialog').getByRole('link',{name:'定稿验证作品',exact:true}).click();
  await page.getByRole('dialog').waitFor({state:'hidden'});
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
- await page.screenshot({path:'tmp/books-reader-mobile.png',fullPage:true});
+ await page.screenshot({path:evidenceDir+'/books-reader-mobile.png',fullPage:true});
  await page.goto(baseUrl+'/library?type=finished');
  await page.getByRole('link',{name:'定稿验证作品',exact:true}).waitFor();
  assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
- await page.screenshot({path:'tmp/books-workspace-mobile.png',fullPage:true});
+ await page.screenshot({path:evidenceDir+'/books-workspace-mobile.png',fullPage:true});
+ // A stale remembered selection must not override the latest edited book on entry.
+ const latest = await page.evaluate(()=>new Promise((resolve,reject)=>{const r=indexedDB.open('FantasyWorkshop');r.onsuccess=()=>{const d=r.result;const q=d.transaction('books').objectStore('books').getAll();q.onsuccess=()=>{const books=q.result.sort((a,b)=>b.updatedAt-a.updatedAt);localStorage.setItem('active-book',books[books.length-1].id);resolve({title:books[0].title,other:books[books.length-1].title});d.close();};q.onerror=()=>reject(q.error);};}));
+ await page.goto(baseUrl+'/projects');
+ await page.getByRole('heading',{name:latest.title,exact:true}).waitFor();
+ assert.equal(await page.locator('.book-editor').count(),1);
+ await page.getByLabel('当前书籍').selectOption({label:latest.other});
+ await page.getByRole('heading',{name:latest.other,exact:true}).waitFor();
+ assert.equal(await page.locator('.book-editor fieldset').count(),1);
+ await page.reload();
+ await page.getByRole('heading',{name:latest.title,exact:true}).waitFor();
  assert.deepEqual(errors,[]); console.log('PASS: finalize, finished partition, projects, batch selection/order, search retention, sorting, cross-chapter move, shared works, persistence, readonly redirect, mobile layout');
- }catch(error){ await page.screenshot({path:'tmp/books-ui-failure.png',fullPage:true}); console.error(await page.evaluate(()=>new Promise(resolve=>{const r=indexedDB.open('FantasyWorkshop');r.onsuccess=()=>{const d=r.result;const q=d.transaction('works').objectStore('works').getAll();q.onsuccess=()=>{resolve(q.result.map(w=>({title:w.title,finalizedAt:w.finalizedAt})));d.close();};};}))); throw error; }finally{await browser.close();}
+ }catch(error){ await page.screenshot({path:evidenceDir+'/books-ui-failure.png',fullPage:true}); console.error(await page.evaluate(()=>new Promise(resolve=>{const r=indexedDB.open('FantasyWorkshop');r.onsuccess=()=>{const d=r.result;const q=d.transaction('works').objectStore('works').getAll();q.onsuccess=()=>{resolve(q.result.map(w=>({title:w.title,finalizedAt:w.finalizedAt})));d.close();};};}))); throw error; }finally{await browser.close();}
 })().catch(e=>{console.error(e);process.exit(1)});
-
