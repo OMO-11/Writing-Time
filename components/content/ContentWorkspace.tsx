@@ -11,6 +11,7 @@ import { CONTENT_TYPES, CONTENT_TYPE_REGISTRY, getContentHref } from "@/lib/cont
 import { createContent, deleteWorkspaceContent, ensureUnifiedContentModel, toggleFavorite } from "@/lib/content-service";
 import { createBlankWork, db } from "@/lib/db";
 import { PaperDialog } from "@/components/ui/PaperDialog";
+import { ContentEmblem } from "@/components/ui/ContentEmblem";
 import { CompanionEmblem } from "@/components/ui/CompanionEmblem";
 import type { ContentItem, ContentType } from "@/types/content";
 
@@ -76,7 +77,7 @@ export function ContentWorkspace({ initialType }: { initialType?: string }) {
           {filtered.map((content) => (
             <article className="content-card" data-accent={CONTENT_TYPE_REGISTRY[content.type].accent} key={content.id}>
               <div className="content-card-meta"><span><ContentIcon type={content.type} size={15} />{CONTENT_TYPE_REGISTRY[content.type].label}</span><button type="button" aria-label={content.favorite ? "取消收藏" : "收藏"} aria-pressed={content.favorite} onClick={() => void toggleFavorite(content.id)}><Star aria-hidden="true" size={16} fill={content.favorite ? "currentColor" : "none"} /></button></div>
-              <CompanionEmblem variant={content.type === "image" || content.type === "gallery" || content.type === "exhibition" ? "lunar" : "blossom"} className="content-card-emblem" /><h2><Link href={content.type === "article" && content.payload.finalizedAt ? `/work/${content.payload.slug}` : getContentHref(content)}>{content.title}</Link></h2>
+              <ContentEmblem type={content.type} /><h2><Link href={content.type === "article" && content.payload.finalizedAt ? `/work/${content.payload.slug}` : getContentHref(content)}>{content.title}</Link></h2>
               {content.type === "article" && <div className="content-work-state">{content.payload.finalizedAt ? <span className="finalized-badge"><LockKeyhole size={12} aria-hidden="true" />已定稿 · 只读</span> : <span>{content.status === "completed" ? "写作完成 · 可编辑" : content.status === "archived" ? "已归档" : "草稿 · 可编辑"}</span>}</div>}
               <p>{content.summary || CONTENT_TYPE_REGISTRY[content.type].description}</p>
               <footer><span>{content.tags.length ? content.tags.slice(0, 3).map((tag) => `#${tag}`).join(" · ") : "尚未归类"}</span><time dateTime={new Date(content.updatedAt).toISOString()}>{new Intl.DateTimeFormat("zh-CN", { month: "short", day: "numeric" }).format(content.updatedAt)}</time></footer>

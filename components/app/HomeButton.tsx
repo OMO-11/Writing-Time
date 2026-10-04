@@ -1,5 +1,5 @@
 "use client";
-import { CompanionEmblem } from "@/components/ui/CompanionEmblem";
+import { WorkshopLogo } from "@/components/ui/WorkshopLogo";
 
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -18,7 +18,7 @@ export function HomeButton() {
 
   return (
     <Link className="global-home-button" href="/workshop" onClick={(event) => void goHome(event)} aria-label="保存并返回 Fantasy Workshop 首页">
-      <span className="workshop-sigil"><CompanionEmblem /></span>
+      <span className="workshop-sigil"><WorkshopLogo /></span>
       <span><strong>幻想工坊</strong><small>FANTASY WORKSHOP</small></span>
     </Link>
   );

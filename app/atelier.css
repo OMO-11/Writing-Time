@@ -327,3 +327,13 @@ body { font-family:var(--font-workshop); }
 }
 .atelier-shell .settings-page > section:before { display:none; }
 .home-book-tab > .companion-emblem { width:32px; height:44px; }
+/* Type-specific miniature seals: one unique drawing per content category. */
+.content-type-emblem { position:absolute; right:13px; top:76px; width:38px; height:38px; pointer-events:none; color:#819ca8; }
+.content-type-emblem[data-content-emblem=image] { color:#9a8eac; }
+.content-type-emblem[data-content-emblem=gallery] { color:#ad9778; }
+.content-type-emblem[data-content-emblem=record] { color:#9584a5; }
+.content-type-emblem[data-content-emblem=collection] { color:#829986; }
+.content-type-emblem[data-content-emblem=timeline] { color:#a48c70; }
+.content-type-emblem[data-content-emblem=note] { color:#b09970; }
+.content-type-emblem[data-content-emblem=exhibition] { color:#94869f; }
+.global-home-button .workshop-sigil > .workshop-logo { width:40px; height:40px; }
