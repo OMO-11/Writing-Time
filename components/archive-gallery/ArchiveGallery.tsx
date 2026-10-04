@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { AtelierDrawing } from "@/components/ui/AtelierDrawing";
 import Link from "next/link";
 import { useLiveQuery } from "dexie-react-hooks";
 import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Flower2, ImagePlus, LoaderCircle, Maximize2, MoonStar, Trash2, X } from "lucide-react";
@@ -87,6 +86,7 @@ export function ArchiveGallery() {
   const selected = galleryImages.find((image) => image.id === selectedId) ?? galleryImages[0];
   const selectedIndex = selected ? galleryImages.indexOf(selected) : 0;
   const isNight = atmosphere === "night";
+  const portrait = isNight ? "/assets/gallery/eden-gallery-portrait.png" : "/assets/gallery/noval-gallery-portrait.png";
 
   useEffect(() => () => { if (noticeTimer.current) clearTimeout(noticeTimer.current); }, []);
   const announce = useCallback((message: string) => {
@@ -157,12 +157,19 @@ export function ArchiveGallery() {
 
         <section className="archive-gallery-hero" aria-labelledby="archive-gallery-title">
           <div className="archive-hero-copy">
-            <div className="archive-hero-eyebrow"><span>A LITTLE LIGHT, KEPT FOREVER</span></div>
+            <div className="archive-hero-eyebrow"><Image src="/assets/gallery/companions-seal.svg" alt="" width={48} height={48} /><span>A LITTLE LIGHT, KEPT FOREVER</span></div>
             <h1 id="archive-gallery-title">拾光<span>画廊</span><i aria-hidden="true">.</i></h1>
             <p>把沿途的光，收进画框。</p>
             <div className="archive-hero-signature"><span aria-hidden="true" /><small>晨花记下相遇 · 星夜妥善珍藏</small></div>
           </div>
-          <div className="archive-hero-portrait"><AtelierDrawing motif="frame" /></div>
+          <div className="archive-hero-portrait">
+            <Image className="archive-portrait-arch" src="/assets/gallery/celestial-arch.svg" alt="" width={380} height={340} />
+            <div key={atmosphere} className="archive-portrait-figure">
+              <Image className="archive-portrait-bleed" src={portrait} alt="" aria-hidden="true" width={1024} height={1024} sizes="(max-width: 600px) 150px, 290px" draggable={false} />
+              <Image className="archive-portrait-character" src={portrait} alt={isNight ? "伊登将画片轻轻收进相册，珍藏旅途中的片刻" : "诺瓦尔展示手中的风景画片，温柔地看向观众"} width={1024} height={1024} sizes="(max-width: 600px) 150px, 290px" draggable={false} priority />
+            </div>
+            <div className="archive-portrait-name"><span>{isNight ? "EDEN" : "NOVAL"}</span><small>{isNight ? "星夜的珍藏者" : "晨光的记录者"}</small></div>
+          </div>
         </section>
 
         <section className="archive-collection" aria-labelledby="archive-collection-title">

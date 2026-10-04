@@ -96,7 +96,7 @@ async function noOverflow(page) {
     await noOverflow(page);
     await page.getByRole('button', { name: '关闭大图' }).click();
     await page.emulateMedia({ reducedMotion: 'reduce' });
-    assert.equal(await page.locator('.archive-hero-portrait .atelier-drawing').evaluate(element => getComputedStyle(element).animationName), 'none');
+    assert.equal(await page.locator('.archive-hero-portrait .archive-portrait-figure').evaluate(element => getComputedStyle(element).animationName), 'none');
     assert.deepEqual(errors, []);
     assert.deepEqual(failedAssets, []);
     const result = { result: 'PASS', checks: ['empty state', 'morning and night themes', 'theme and gallery persistence', 'batch import', 'image preview and keyboard navigation', 'modal focus restore', 'remove keeps original', '1440/768/390/320 layouts', 'mobile lightbox', 'reduced motion', 'no page errors or failed assets'] };

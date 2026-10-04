@@ -1,12 +1,12 @@
 /* 2026-10-03 — original observatory / manuscript visual system. */
 :root {
-  --atelier-paper:#f7f7f2; --atelier-ink:#344750; --atelier-muted:#65757d;
+  --atelier-paper:#f4f0e8; --atelier-ink:#344750; --atelier-muted:#65757d;
   --atelier-blue:#829eab; --atelier-violet:#a59bb5; --atelier-gold:#b69c6d;
-  --atelier-wash:#e9eeec; --atelier-line:#d6dcda;
+  --atelier-wash:#e5eaf0; --atelier-line:#d6dcda;
 }
 body { font-family:var(--font-workshop); }
 .atelier-shell {
-  --page-bg:var(--atelier-paper); --surface:#fcfcf8; --surface-soft:#eef1ed;
+  --page-bg:var(--atelier-paper); --surface:#fbf8f2; --surface-soft:#eeeae3;
   --text-main:var(--atelier-ink); --text-secondary:var(--atelier-muted); --deep-blue:#425f70;
   --border:var(--atelier-line); --paper:var(--page-bg); --paper-light:var(--surface);
   --study-ink:var(--atelier-ink); --study-muted:var(--atelier-muted); --study-line:var(--atelier-line);
@@ -16,13 +16,13 @@ body { font-family:var(--font-workshop); }
 .atelier-shell :where(button,input,select,textarea) { font-family:var(--font-workshop); }
 .atelier-shell :where(a,button,input,select,textarea,summary):focus-visible { outline:2px solid #59798c; outline-offset:4px; }
 .atelier-drawing { display:block; flex:none; pointer-events:none; width:240px; height:auto; }
-.atelier-shell .global-header { background:#f7f7f2f5; border-bottom:1px solid var(--atelier-line); box-shadow:none; }
+.atelier-shell .global-header { background:#f4f0e8f5; border-bottom:1px solid var(--atelier-line); box-shadow:none; }
 .atelier-shell .global-home-button { gap:10px; }
 .atelier-shell .global-home-button strong { font-size:17px; font-weight:500; letter-spacing:.16em; }
 .atelier-shell .global-home-button small { font-size:8px; letter-spacing:.17em; }
 .atelier-shell .workshop-sigil { background:none; clip-path:none; width:38px; height:42px; padding:0; border:0; }
 .workshop-sigil > svg { width:38px; height:38px; }
-.atelier-shell .global-search { border-radius:2px; border:0; border-bottom:1px solid #cbd3d3; background:#edf0ec; }
+.atelier-shell .global-search { border-radius:2px; border:0; border-bottom:1px solid #cbd3d3; background:#f1ede6; }
 .atelier-shell .global-primary-nav a { letter-spacing:.07em; }
 .atelier-shell .global-primary-nav a[aria-current=page]:after { height:2px; background:#8fa3ae; }
 .atelier-shell :is(.quick-create summary,.primary-paper-button,.paper-button,.finalize-action,.editor-export,.settings-actions button) { border-radius:3px; box-shadow:none; min-height:44px; font-weight:400; }
@@ -63,7 +63,7 @@ body { font-family:var(--font-workshop); }
 .atelier-shell .quick-actions { border:0; border-left:1px solid var(--atelier-line); border-radius:0; box-shadow:none; background:none; padding:12px 0 0 24px; min-height:0; }
 .atelier-shell .quick-actions-grid { grid-template-columns:1fr; border:0; }
 .atelier-shell .quick-action { align-items:center; min-height:72px; padding:10px 0; border:0; border-bottom:1px solid var(--atelier-line); gap:12px; }
-.atelier-shell .quick-action:hover { transform:none; background:#e9eeeb; }
+.atelier-shell .quick-action:hover { transform:none; background:#e7ebf0; }
 .atelier-shell .quick-action-icon { background:none; clip-path:none; border:0; color:#7f94a1; width:30px; flex-basis:30px; }
 .atelier-shell .quick-action strong { font-weight:400; font-size:13px; }
 .atelier-shell .quick-action small { font-size:10px; }
@@ -73,17 +73,17 @@ body { font-family:var(--font-workshop); }
 .atelier-shell .home-module { border:0; border-top:1px solid var(--atelier-line); border-radius:0; background:none; box-shadow:none; padding:22px 0; }
 .atelier-shell .home-module h2,.atelier-shell .section-heading h2 { font-size:21px; font-weight:400; }
 .atelier-shell .home-module .character-badge { display:none; }
-.atelier-shell .quick-capture-module { background:#edf1ed; border-top:2px solid #9fb0b1; padding:22px; }
+.atelier-shell .quick-capture-module { background:#f1ede6; border-top:2px solid #9fb0b1; padding:22px; }
 .atelier-shell .quick-capture-module textarea { background:transparent; border:0; border-bottom:1px solid #bac9c7; border-radius:0; font-size:14px; }
 .atelier-shell .quick-capture-module button { border-radius:2px; font-weight:400; }
 .atelier-shell .continue-editing { margin:0; grid-template-columns:160px 1fr; padding:26px 0; gap:32px; background:none; }
 .atelier-shell .continue-cover { min-height:180px; border-radius:0; }
 .atelier-shell .paper-cover-large { min-height:180px; }
-.atelier-shell .paper-cover { background:#e7eeec; }
+.atelier-shell .paper-cover { background:#e5eaf0; }
 .atelier-shell .continue-copy h2 { font-size:25px; font-weight:400; }
 .atelier-shell .work-card { border:0; border-top:1px solid var(--atelier-line); border-radius:0; box-shadow:none; background:none; }
 .atelier-shell .work-card:hover { transform:none; box-shadow:none; }
-.atelier-shell .work-card-cover { height:125px; background:#e9eeeb; }
+.atelier-shell .work-card-cover { height:125px; background:#e7ebf0; }
 .atelier-shell .work-card-body { padding:16px 0; }
 .atelier-shell .work-card h3 { font-weight:400; }
 /* Workspace: the rail reads like a contents index; files have clipped label corners. */
@@ -91,14 +91,14 @@ body { font-family:var(--font-workshop); }
 .atelier-shell .content-type-rail { border:0; border-right:1px solid var(--atelier-line); border-radius:0; padding:0 18px 20px 0; background:none; }
 .atelier-shell .content-type-rail button { border-radius:0; font-weight:400; }
 .atelier-shell .content-type-rail button span { font-size:13px; font-weight:400; }
-.atelier-shell .content-type-rail button[data-active=true] { background:#e7edeb; border-left-color:#8ca6b1; }
+.atelier-shell .content-type-rail button[data-active=true] { background:#e3e9f0; border-left-color:#8ca6b1; }
 .atelier-shell .content-section-intro h2 { font-size:21px; font-weight:400; }
 .atelier-shell .content-section-intro p { font-size:13px; }
 .atelier-shell .content-catalog-tools > label,.atelier-shell .content-catalog-tools select { border-radius:2px; background:transparent; }
 .atelier-shell .content-grid { grid-template-columns:repeat(2,minmax(0,1fr)); gap:20px; }
-.atelier-shell .content-card { background:#fcfcf8; border:1px solid #d6dcda; border-radius:0; box-shadow:none; padding:20px; min-height:235px; }
+.atelier-shell .content-card { background:#fbf8f2; border:1px solid #d6dcda; border-radius:0; box-shadow:none; padding:20px; min-height:235px; }
 .atelier-shell .content-card:before { width:23px; height:2px; left:20px; }
-.atelier-shell .content-card:after { content:""; position:absolute; top:-1px; right:-1px; width:13px; height:13px; background:linear-gradient(45deg,#dce3e1 49%,var(--page-bg) 51%); pointer-events:none; }
+.atelier-shell .content-card:after { content:""; position:absolute; top:-1px; right:-1px; width:13px; height:13px; background:linear-gradient(45deg,#dde3eb 49%,var(--page-bg) 51%); pointer-events:none; }
 .atelier-shell .content-card:hover { transform:none; border-color:#91a6b1; box-shadow:0 4px 14px #34475006; }
 .atelier-shell .content-card h2 { font-size:19px; font-weight:400; margin-top:12px; }
 .atelier-shell .content-card p { font-size:13px; }
@@ -117,30 +117,30 @@ body { font-family:var(--font-workshop); }
 .atelier-shell .gallery-actions button,.atelier-shell .asset-search { border-radius:2px; }
 .atelier-shell .asset-tile { border-radius:0; background:transparent; box-shadow:none; }
 .atelier-shell .asset-tile footer { border-top:1px solid var(--atelier-line); padding:12px 0; }
-.atelier-shell .gallery-filter-drawer { border-radius:2px; background:#edf0ed; }
+.atelier-shell .gallery-filter-drawer { border-radius:2px; background:#f1ede6; }
 .atelier-shell .search-page { max-width:1240px; margin:30px auto; padding:0 40px 70px; }
 .atelier-shell .search-query-panel,.atelier-shell .search-results-panel { background:none; border-radius:0; box-shadow:none; }
-.atelier-shell .search-page-input { border-radius:0; border:0; border-bottom:1px solid #9cb0b8; background:#eef1ed; min-height:58px; }
+.atelier-shell .search-page-input { border-radius:0; border:0; border-bottom:1px solid #9cb0b8; background:#eeeae3; min-height:58px; }
 .atelier-shell .search-result-item { border-radius:0; border-bottom:1px solid var(--atelier-line); min-height:64px; }
 .atelier-shell .search-result-copy strong { font-size:14px; font-weight:400; }
 /* Writing: calibrated margins, no illustration covering the manuscript. */
-.atelier-shell .workbench { background:#eef1ed; }
-.atelier-shell .finalize-bar { background:#edf0ec; border-bottom:1px solid var(--atelier-line); }
+.atelier-shell .workbench { background:#eeeae3; }
+.atelier-shell .finalize-bar { background:#f1ede6; border-bottom:1px solid var(--atelier-line); }
 .atelier-shell .editor-header,.atelier-shell .markdown-toolbar { background:var(--atelier-paper); }
 .atelier-shell .editor-title-field input { font-weight:400; }
-.atelier-shell .mode-switcher { border-radius:2px; box-shadow:none; background:#e8ede9; }
+.atelier-shell .mode-switcher { border-radius:2px; box-shadow:none; background:#e5eaf0; }
 .atelier-shell .mode-switcher button { border-radius:0; }
-.atelier-shell .editor-stage { background:#fcfcf8; border-radius:0; box-shadow:0 2px 15px #35475007; }
-.atelier-shell .page-seam { background:#dce3e0; width:1px; }
+.atelier-shell .editor-stage { background:#fbf8f2; border-radius:0; box-shadow:0 2px 15px #35475007; }
+.atelier-shell .page-seam { background:#dde3eb; width:1px; }
 .atelier-shell .editor-empty-companion { position:relative; right:auto; bottom:auto; width:auto; min-height:0; margin:20px 34px; padding:16px 22px; border:0; border-top:1px solid #c9d6d6; border-radius:0; background:none; box-shadow:none; align-items:center; justify-content:flex-start; gap:20px; }
 .atelier-shell .editor-empty-companion > .atelier-drawing { width:110px; height:80px; }
 .atelier-shell .editor-empty-companion button { border-radius:2px; font-size:12px; min-height:44px; }
 .atelier-shell .editor-empty-companion strong { font-size:17px; font-weight:400; }
 .atelier-shell .drawer-tab { border-radius:2px; }
-.atelier-shell .work-detail { max-width:1060px; margin:32px auto; background:#fcfcf8; border-inline:1px solid var(--atelier-line); }
+.atelier-shell .work-detail { max-width:1060px; margin:32px auto; background:#fbf8f2; border-inline:1px solid var(--atelier-line); }
 .atelier-shell .work-detail > header { background:none; border-bottom:1px solid var(--atelier-line); }
 .atelier-shell .work-detail > header h2 { font-weight:400; }
-.atelier-shell .work-finalized-actions { background:#edf0ec; }
+.atelier-shell .work-finalized-actions { background:#f1ede6; }
 /* Preferences: a numbered calibration log. */
 .atelier-shell .settings-page { max-width:1240px; padding:0 40px 70px; margin:24px auto; background:none; gap:0; counter-reset:preferences; }
 .atelier-shell .settings-page > section { position:relative; background:none; border-bottom:1px solid var(--atelier-line); padding:30px 0; grid-template-columns:42px minmax(0,1fr); gap:22px; counter-increment:preferences; }
@@ -151,20 +151,15 @@ body { font-family:var(--font-workshop); }
 .atelier-shell .appearance-setting-grid label { background:none; border:0; border-bottom:1px solid var(--atelier-line); border-radius:0; padding:0 0 12px; }
 .atelier-shell .appearance-setting-grid select { border-radius:2px; min-height:44px; }
 /* Shared dialog chrome. */
-.atelier-shell .paper-dialog { border-radius:4px; background:#fcfcf8; }
+.atelier-shell .paper-dialog { border-radius:4px; background:#fbf8f2; }
 .atelier-shell .paper-dialog-heading h2 { font-weight:400; }
 .atelier-shell .paper-dialog-actions button { border-radius:2px; }
 /* The immersive entrance keeps its landscape; typography and controls join the system. */
-.portal-root,.archive-gallery-shell { font-family:var(--font-workshop); --font-serif:var(--font-workshop); --font-sans:var(--font-workshop); }
+.portal-root { font-family:var(--font-workshop); --font-serif:var(--font-workshop); --font-sans:var(--font-workshop); }
 .portal-root .dream-brand { letter-spacing:.16em; }
 .portal-root .dream-enter { border-radius:3px; }
 .portal-root .dream-greeting h1 { font-weight:400; letter-spacing:.055em; }
 .portal-root .dream-clock { font-weight:300; }
-.archive-gallery-shell .archive-gallery-hero { border-bottom:1px solid var(--gallery-line); }
-.archive-gallery-shell .archive-hero-copy h1 { font-weight:400; letter-spacing:.07em; }
-.archive-gallery-shell .archive-hero-portrait { display:flex; align-items:center; justify-content:center; }
-.archive-gallery-shell .archive-hero-portrait > .atelier-drawing { width:min(100%,360px); height:auto; --atelier-paper:var(--gallery-paper); --atelier-wash:var(--gallery-wash); --atelier-blue:var(--gallery-accent); --atelier-violet:var(--gallery-muted); }
-.archive-gallery-shell .archive-primary-button { border-radius:3px; box-shadow:none; }
 /* Only brief interface feedback; no perpetual decorative motion. */
 .atelier-shell :is(.hero-continue,.quick-action,.content-card) { transition:color 160ms,background-color 160ms,border-color 160ms; }
 @media(max-width:1100px) {
@@ -225,9 +220,9 @@ body { font-family:var(--font-workshop); }
 .atelier-first-page { font-size:12px; letter-spacing:.16em; }
 .atelier-shell .settings-page > .character-display-settings { background:none !important; border:0; border-bottom:1px solid var(--atelier-line); }
 .atelier-settings-link { display:grid; width:40px; height:44px; place-items:center; color:var(--atelier-muted); }
-.atelier-settings-link:hover { color:var(--deep-blue); background:#e9eeeb; }
+.atelier-settings-link:hover { color:var(--deep-blue); background:#e7ebf0; }
 .atelier-shell .content-detail-header { background:var(--atelier-paper); }
-.atelier-shell .typed-editor { background:#fcfcf8; }
+.atelier-shell .typed-editor { background:#fbf8f2; }
 .atelier-shell .typed-editor :is(input,textarea,select) { border-radius:2px; }
 .atelier-shell .typed-editor :is(section,article) { border-radius:2px; box-shadow:none; }
 .atelier-shell .work-finalized-actions :is(a,button) { border-radius:2px; }
@@ -271,13 +266,13 @@ body { font-family:var(--font-workshop); }
 .atelier-shell .typed-editor > header > div > span { font-size:9px; letter-spacing:.17em; }
 .atelier-shell .typed-editor { border:0; box-shadow:none; }
 .atelier-shell .record-field-grid label { border-radius:0; background:none; border:0; border-bottom:1px solid var(--atelier-line); }
-.atelier-shell .exhibition-blocks { border-radius:0; background:#eef0ec; }
-.atelier-shell .exhibition-blocks > article { background:#fcfcf8; border:1px solid var(--atelier-line); box-shadow:none; }
+.atelier-shell .exhibition-blocks { border-radius:0; background:#eeeae3; }
+.atelier-shell .exhibition-blocks > article { background:#fbf8f2; border:1px solid var(--atelier-line); box-shadow:none; }
 .atelier-shell .asset-library > nav[aria-label="图片分页"] { display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:16px; margin-top:32px; padding-top:20px; border-top:1px solid var(--atelier-line); font-size:12px; color:var(--atelier-muted); }
 .atelier-shell .asset-library > nav[aria-label="图片分页"] button { min-height:44px; padding:8px 12px; border:1px solid var(--atelier-line); border-radius:2px; }
 .atelier-shell .asset-library > nav[aria-label="图片分页"] button:disabled { opacity:.45; }
 .atelier-shell :is(.common-content-fields,.typed-editor,.content-links-panel) { border-radius:0; box-shadow:none; }
-.atelier-shell .common-content-fields { background:#f0f3ef; border:0; border-top:2px solid #a1b3b7; }
+.atelier-shell .common-content-fields { background:#f1ede6; border:0; border-top:2px solid #a1b3b7; }
 .atelier-shell .common-content-fields :is(input,textarea,button,select) { border-radius:2px; }
 .atelier-shell .common-content-fields h2 { font-weight:400; }
 .atelier-shell .content-links-panel { background:none; border:0; border-top:1px solid #b5a9c3; }
@@ -337,3 +332,14 @@ body { font-family:var(--font-workshop); }
 .content-type-emblem[data-content-emblem=note] { color:#b09970; }
 .content-type-emblem[data-content-emblem=exhibition] { color:#94869f; }
 .global-home-button .workshop-sigil > .workshop-logo { width:40px; height:40px; }
+
+/* Shared warm paper and mist-blue atmosphere across workshop surfaces. */
+:root {
+  --workshop-background: radial-gradient(ellipse at 88% 8%, #e3eaf0 0, transparent 48%), linear-gradient(115deg, #f4f0e8, #f6f3ec 60%, #edf0f4);
+}
+.app-shell { background: var(--workshop-background); background-attachment: fixed; }
+.app-shell .home-dashboard { background: transparent; }
+.atelier-shell .workbench { background: transparent; }
+.atelier-shell .global-header { background: linear-gradient(110deg, #f4f0e8f5, #e8edf3f5); }
+
+.app-shell .page-shell { background: transparent; }
