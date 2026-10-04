@@ -1,10 +1,11 @@
 import { FileDown, FilePlus2 } from "lucide-react";
 import { HOME_DEMO_COPY } from "@/components/home/demo-data";
+import { CharacterIllustration } from "@/components/theme/CharacterIllustration";
 
 export function EmptyState({ onNewWork, onImportMarkdown }: { onNewWork: () => void; onImportMarkdown: () => void }) {
   return (
     <section className="home-empty-state" data-character-theme="noval" aria-labelledby="home-empty-title">
-      <span className="atelier-first-page" aria-hidden="true"><b>00</b><i />起笔之前</span>
+      <CharacterIllustration character="noval" variant="empty" placement="left" size="md" fade />
       <div>
         <p className="home-eyebrow">YOUR FIRST PAGE</p>
         <h2 id="home-empty-title">{HOME_DEMO_COPY.emptyTitle}</h2>

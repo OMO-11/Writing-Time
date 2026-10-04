@@ -298,3 +298,32 @@ body { font-family:var(--font-workshop); }
 .home-book-empty a { display:inline-flex; gap:12px; align-items:center; min-height:44px; margin-top:12px; font-size:13px; }
 .atelier-shell .home-module-flow > .recent-works { margin-top:8px; }
 @media(max-width:767px) { .home-book-entry strong { font-size:20px; } .home-book-entry { column-gap:12px; } }
+/* Review corrections: shared headings, accurate companion heraldry, visible actions. */
+.companion-emblem { display:block; flex:none; width:100px; height:100px; color:#718e9e; pointer-events:none; }
+.global-home-button .workshop-sigil { clip-path:none; background:none; border:0; }
+.global-home-button .workshop-sigil > .companion-emblem { width:40px; height:40px; }
+.atelier-shell .atelier-title-band { max-width:1240px; min-height:196px; padding:32px 16px; }
+.atelier-shell .atelier-title-band h1 { font-size:28px; letter-spacing:.025em; }
+.atelier-title-band .eyebrow { font-size:11px; letter-spacing:.08em; }
+.atelier-title-band > .companion-emblem { width:112px; height:112px; margin-right:12px; }
+.content-rail-emblem { width:100px; height:100px; margin:0 auto 26px; }
+.atelier-shell .content-card { padding-right:56px; }
+.content-card-emblem { position:absolute; right:12px; top:72px; width:36px; height:48px; opacity:.8; }
+.content-card-actions { position:relative; z-index:3; display:flex; justify-content:flex-end; margin-top:12px; border-top:1px solid var(--atelier-line); }
+.content-card-actions button { display:flex; gap:6px; align-items:center; min-height:44px; color:#865e61; font-size:12px; padding:6px 0 0 12px; }
+.content-card-actions button:disabled { color:#79838a; cursor:not-allowed; }
+.content-card .content-collect-link { position:relative; z-index:3; }
+.atelier-shell .character-empty-state { overflow:hidden; gap:28px; }
+.atelier-shell .character-empty-state > .character-illustration { width:200px; height:260px; flex:none; }
+.atelier-shell .settings-page > .character-display-settings { grid-template-columns:42px minmax(0,1fr) 200px; }
+.atelier-shell .character-display-settings > .character-illustration { width:200px; height:280px; margin:0; }
+@media(max-width:767px) {
+  .atelier-shell .atelier-title-band { padding:28px 18px; min-height:180px; }
+  .atelier-title-band > .companion-emblem { width:68px; height:90px; margin:0; }
+  .content-rail-emblem { display:none; }
+  .atelier-shell .character-empty-state > .character-illustration { width:160px; height:200px; align-self:center; }
+  .atelier-shell .settings-page > .character-display-settings { grid-template-columns:24px minmax(0,1fr); }
+  .atelier-shell .character-display-settings > .character-illustration { grid-column:2; justify-self:end; height:160px; width:125px; }
+}
+.atelier-shell .settings-page > section:before { display:none; }
+.home-book-tab > .companion-emblem { width:32px; height:44px; }

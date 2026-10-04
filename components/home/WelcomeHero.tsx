@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { ArrowRight, BookOpenText, Images } from "lucide-react";
-import { AtelierDrawing } from "@/components/ui/AtelierDrawing";
+import { HOME_DEMO_COPY } from "@/components/home/demo-data";
+import { CharacterBadge } from "@/components/theme/CharacterBadge";
+import { CharacterIllustration } from "@/components/theme/CharacterIllustration";
 import type { WorkRecord } from "@/types/workshop";
 
 interface WelcomeHeroProps {
@@ -12,12 +14,12 @@ interface WelcomeHeroProps {
 
 export function WelcomeHero({ workCount, imageCount, recentWork, onCreateWork }: WelcomeHeroProps) {
   return (
-    <section className="welcome-hero atelier-welcome" aria-labelledby="welcome-title" data-character-theme="balanced">
+    <section className="welcome-hero decorative-panel" aria-labelledby="welcome-title" data-character-theme="balanced">
       <span aria-hidden="true" />
       <div className="welcome-hero-copy">
-        <p className="home-eyebrow">幻想工坊 / 日常手记</p>
-        <h1 id="welcome-title">在微光里，<br />续写你的世界。</h1>
-        <p className="welcome-description">写下一段故事，留住一次发现。让尚未成形的想象，慢慢拥有自己的轮廓。</p>
+        <p className="home-eyebrow">{HOME_DEMO_COPY.eyebrow}</p>
+        <h1 id="welcome-title">今天也一起看看，这个世界还有什么新的故事吧。</h1>
+        <p className="welcome-description">{HOME_DEMO_COPY.description}</p>
 
         <dl className="welcome-stats" aria-label="本地工坊统计">
           <div><BookOpenText aria-hidden="true" size={16} /><dt>作品</dt><dd>{workCount}</dd></div>
@@ -35,9 +37,9 @@ export function WelcomeHero({ workCount, imageCount, recentWork, onCreateWork }:
             <ArrowRight aria-hidden="true" size={19} />
           </button>
         )}
-        <p className="atelier-hero-note">文字 · 图像 · 世界设定</p>
+        <CharacterBadge character="noval" label="诺瓦尔 · 今日同行" />
       </div>
-      <figure className="atelier-observatory"><AtelierDrawing motif="observatory" /><figcaption><span>01 / 观测手记</span><i />每一个世界，始于一次发现。</figcaption></figure>
+      <CharacterIllustration character="noval" variant="welcome" placement="right" size="lg" fade priority />
     </section>
   );
 }

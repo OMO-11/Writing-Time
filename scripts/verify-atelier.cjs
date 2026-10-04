@@ -15,7 +15,7 @@ const base = process.env.BASE_URL || 'http://localhost:3101';
     for (const route of ['workshop','library','gallery','search','settings','workbench','projects','archive-gallery']) {
       await page.goto(`${base}/${route}`);
       await page.locator('main').first().waitFor();
-      if(route === 'workshop') await page.getByRole('heading',{name:/在微光里/}).waitFor();
+      if(route === 'workshop') await page.locator('#welcome-title').waitFor();
       if(route === 'workbench') await page.waitForFunction(()=>document.querySelector('.editor-title-field input')?.disabled === false && document.querySelector('.cm-content'));
       await page.evaluate(()=>document.fonts.ready);
       for (const width of [1440,768,390,320]) {

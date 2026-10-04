@@ -50,7 +50,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   }, [flushSave, router, setCommandPaletteOpen]);
 
   return (
-    <CharacterThemeProvider><div className="app-shell atelier-shell" data-surface={pathname.split("/")[1] || "workshop"}>
+    <CharacterThemeProvider><div className={`app-shell${pathname === "/workshop" ? "" : " atelier-shell"}`} data-surface={pathname.split("/")[1] || "workshop"}>
       <a className="skip-link" href="#app-content">跳到主要内容</a>
       <GlobalHeader />
       <div id="app-content" className="app-shell-content" tabIndex={-1}>{children}</div>

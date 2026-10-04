@@ -5,6 +5,7 @@ import { ArrowDown, ArrowRight, ArrowUp, Eye, EyeOff, Image as ImageIcon, Send, 
 import { useState } from "react";
 import { ContentIcon } from "@/components/content/ContentIcon";
 import { CharacterBadge } from "@/components/theme/CharacterBadge";
+import { CompanionEmblem } from "@/components/ui/CompanionEmblem";
 import { BlobImage } from "@/components/ui/BlobImage";
 import { getContentHref } from "@/lib/content-registry";
 import { createContent, saveContent } from "@/lib/content-service";
@@ -36,7 +37,7 @@ export function QuickCapture({ onSaved }: { onSaved?: (message: string) => void 
 export function RecentBook({ book }: { book?: BookRecord }) {
   const entries = book?.chapters.reduce((total, chapter) => total + chapter.workIds.length, 0) ?? 0;
   return <section className="home-module recent-book-module"><header><div><p className="home-eyebrow">ON THE BINDING DESK</p><h2>最近编订</h2></div><Link href="/projects">全部书籍 <ArrowRight aria-hidden="true" size={15} /></Link></header>
-    {book ? <Link className="home-book-entry" href="/projects"><span className="home-book-tab" aria-hidden="true">01</span><div><strong>{book.title}</strong><p>{book.chapters.length} 章 · {entries} 篇定稿</p><small>最近修改 · {new Intl.DateTimeFormat("zh-CN", { month: "long", day: "numeric" }).format(book.updatedAt)}</small></div><ArrowRight size={18} aria-hidden="true" /><span className="home-book-action">继续编订</span></Link> : <div className="home-book-empty"><p>把完成的篇章，慢慢编成一本书。</p><Link href="/projects">开启第一本书 <ArrowRight size={15} aria-hidden="true" /></Link></div>}
+    {book ? <Link className="home-book-entry" href="/projects"><span className="home-book-tab" aria-hidden="true"><CompanionEmblem variant="blossom" /></span><div><strong>{book.title}</strong><p>{book.chapters.length} 章 · {entries} 篇定稿</p><small>最近修改 · {new Intl.DateTimeFormat("zh-CN", { month: "long", day: "numeric" }).format(book.updatedAt)}</small></div><ArrowRight size={18} aria-hidden="true" /><span className="home-book-action">继续编订</span></Link> : <div className="home-book-empty"><p>把完成的篇章，慢慢编成一本书。</p><Link href="/projects">开启第一本书 <ArrowRight size={15} aria-hidden="true" /></Link></div>}
   </section>;
 }
 

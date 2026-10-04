@@ -29,7 +29,7 @@ try {
  assert.ok((await p.locator('.home-book-entry').innerText()).includes('1 章 · 0 篇定稿'));
  for(const width of [1440,768,390,320]) {await p.setViewportSize({width,height:1000});assert.equal(await p.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);if(width===1440||width===390) await p.screenshot({path:`${out}/home-${width}.png`,fullPage:true});}
  await p.locator('.home-book-entry').click();await p.getByRole('heading',{name:'最新编订的书',exact:true}).waitFor();
- await p.goto(base+'/workshop');await p.getByText('定制主页模块',{exact:true}).click();await p.getByRole('button',{name:'隐藏最近编订',exact:true}).click();await p.reload();await p.getByRole('heading',{name:/在微光里/}).waitFor();
+ await p.goto(base+'/workshop');await p.getByText('定制主页模块',{exact:true}).click();await p.getByRole('button',{name:'隐藏最近编订',exact:true}).click();await p.reload();await p.locator('#welcome-title').waitFor();
  await p.getByText('定制主页模块',{exact:true}).click();await p.getByRole('button',{name:'显示最近编订',exact:true}).waitFor();assert.equal(await p.locator('.recent-book-module').count(),0);await p.getByRole('button',{name:'显示最近编订',exact:true}).click();await p.locator('.home-book-entry').waitFor();
  await p.getByRole('button',{name:/新建文章/}).click();await p.waitForURL('**/workbench?work=*');await p.getByRole('textbox',{name:'作品标题',exact:true}).fill('仍在书写的草稿');
  await p.getByRole('link',{name:'保存并返回 Fantasy Workshop 首页',exact:true}).click();await p.waitForURL('**/workshop');await p.getByRole('link',{name:'继续编辑',exact:true}).waitFor();assert.match(await p.locator('.hero-continue').getAttribute('href'),/^\/workbench\?work=/);

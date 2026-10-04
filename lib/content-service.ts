@@ -256,3 +256,31 @@ export async function updateImageRecord(image: ImageRecord) {
   await db.contents.put({ ...imageContentFromRecord(image), favorite: previous?.favorite ?? false });
   await rebuildReferencesFor({ ...imageContentFromRecord(image), favorite: previous?.favorite ?? false });
 }
+
+/** Delete an unreferenced workspace item and its backing record atomically. */
+export async function deleteWorkspaceContent(id: string, expectedUpdatedAt: number) {
+  await db.transaction("rw", [db.contents, db.works, db.images, db.collections, db.books, db.contentReferences, db.editorSessions, db.recoverySnapshots], async () => {
+    const content = await db.contents.get(id);
+    if (!content) return;
+    if (content.updatedAt !== expectedUpdatedAt) throw new Error("内容刚刚发生修改，请关闭弹窗并重新确认删除。");
+    const work = await db.works.get(id);
+    if ((content.type === "article" && content.payload.finalizedAt) || work?.finalizedAt) throw new Error("已定稿作品受只读保护，不能删除。");
+    await rebuildAllReferences();
+    const incoming = await db.contentReferences.where("targetId").equals(id).filter(ref => ref.sourceId !== id).count();
+    const memberships = await db.contents.filter(item => item.id !== id && item.collectionIds.includes(id)).count();
+    const bookReferences = await db.books.filter(book => book.chapters.some(chapter => chapter.workIds.includes(id))).count();
+    const collectionReferences = await db.collections.filter(collection => collection.id !== id && collection.workIds.includes(id)).count();
+    const imageReferences = content.type === "image" ? await db.works.filter(item => item.coverImageId === id || item.markdown.includes("fw-asset://" + id)).count() : 0;
+    if (incoming || memberships || bookReferences || collectionReferences || imageReferences) throw new Error("此内容仍被其他条目、合集或书籍引用。请先解除引用，再删除。");
+    if (content.type === "article") {
+      await db.works.delete(id);
+      await db.editorSessions.delete(id);
+      await db.recoverySnapshots.where("workId").equals(id).delete();
+    }
+    if (content.type === "image") await db.images.delete(content.payload.assetId || id);
+    if (content.type === "collection") await db.collections.delete(id);
+    await db.contents.delete(id);
+    await db.contentReferences.where("sourceId").equals(id).delete();
+    await db.contentReferences.where("targetId").equals(id).delete();
+  });
+}
