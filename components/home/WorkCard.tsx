@@ -24,7 +24,7 @@ export function WorkCard({ work, cover, index = 0 }: { work: WorkRecord; cover?:
       </Link>
       <div className="work-card-body">
         <div className="work-card-topline">
-          <span className={`work-status ${status.className}`}>{status.label}</span>
+          <span className={`work-status ${status.className}`}>{work.finalizedAt ? "已定稿 · 只读" : status.label}</span>
           <time dateTime={new Date(work.updatedAt).toISOString()}>{formatHomeDate(work.updatedAt)}</time>
         </div>
         <h3><Link href={`/work/${work.slug}`}>{work.title}</Link></h3>
@@ -34,7 +34,7 @@ export function WorkCard({ work, cover, index = 0 }: { work: WorkRecord; cover?:
             {work.tags.slice(0, 2).map((tag) => <span key={tag}>#{tag}</span>)}
             {work.tags.length === 0 && <span>#未分类</span>}
           </div>
-          <Link href={`/workbench?work=${work.id}`} aria-label={`编辑《${work.title}》`}><ArrowUpRight aria-hidden="true" size={17} /></Link>
+          <Link href={work.finalizedAt ? `/work/${work.slug}` : `/workbench?work=${work.id}`} aria-label={`${work.finalizedAt ? "阅读" : "编辑"}《${work.title}》`}><ArrowUpRight aria-hidden="true" size={17} /></Link>
         </footer>
       </div>
     </article>

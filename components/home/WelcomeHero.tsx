@@ -25,8 +25,8 @@ export function WelcomeHero({ workCount, imageCount, recentWork, onCreateWork }:
         </dl>
 
         {recentWork ? (
-          <Link className="hero-continue" href={`/workbench?work=${recentWork.id}`}>
-            <span><small>继续创作</small><strong>{recentWork.title}</strong></span>
+          <Link className="hero-continue" href={recentWork.finalizedAt ? `/work/${recentWork.slug}` : `/workbench?work=${recentWork.id}`}>
+            <span><small>{recentWork.finalizedAt ? "阅读定稿" : "继续创作"}</small><strong>{recentWork.title}</strong></span>
             <ArrowRight aria-hidden="true" size={19} />
           </Link>
         ) : (

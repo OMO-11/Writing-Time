@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowDown, ArrowRight, ArrowUp, Eye, EyeOff, FolderKanban, Image as ImageIcon, Send, Settings2, Sparkles, Star } from "lucide-react";
+import { ArrowDown, ArrowRight, ArrowUp, Eye, EyeOff, Image as ImageIcon, Send, Settings2, Sparkles, Star } from "lucide-react";
 import { useState } from "react";
 import { ContentIcon } from "@/components/content/ContentIcon";
 import { CharacterBadge } from "@/components/theme/CharacterBadge";
@@ -9,14 +9,14 @@ import { BlobImage } from "@/components/ui/BlobImage";
 import { getContentHref } from "@/lib/content-registry";
 import { createContent, saveContent } from "@/lib/content-service";
 import type { ActivityRecord, ContentItem } from "@/types/content";
-import type { ImageRecord } from "@/types/workshop";
+import type { BookRecord, ImageRecord } from "@/types/workshop";
 
 export type HomeModuleKey = "continue" | "quick-capture" | "active-projects" | "recent-works" | "recent-images" | "unsorted" | "favorites" | "daily-activity";
 export interface HomeModuleSetting { key: HomeModuleKey; visible: boolean }
 export const DEFAULT_HOME_MODULES: HomeModuleSetting[] = [
   { key: "continue", visible: true }, { key: "quick-capture", visible: true }, { key: "active-projects", visible: true }, { key: "recent-works", visible: true }, { key: "recent-images", visible: true }, { key: "unsorted", visible: true }, { key: "favorites", visible: true }, { key: "daily-activity", visible: true },
 ];
-const labels: Record<HomeModuleKey, string> = { continue: "继续编辑", "quick-capture": "快速记录", "active-projects": "活跃项目", "recent-works": "最近作品", "recent-images": "最近图片", unsorted: "待整理", favorites: "收藏", "daily-activity": "今日活动" };
+const labels: Record<HomeModuleKey, string> = { continue: "最近手稿", "quick-capture": "快速记录", "active-projects": "最近编订", "recent-works": "最近作品", "recent-images": "最近图片", unsorted: "待整理", favorites: "收藏", "daily-activity": "今日活动" };
 
 export function QuickCapture({ onSaved }: { onSaved?: (message: string) => void }) {
   const [text, setText] = useState("");
@@ -33,8 +33,11 @@ export function QuickCapture({ onSaved }: { onSaved?: (message: string) => void 
   return <section className="home-module quick-capture-module" data-character-theme="noval"><header><div><p className="home-eyebrow">QUICK CAPTURE</p><h2>快速记录</h2></div><CharacterBadge character="noval" label="新发现" /></header><div><textarea rows={3} value={text} onChange={(event) => setText(event.target.value)} placeholder="一句对白、一个角色动作，或刚刚看见的颜色……" onKeyDown={(event) => { if ((event.ctrlKey || event.metaKey) && event.key === "Enter") void capture(); }} /><button type="button" disabled={!text.trim() || saving} onClick={() => void capture()}><Send aria-hidden="true" size={16} />{saving ? "保存中" : "收进卡片盒"}</button></div><small>Ctrl/Cmd + Enter 保存 · 之后可转换为文章、设定卡或项目任务</small></section>;
 }
 
-export function ActiveProjects({ projects }: { projects: Array<ContentItem<"project">> }) {
-  return <section className="home-module active-projects-module"><header><div><p className="home-eyebrow">ACTIVE PROJECTS</p><h2>活跃项目</h2></div><Link href="/library">全部内容 <ArrowRight aria-hidden="true" size={15} /></Link></header><div>{projects.slice(0, 3).map((project) => <Link href={`/content/${project.id}`} key={project.id}><span><FolderKanban aria-hidden="true" size={18} /></span><div><strong>{project.title}</strong><small>{project.payload.memberContentIds.length} 项内容 · {project.payload.milestones.filter((item) => item.completed).length}/{project.payload.milestones.length} 里程碑</small><i><b style={{ width: `${project.payload.progress}%` }} /></i></div><em>{project.payload.progress}%</em></Link>)}{!projects.length ? <p>创建项目后，可在这里查看进度、看板与最近编辑。</p> : null}</div></section>;
+export function RecentBook({ book }: { book?: BookRecord }) {
+  const entries = book?.chapters.reduce((total, chapter) => total + chapter.workIds.length, 0) ?? 0;
+  return <section className="home-module recent-book-module"><header><div><p className="home-eyebrow">ON THE BINDING DESK</p><h2>最近编订</h2></div><Link href="/projects">全部书籍 <ArrowRight aria-hidden="true" size={15} /></Link></header>
+    {book ? <Link className="home-book-entry" href="/projects"><span className="home-book-tab" aria-hidden="true">01</span><div><strong>{book.title}</strong><p>{book.chapters.length} 章 · {entries} 篇定稿</p><small>最近修改 · {new Intl.DateTimeFormat("zh-CN", { month: "long", day: "numeric" }).format(book.updatedAt)}</small></div><ArrowRight size={18} aria-hidden="true" /><span className="home-book-action">继续编订</span></Link> : <div className="home-book-empty"><p>把完成的篇章，慢慢编成一本书。</p><Link href="/projects">开启第一本书 <ArrowRight size={15} aria-hidden="true" /></Link></div>}
+  </section>;
 }
 
 export function RecentImagesModule({ images }: { images: ImageRecord[] }) {

@@ -284,3 +284,17 @@ body { font-family:var(--font-workshop); }
 .atelier-shell .content-detail-header :is(button,summary,a) { border-radius:2px; }
 .atelier-shell .content-links-panel h2 { font-weight:400; }
 .atelier-shell .typed-editor label > span { font-size:12px; }
+/* Home continuity: one recent binding, distinct from manuscript cards. */
+.atelier-shell .recent-book-module { border-top-color:#b4a6c0; }
+.home-book-entry { display:grid; grid-template-columns:32px minmax(0,1fr) 20px; align-items:center; column-gap:18px; padding:20px 0 8px; color:var(--atelier-ink); }
+.home-book-tab { align-self:start; border-top:2px solid #aaa0b9; padding-top:8px; color:#728995; font-size:13px; font-variant-numeric:tabular-nums; }
+.home-book-entry strong { font-size:22px; font-weight:400; overflow-wrap:anywhere; }
+.home-book-entry p { font-size:13px; color:var(--atelier-muted); margin:12px 0; }
+.home-book-entry small { font-size:11px; color:var(--atelier-muted); }
+.home-book-action { grid-column:2 / -1; border-top:1px solid var(--atelier-line); margin-top:22px; padding-top:12px; font-size:12px; }
+.home-book-entry:hover .home-book-action { color:#405e72; border-color:#9dadb7; }
+.home-book-empty { padding:20px 0; }
+.home-book-empty p { font-size:13px; color:var(--atelier-muted); }
+.home-book-empty a { display:inline-flex; gap:12px; align-items:center; min-height:44px; margin-top:12px; font-size:13px; }
+.atelier-shell .home-module-flow > .recent-works { margin-top:8px; }
+@media(max-width:767px) { .home-book-entry strong { font-size:20px; } .home-book-entry { column-gap:12px; } }

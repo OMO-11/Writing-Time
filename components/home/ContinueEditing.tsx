@@ -19,7 +19,7 @@ export function ContinueEditing({ work, cover }: { work: WorkRecord; cover?: Ima
         )}
       </div>
       <div className="continue-copy">
-        <p className="home-eyebrow">CONTINUE EDITING</p>
+        <p className="home-eyebrow">{work.finalizedAt ? "FINISHED MANUSCRIPT" : "CONTINUE EDITING"}</p>
         <h2 id="continue-title">{work.title}</h2>
         <p className="continue-chapter">{getCurrentChapter(work.markdown)}</p>
         {work.excerptHtml ? <MarkdownExcerpt html={work.excerptHtml} className="continue-excerpt" /> : <p className="continue-excerpt">这篇手稿还没有摘要，回到工坊继续写下第一段吧。</p>}
@@ -28,8 +28,8 @@ export function ContinueEditing({ work, cover }: { work: WorkRecord; cover?: Ima
           <div><dt>更新时间</dt><dd>{formatHomeDate(work.updatedAt)}</dd></div>
           <div><dt>格式</dt><dd><FileText aria-hidden="true" size={13} /> Markdown</dd></div>
         </dl>
-        <Link className="text-action text-action-strong" href={`/workbench?work=${work.id}`}>
-          继续编辑 <ArrowRight aria-hidden="true" size={17} />
+        <Link className="text-action text-action-strong" href={work.finalizedAt ? `/work/${work.slug}` : `/workbench?work=${work.id}`}>
+          {work.finalizedAt ? "阅读定稿" : "继续编辑"} <ArrowRight aria-hidden="true" size={17} />
         </Link>
       </div>
     </section>

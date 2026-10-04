@@ -6,7 +6,7 @@ import type { DragEvent } from "react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ContinueEditing } from "@/components/home/ContinueEditing";
 import { EmptyState } from "@/components/home/EmptyState";
-import { ActiveProjects, DailyActivity, DEFAULT_HOME_MODULES, Favorites, HomeModuleControls, type HomeModuleSetting, QuickCapture, RecentImagesModule, UnsortedItems } from "@/components/home/HomeContentModules";
+import { RecentBook, DailyActivity, DEFAULT_HOME_MODULES, Favorites, HomeModuleControls, type HomeModuleSetting, QuickCapture, RecentImagesModule, UnsortedItems } from "@/components/home/HomeContentModules";
 import { ImportDropOverlay } from "@/components/home/ImportDropOverlay";
 import { QuickActions } from "@/components/home/QuickActions";
 import { RecentWorks } from "@/components/home/RecentWorks";
@@ -14,7 +14,6 @@ import { WelcomeHero } from "@/components/home/WelcomeHero";
 import { createContent } from "@/lib/content-service";
 import { createBlankWork, db, importImageFile } from "@/lib/db";
 import { importMarkdownWork, isMarkdownFile, isSupportedImageFile } from "@/lib/work-import";
-import type { ContentItem } from "@/types/content";
 
 export function HomeDashboard() {
   const router = useRouter();
@@ -26,6 +25,7 @@ export function HomeDashboard() {
   const [modules, setModules] = useState<HomeModuleSetting[]>(DEFAULT_HOME_MODULES);
 
   const works = useLiveQuery(() => db.works.orderBy("updatedAt").reverse().limit(4).toArray(), [], []);
+  const recentBook = useLiveQuery(() => db.books.orderBy("updatedAt").last());
   const workCount = useLiveQuery(() => db.works.count(), [], 0);
   const images = useLiveQuery(() => db.images.orderBy("createdAt").reverse().limit(3).toArray(), [], []);
   const imageCount = useLiveQuery(() => db.images.count(), [], 0);
@@ -111,7 +111,6 @@ export function HomeDashboard() {
     work,
     cover: work.coverImageId ? covers.get(work.coverImageId) : undefined,
   }));
-  const projects = contents.filter((item) => item.type === "project" && item.status === "active").map((item) => item as ContentItem<"project">);
   const unsorted = contents.filter((item) => !item.tags.length && !item.collectionIds.length && item.type !== "collection");
   const favorites = contents.filter((item) => item.favorite);
   const updateModules = (next: HomeModuleSetting[]) => { setModules(next); void db.settings.put({ key: "home-module-layout", value: next }); };
@@ -141,7 +140,7 @@ export function HomeDashboard() {
           {modules.filter((module) => module.visible).map((module) => {
             if (module.key === "continue") return <div key={module.key}>{recentWork ? <ContinueEditing work={recentWork} cover={recentWork.coverImageId ? covers.get(recentWork.coverImageId) : undefined} /> : <EmptyState onNewWork={() => void createWork()} onImportMarkdown={() => markdownInput.current?.click()} />}</div>;
             if (module.key === "quick-capture") return <QuickCapture key={module.key} onSaved={announce} />;
-            if (module.key === "active-projects") return <ActiveProjects key={module.key} projects={projects} />;
+            if (module.key === "active-projects") return <RecentBook key={module.key} book={recentBook} />;
             if (module.key === "recent-works") return <RecentWorks key={module.key} items={recentItems} />;
             if (module.key === "recent-images") return <RecentImagesModule key={module.key} images={images} />;
             if (module.key === "unsorted") return <UnsortedItems key={module.key} items={unsorted} />;
