@@ -55,6 +55,7 @@
 .archive-atmosphere button:hover { color: var(--gallery-ink); background: var(--gallery-inset); }
 .archive-atmosphere button[aria-pressed="true"] { background: var(--gallery-paper); color: var(--gallery-ink); box-shadow: 0 2px 8px var(--gallery-shadow); }
 .archive-atmosphere button[aria-pressed="true"] svg { color: var(--gallery-gold); }
+.archive-atmosphere button[aria-disabled="true"] { cursor: progress; }
 
 .archive-gallery-hero { display: grid; grid-template-columns: 1fr 380px; align-items: center; min-height: 320px; gap: 40px; padding: 20px 5.2% 14px 1.5%; }
 .archive-hero-copy { position: relative; padding: 16px 0; }
@@ -70,10 +71,11 @@
 .archive-hero-portrait { width: 100%; height: 285px; position: relative; isolation: isolate; }
 .archive-hero-portrait::before { content: ""; position: absolute; inset: 18% 8% 0; z-index: -1; background: radial-gradient(ellipse, color-mix(in srgb, var(--gallery-lavender) 60%, transparent), transparent 70%); filter: blur(12px); }
 .archive-portrait-arch { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; opacity: .6; mask-image: linear-gradient(transparent, #000 12%, #000 70%, transparent 100%); }
-.archive-portrait-figure { position: absolute; width: 290px; height: 280px; bottom: 1px; left: 50%; transform: translateX(-50%); mask-image: radial-gradient(ellipse 65% 65% at 50% 40%, #000 55%, #000c 73%, transparent 100%); animation: archive-portrait-appear 300ms ease-out; }
+.archive-portrait-figure { position: absolute; width: 290px; height: 280px; bottom: 1px; left: 50%; transform: translateX(-50%); mask-image: radial-gradient(ellipse 65% 65% at 50% 40%, #000 55%, #000c 73%, transparent 100%); }
 .archive-portrait-figure > img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; mask-image: linear-gradient(#000 74%, #000e 82%, #0007 94%, transparent 100%); }
 .archive-portrait-bleed { filter: blur(6px); opacity: .35; transform: scale(1.025); pointer-events: none; }
 .archive-portrait-character { filter: blur(.2px); }
+.archive-portrait-figure[data-active="false"] { visibility: hidden; }
 .archive-portrait-name { position: absolute; z-index: 1; right: -28px; top: 55%; display: flex; flex-direction: column; gap: 5px; color: var(--gallery-muted); }
 .archive-portrait-name > span { font: italic 19px/1.2 Georgia, serif; letter-spacing: .13em; color: var(--gallery-gold); }
 .archive-portrait-name > small { font-size: 10px; letter-spacing: .12em; }
@@ -164,7 +166,23 @@
 .archive-lightbox-navigation { display: flex; gap: 10px; flex-shrink: 0; }
 .archive-spinner { animation: archive-spin 1s linear infinite; }
 @keyframes archive-spin { to { transform: rotate(360deg); } }
-@keyframes archive-portrait-appear { from { opacity: 0; } to { opacity: 1; } }
+
+/* Native old/new page snapshots remain opaque: the new real theme opens as a circle.
+   Scope these rules to this interaction so route transitions keep their own behavior. */
+html.gallery-theme-transition::view-transition-group(root),
+html.gallery-theme-transition::view-transition-old(root),
+html.gallery-theme-transition::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+html.gallery-theme-transition::view-transition-old(root) { z-index: 1; }
+html.gallery-theme-transition::view-transition-new(root) { z-index: 2; }
+html.gallery-theme-transition::view-transition-image-pair(root) { isolation: isolate; }
+html.gallery-theme-transition .archive-gallery-shell,
+html.gallery-theme-transition .archive-gallery-shell * {
+  transition: none !important;
+  animation: none !important;
+}
 
 @media (min-width: 1600px) { .archive-gallery-grid { gap: 30px; } .archive-card-image { aspect-ratio: 1.25; } }
 @media (max-width: 1180px) {

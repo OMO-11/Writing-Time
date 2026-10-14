@@ -7,9 +7,9 @@ import { ArrowLeft, ArrowRight, Check, ChevronLeft, ChevronRight, Flower2, Image
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { db, importImageFile } from "@/lib/db";
 import type { ImageRecord } from "@/types/workshop";
+import { useGalleryAtmosphere } from "./useGalleryAtmosphere";
 
 const GALLERY_SETTING_KEY = "archive-gallery-image-ids";
-const ATMOSPHERE_SETTING_KEY = "archive-gallery-atmosphere";
 
 function GalleryImage({ image, thumbnail = false }: { image: ImageRecord; thumbnail?: boolean }) {
   const imageRef = useRef<HTMLImageElement>(null);
@@ -72,8 +72,6 @@ export function ArchiveGallery() {
     ]);
     return { images, ids: Array.isArray(membership?.value) ? membership.value as string[] : images.map((image) => image.id) };
   }, []);
-  const atmosphereSetting = useLiveQuery(() => db.settings.get(ATMOSPHERE_SETTING_KEY), []);
-  const atmosphere = atmosphereSetting?.value === "night" ? "night" : "morning";
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [importing, setImporting] = useState(false);
   const [notice, setNotice] = useState("");
@@ -85,8 +83,6 @@ export function ArchiveGallery() {
   }, [data]);
   const selected = galleryImages.find((image) => image.id === selectedId) ?? galleryImages[0];
   const selectedIndex = selected ? galleryImages.indexOf(selected) : 0;
-  const isNight = atmosphere === "night";
-  const portrait = isNight ? "/assets/gallery/eden-gallery-portrait.png" : "/assets/gallery/noval-gallery-portrait.png";
 
   useEffect(() => () => { if (noticeTimer.current) clearTimeout(noticeTimer.current); }, []);
   const announce = useCallback((message: string) => {
@@ -95,10 +91,8 @@ export function ArchiveGallery() {
     noticeTimer.current = setTimeout(() => setNotice(""), 4500);
   }, []);
 
-  const setAtmosphere = async (value: "morning" | "night") => {
-    try { await db.settings.put({ key: ATMOSPHERE_SETTING_KEY, value }); }
-    catch { announce("展示偏好未能保存，请重试。"); }
-  };
+  const { atmosphere, switching, changeAtmosphere } = useGalleryAtmosphere(() => announce("展示偏好未能保存，请重试。"));
+  const isNight = atmosphere === "night";
 
   const importFiles = async (files: FileList | File[]) => {
     if (!data || importInFlight.current) return;
@@ -149,9 +143,9 @@ export function ArchiveGallery() {
       <div className="archive-gallery-wrap">
         <header className="archive-gallery-toolbar">
           <Link href="/" className="archive-gallery-back" aria-label="返回地图"><ArrowLeft size={16} /><span>WRITING TIME<small>返回地图</small></span></Link>
-          <div className="archive-atmosphere" role="group" aria-label="画廊氛围">
-            <button type="button" aria-pressed={!isNight} onClick={() => void setAtmosphere("morning")}><Flower2 size={16} />晨光<span>诺瓦尔</span></button>
-            <button type="button" aria-pressed={isNight} onClick={() => void setAtmosphere("night")}><MoonStar size={16} />星夜<span>伊登</span></button>
+          <div className="archive-atmosphere" role="group" aria-label="画廊氛围" aria-busy={switching}>
+            <button type="button" aria-pressed={!isNight} aria-disabled={switching} onClick={(event) => void changeAtmosphere("morning", event)}><Flower2 size={16} />晨光<span>诺瓦尔</span></button>
+            <button type="button" aria-pressed={isNight} aria-disabled={switching} onClick={(event) => void changeAtmosphere("night", event)}><MoonStar size={16} />星夜<span>伊登</span></button>
           </div>
         </header>
 
@@ -164,10 +158,13 @@ export function ArchiveGallery() {
           </div>
           <div className="archive-hero-portrait">
             <Image className="archive-portrait-arch" src="/assets/gallery/celestial-arch.svg" alt="" width={380} height={340} />
-            <div key={atmosphere} className="archive-portrait-figure">
-              <Image className="archive-portrait-bleed" src={portrait} alt="" aria-hidden="true" width={1024} height={1024} sizes="(max-width: 600px) 150px, 290px" draggable={false} />
-              <Image className="archive-portrait-character" src={portrait} alt={isNight ? "伊登将画片轻轻收进相册，珍藏旅途中的片刻" : "诺瓦尔展示手中的风景画片，温柔地看向观众"} width={1024} height={1024} sizes="(max-width: 600px) 150px, 290px" draggable={false} priority />
-            </div>
+            {(["morning", "night"] as const).map((theme) => {
+              const portrait = `/assets/gallery/${theme === "night" ? "eden" : "noval"}-gallery-portrait.png`;
+              return <div key={theme} className="archive-portrait-figure" data-portrait={theme} data-active={atmosphere === theme} aria-hidden={atmosphere !== theme}>
+                <Image className="archive-portrait-bleed" src={portrait} alt="" aria-hidden="true" width={1024} height={1024} sizes="(max-width: 600px) 150px, 290px" draggable={false} loading="eager" />
+                <Image className="archive-portrait-character" src={portrait} alt={theme === "night" ? "伊登将画片轻轻收进相册，珍藏旅途中的片刻" : "诺瓦尔展示手中的风景画片，温柔地看向观众"} width={1024} height={1024} sizes="(max-width: 600px) 150px, 290px" draggable={false} priority />
+              </div>;
+            })}
             <div className="archive-portrait-name"><span>{isNight ? "EDEN" : "NOVAL"}</span><small>{isNight ? "星夜的珍藏者" : "晨光的记录者"}</small></div>
           </div>
         </section>
